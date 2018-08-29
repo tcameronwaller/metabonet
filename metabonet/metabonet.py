@@ -134,6 +134,25 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def evaluate_arguments(arguments=None):
+    """
+    Reads and organizes source information from file
+
+    arguments:
+
+        arguments (object): arguments from terminal
+
+    returns:
+        (bool): whether arguments are adequate
+
+    raises:
+
+    """
+
+
+    # TODO: Make sure necessary input files are available, etc...
+    pass
+
 ###############################################################################
 # Procedure
 
@@ -153,7 +172,14 @@ def execute_procedure():
     # Parse arguments from terminal.
     arguments = parse_arguments()
     # Evaluate arguments.
-    # Make sure necessary input files are available, etc...
+    match = evaluate_arguments(arguments=arguments)
+    if match:
+        # Execute procedure.
+        pass
+    else:
+        # Display explanatory error message.
+        # TODO: especially explain the necessary input files...
+        pass
 
     pass
 
