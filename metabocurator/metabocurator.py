@@ -3,7 +3,7 @@ Module to accept parameters from user and execute procedures.
 
 Title:
 
-    metabonet
+    metabocurator
 
 Imports:
 
@@ -102,11 +102,11 @@ def parse_arguments():
     )
     parser.add_argument(
         "-s", "--source", dest="source", type=str, required=True,
-        help="Directory of source files."
+        help="Directory of input files."
     )
     parser.add_argument(
         "-d", "--destination", dest="destination", type=str, required=True,
-        help="Directory for product files."
+        help="Directory for output files."
     )
     #parser.add_argument(
     #    "-m", "--method", dest="method", type=str,

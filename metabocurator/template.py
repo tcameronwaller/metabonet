@@ -1,9 +1,9 @@
 """
-Module to accept parameters from user and execute procedures.
+Module to provide template of common structure of modules.
 
 Title:
 
-    metabonet
+    template
 
 Imports:
 
@@ -11,6 +11,7 @@ Imports:
     sys: Package to interact with the interpreter.
     shutil: Package to perform file operations.
     importlib: Package to import packages and modules.
+    argparse: Package to interpret user parameters from terminal.
     csv: Package to organize information in text.
     copy: Package to copy objects.
     pickle: Package to preserve information.
@@ -71,8 +72,6 @@ License:
 
 # Standard
 
-import argparse
-
 # Relevant
 
 # Custom
@@ -82,76 +81,6 @@ import argparse
 
 ###############################################################################
 # Functionality
-
-def parse_arguments():
-    """
-    Reads and organizes source information from file.
-
-    arguments:
-
-    returns:
-        (object): arguments from terminal
-
-    raises:
-
-    """
-
-    # Define arguments.
-    parser = argparse.ArgumentParser(
-        description="Define custom networks from metabolic models."
-    )
-    parser.add_argument(
-        "-s", "--source", dest="source", type=str, required=True,
-        help="Directory of source files."
-    )
-    parser.add_argument(
-        "-d", "--destination", dest="destination", type=str, required=True,
-        help="Directory for product files."
-    )
-    #parser.add_argument(
-    #    "-m", "--method", dest="method", type=str,
-    #    choices=["omission", "replication"], default="omission",
-    #    help="Method for simplification (default: %(default)s)."
-    #)
-    method = parser.add_mutually_exclusive_group(required=True)
-    method.add_argument(
-        "-o", "--omission", dest="omission", action="store_true",
-        help="Simplify by omission method."
-    )
-    method.add_argument(
-        "-r", "--replication", dest="replication", action="store_true",
-        help="Simplify by replication method."
-    )
-    parser.add_argument(
-        "-c", "--compartmentalize", dest="compartmentalization",
-        action="store_true", help="Compartmentalize metabolites."
-    )
-    parser.add_argument(
-        "-x", "--clean", dest="clean", action="store_true",
-        help="Clean intermediate files."
-    )
-    # Parse arguments.
-    return parser.parse_args()
-
-
-def evaluate_source(directory=None):
-    """
-    Evaluates source files.
-
-    arguments:
-
-        directory (object): arguments from terminal
-
-    returns:
-        (bool): whether arguments are adequate
-
-    raises:
-
-    """
-
-
-    # TODO: Make sure necessary input files are available, etc...
-    pass
 
 ###############################################################################
 # Procedure
@@ -168,18 +97,6 @@ def execute_procedure():
     raises:
 
     """
-
-    # Parse arguments from terminal.
-    arguments = parse_arguments()
-    # Evaluate arguments *** input files.
-    match = evaluate_source(directory=arguments.source)
-    if match:
-        # Execute procedure.
-        pass
-    else:
-        # Display explanatory error message.
-        # TODO: especially explain the necessary input files...
-        pass
 
     pass
 

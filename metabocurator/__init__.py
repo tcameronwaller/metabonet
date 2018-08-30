@@ -2,13 +2,13 @@
 Package to define custom networks from metabolic models.
 
 Title:
-    metabonet
+    metabocurator
 
 Subpackages:
 
 Modules:
 
-    utility: miscellaneous functionality.
+    metabocurator: ...
 
 
 """
@@ -28,8 +28,8 @@ Modules:
 
 # Custom
 
-import metabonet
-#import utility
+import metabocurator
+import utility
 
 #dir()
 #importlib.reload()
