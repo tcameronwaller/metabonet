@@ -77,6 +77,8 @@ import argparse
 
 # Custom
 
+import reconciliation
+
 #dir()
 #importlib.reload()
 
@@ -85,46 +87,37 @@ import argparse
 
 def parse_arguments():
     """
-    Reads and organizes source information from file.
+    Defines and interprets arguments from terminal.
 
     arguments:
 
+    raises:
+
     returns:
         (object): arguments from terminal
-
-    raises:
 
     """
 
     # Define arguments.
     parser = argparse.ArgumentParser(
-        description="Define custom networks from metabolic models."
+        description="Curate model of metabolism for definition of networks."
     )
     parser.add_argument(
         "-s", "--source", dest="source", type=str, required=True,
-        help="Directory of input files."
+        help="Directory of source files."
     )
     parser.add_argument(
         "-d", "--destination", dest="destination", type=str, required=True,
-        help="Directory for output files."
+        help="Directory for product files."
     )
-    #parser.add_argument(
-    #    "-m", "--method", dest="method", type=str,
-    #    choices=["omission", "replication"], default="omission",
-    #    help="Method for simplification (default: %(default)s)."
-    #)
-    method = parser.add_mutually_exclusive_group(required=True)
-    method.add_argument(
-        "-o", "--omission", dest="omission", action="store_true",
-        help="Simplify by omission method."
+    procedure = parser.add_mutually_exclusive_group(required=True)
+    procedure.add_argument(
+        "-r", "--reconciliation", dest="reconciliation", action="store_true",
+        help="Reconcile model to MetaNetX."
     )
-    method.add_argument(
-        "-r", "--replication", dest="replication", action="store_true",
-        help="Simplify by replication method."
-    )
-    parser.add_argument(
-        "-c", "--compartmentalize", dest="compartmentalization",
-        action="store_true", help="Compartmentalize metabolites."
+    procedure.add_argument(
+        "-a", "--adaptation", dest="adaptation", action="store_true",
+        help="Adapt model from MetaNetX."
     )
     parser.add_argument(
         "-x", "--clean", dest="clean", action="store_true",
@@ -142,16 +135,15 @@ def evaluate_source(directory=None):
 
         directory (object): arguments from terminal
 
+    raises:
+
     returns:
         (bool): whether arguments are adequate
 
-    raises:
-
     """
 
-
     # TODO: Make sure necessary input files are available, etc...
-    pass
+    return True
 
 ###############################################################################
 # Procedure
@@ -163,23 +155,24 @@ def execute_procedure():
 
     arguments:
 
-    returns:
-
     raises:
+
+    returns:
 
     """
 
     # Parse arguments from terminal.
     arguments = parse_arguments()
-    # Evaluate arguments *** input files.
-    match = evaluate_source(directory=arguments.source)
-    if match:
-        # Execute procedure.
+    # Execute procedure.
+    if arguments.reconciliation:
+        reconciliation.execute_procedure(
+            source=arguments.source,
+            destination=arguments.destination,
+            clean=arguments.clean
+        )
+    elif arguments.adaptation:
         pass
-    else:
-        # Display explanatory error message.
-        # TODO: especially explain the necessary input files...
-        pass
+
 
     pass
 

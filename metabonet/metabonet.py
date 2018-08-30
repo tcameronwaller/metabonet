@@ -85,7 +85,7 @@ import argparse
 
 def parse_arguments():
     """
-    Reads and organizes source information from file.
+    Defines and interprets arguments from terminal.
 
     arguments:
 

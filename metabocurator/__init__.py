@@ -29,6 +29,7 @@ Modules:
 # Custom
 
 import metabocurator
+import reconciliation
 import utility
 
 #dir()

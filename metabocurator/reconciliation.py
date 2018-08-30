@@ -372,12 +372,26 @@ def write_product(content=None):
 # Procedure
 
 
-def main():
+def execute_procedure(source=None, destination=None, clean=None):
     """
-    This function defines the main activity of the module.
+    Function to execute module's main behavior.
+
+    arguments:
+        source (str): directory of source files
+        destination (str): directory for product files
+        clean (bool): whether to remove intermediate files
+
+    returns:
+
+    raises:
+
     """
 
+    print("Executing reconciliation procedure...")
+
     # Read source information from file
+
+    # TODO: Adapt this to pull in multiple files from the specified directory.
     source = read_source()
     # Correct content
     content_compartment = change_model_compartment(content=source["content"])
@@ -389,7 +403,3 @@ def main():
     )
     #Write product content to file
     write_product(content=content_identifier)
-
-
-if (__name__ == "__main__"):
-    main()
