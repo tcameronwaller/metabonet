@@ -72,6 +72,7 @@ License:
 # Standard
 
 import argparse
+import textwrap
 
 # Relevant
 
@@ -100,7 +101,41 @@ def parse_arguments():
 
     # Define arguments.
     parser = argparse.ArgumentParser(
-        description="Curate model of metabolism for definition of networks."
+        description=textwrap.dedent("""\
+            --------------------------------------------------
+
+            Curate model of metabolism for definition of networks.
+
+            --------------------------------------------------
+        """),
+        epilog=textwrap.dedent("""\
+
+            --------------------------------------------------
+
+            reconciliation procedure
+
+            source
+            1. model of human metabolism in
+               Systems Biology Markup Language (SBML) format
+            2. curation information about metabolites in
+               text table with tab delimiters
+
+            product
+            ...
+
+            --------------------------------------------------
+
+            adaptation procedure
+
+            source
+            ...
+
+            product
+            ...
+
+            --------------------------------------------------
+        """),
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
         "-o", "--origin", dest="origin", type=str, required=True,

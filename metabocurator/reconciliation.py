@@ -107,7 +107,7 @@ def read_source(directory=None):
 
     """
 
-    # Specify directories and files
+    # Specify directories and files.
     path_model = os.path.join(directory, "recon2m2.xml")
     path_metabolites = os.path.join(
         directory, "reconciliation_metabolites.tsv"
@@ -115,74 +115,89 @@ def read_source(directory=None):
     #path_reactions = os.path.join(
     #    directory, "reconciliation_reactions.tsv"
     #)
-    # Read information from file
-    model = et.parse(path_model)
+    # Read information from file.
+    content = et.parse(path_model)
     curation_metabolites = utility.read_file_table(
         path_file=path_metabolites,
         names=None,
         delimiter="\t"
     )
-    # Compile and return information
+    # Compile and return information.
     return {
-        "model": model,
+        "content": content,
         "curation_metabolites": curation_metabolites
     }
 
 
-def remove_model_identifier_prefix(content=None):
+def copy_interpret_content_recon2m2(content=None):
     """
-    Removes unnecessary prefixes from identifiers for model's entities
+    Copies and interprets content from Recon 2M.2
 
-    This function removes unnecessary prefixes from identifiers for
-    metabolites.
+    This function copies and interprets content from a metabolic model in
+    Systems Biology Markup Language (SBML), a form of Extensible Markup
+    Language (XML).
+
+    arguments:
+        content (object): content from Recon 2M.2 in SBML
+
+    raises:
+
+    returns:
+        (object): references to definition of name space and sections within
+            content
+
+    """
+
+    # Copy content.
+    content_copy = copy.deepcopy(content)
+    # Define name space.
+    space = {
+        "version": "http://www.sbml.org/sbml/level2/version4",
+        "syntax": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    }
+    # Set references to sections within content.
+    sbml = content_copy.getroot()
+    model = sbml[0]
+    compartments = model[1]
+    metabolites = model[2]
+    reactions = model[3]
+    # Compile and return information.
+    return {
+        "space": space,
+        "content": content_copy,
+        "model": model,
+        "compartments": compartments,
+        "metabolites": metabolites,
+        "reactions": reactions
+    }
+
+
+def change_model_compartment(content=None):
+    """
+    Changes annotations for a model's compartments
+
+    This function changes annotations of a model's compartments.
 
     arguments:
         content (object): content from file in Systems Biology Markup Language
             (XML)
 
-    returns:
-        content with changes to identifiers of metabolites
-
     raises:
+
+    returns:
+        (object): content with changes
 
     """
 
-    # Copy and interpret content
-    reference = utility.copy_interpret_content_recon2m2(content=content)
-    # Remove prefixes from identifiers for metabolites
-    for metabolite in reference["metabolites"].findall(
-    "version:species", reference["space"]
+    # Copy and interpret content.
+    reference = copy_interpret_content_recon2m2(content=content)
+    # Correct information for compartments.
+    for compartment in reference["compartments"].findall(
+        "version:compartment", reference["space"]
     ):
-        # Remove prefix from metabolite's identifier
-        novel_identifier = re.sub(r"^M_", "", metabolite.attrib["id"])
-        metabolite.attrib["id"] = novel_identifier
-        # Search metabolite's annotation
-        for description in metabolite.iter(
-        "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}description"
-        ):
-            # Remove prefix from metabolite's identifier
-            novel_identifier = re.sub(
-                r"^#M_",
-                "#",
-                description.attrib[
-                "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about"
-                ]
-            )
-            description.attrib[
-            "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about"
-            ] = novel_identifier
-    # Remove prefixes from identifiers for reactions' metabolites
-    for reaction in reference["reactions"].findall(
-    "version:reaction", reference["space"]
-    ):
-        # Search reaction's metabolites
-        for metabolite in reaction.iter(
-        "{http://www.sbml.org/sbml/level2/version4}speciesReference"
-        ):
-            # Remove prefix from metabolite's identifier
-            novel_identifier = re.sub(r"^M_", "", metabolite.attrib["species"])
-            metabolite.attrib["species"] = novel_identifier
-    # Return content with changes
+        if compartment.attrib["id"] == "e":
+            compartment.attrib["name"] = "extracellular region"
+    # Return content with changes.
     return reference["content"]
 
 
@@ -197,87 +212,111 @@ def change_model_boundary(content=None):
         content (object): content from file in Systems Biology Markup Language
             (XML)
 
-    returns:
-        content with changes to attributes of compartments, metabolites, and
-            reactions
-
     raises:
+
+    returns:
+        (object): content with changes
 
     """
 
-    # Copy and interpret content
-    reference = utility.copy_interpret_content_recon2m2(content=content)
-    # Correct compartment for model's boundary
+    # Copy and interpret content.
+    reference = copy_interpret_content_recon2m2(content=content)
+    # Correct designation of model's boundary in compartments.
     for compartment in reference["compartments"].findall(
-    "version:compartment", reference["space"]
+        "version:compartment", reference["space"]
     ):
-        # Determine whether compartment is for model's boundary
+        # Determine whether compartment is for model's boundary.
         if compartment.attrib["id"] == "b":
             compartment.attrib["name"] = "model boundary"
-    # Correct metabolites for model's boundary
+    # Correct designation of model's boundary in metabolites.
     for metabolite in reference["metabolites"].findall(
-    "version:species", reference["space"]
+        "version:species", reference["space"]
     ):
-        # Determine whether metabolite's compartment is model's boundary
+        # Determine whether metabolite's compartment is model's boundary.
         if "boundary" in metabolite.attrib["id"]:
             novel_identifier = re.sub(
-            r"_[eciglmnrx]_boundary", "_b", metabolite.attrib["id"]
+                r"_[eciglmnrx]_boundary", "_b", metabolite.attrib["id"]
             )
             metabolite.attrib["id"] = novel_identifier
             novel_compartment = "b"
             metabolite.attrib["compartment"] = novel_compartment
-    # Correct reactions for model's boundary
+    # Correct designation of model's boundary in reactions.
     for reaction in reference["reactions"].findall(
-    "version:reaction", reference["space"]
+        "version:reaction", reference["space"]
     ):
-        # Search reaction's metabolites
+        # Search reaction's metabolites.
         for metabolite in reaction.iter(
-        "{http://www.sbml.org/sbml/level2/version4}speciesReference"
+            "{http://www.sbml.org/sbml/level2/version4}speciesReference"
         ):
-            # Determine whether metabolite's compartment is model's boundary
+            # Determine whether metabolite's compartment is model's boundary.
             if "boundary" in metabolite.attrib["species"]:
                 novel_identifier = re.sub(
-                r"_[eciglmnrx]_boundary", "_b", metabolite.attrib["species"]
+                    r"_[eciglmnrx]_boundary", "_b",
+                    metabolite.attrib["species"]
                 )
                 metabolite.attrib["species"] = novel_identifier
-    # Return content with changes
+    # Return content with changes.
     return reference["content"]
 
 
-def change_model_compartment(content=None):
+def remove_model_identifier_prefix(content=None):
     """
-    Changes annotations for a model's compartments
+    Removes unnecessary prefixes from identifiers for model's entities
 
-    This function changes annotations of a model's compartments.
+    This function removes unnecessary prefixes from identifiers for
+    metabolites.
 
     arguments:
         content (object): content from file in Systems Biology Markup Language
             (XML)
 
-    returns:
-        content with changes to attributes of compartments, metabolites, and
-            reactions
-
     raises:
+
+    returns:
+        (object): content with changes
 
     """
 
-    # Copy and interpret content
-    reference = utility.copy_interpret_content_recon2m2(content=content)
-    # Correct compartment for model's boundary
-    for compartment in reference["compartments"].findall(
-    "version:compartment", reference["space"]
+    # Copy and interpret content.
+    reference = copy_interpret_content_recon2m2(content=content)
+    # Remove prefixes from identifiers for metabolites.
+    for metabolite in reference["metabolites"].findall(
+    "version:species", reference["space"]
     ):
-        # Determine whether compartment is for model's boundary
-        if compartment.attrib["id"] == "e":
-            compartment.attrib["name"] = "extracellular region"
-    # Return content with changes
+        # Remove prefix from metabolite's identifier.
+        novel_identifier = re.sub(r"^M_", "", metabolite.attrib["id"])
+        metabolite.attrib["id"] = novel_identifier
+        # Search metabolite's annotation.
+        for description in metabolite.iter(
+        "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}description"
+        ):
+            # Remove prefix from metabolite's identifier.
+            novel_identifier = re.sub(
+                r"^#M_",
+                "#",
+                description.attrib[
+                "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about"
+                ]
+            )
+            description.attrib[
+            "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about"
+            ] = novel_identifier
+    # Remove prefixes from identifiers for reactions' metabolites.
+    for reaction in reference["reactions"].findall(
+    "version:reaction", reference["space"]
+    ):
+        # Search reaction's metabolites.
+        for metabolite in reaction.iter(
+        "{http://www.sbml.org/sbml/level2/version4}speciesReference"
+        ):
+            # Remove prefix from metabolite's identifier.
+            novel_identifier = re.sub(r"^M_", "", metabolite.attrib["species"])
+            metabolite.attrib["species"] = novel_identifier
+    # Return content with changes.
     return reference["content"]
 
 
-def change_model_metabolites_identifiers(
-        metabolites_identifiers=None, content=None
-):
+def change_model_metabolites(curation_metabolites=None, content=None):
     """
     Changes metabolites' identifiers
 
@@ -285,75 +324,75 @@ def change_model_metabolites_identifiers(
     about translation.
 
     arguments:
-        metabolites_identifiers (list<dict<str>>): translations of metabolites'
+        curation_metabolites (list<dict<str>>): translations of metabolites'
             identifiers
         content (object): content from file in Systems Biology Markup Language
             (XML)
 
-    returns:
-        content with changes to metabolites' identifiers
-
     raises:
+
+    returns:
+        (object): content with changes
 
     """
 
-    # Copy and interpret content
-    reference = utility.copy_interpret_content_recon2m2(content=content)
-    # Change content for each combination of original and novel identifiers
-    for row in metabolites_identifiers:
-        # Construct targets to recognize original and novel identifiers
+    # Copy and interpret content.
+    reference = copy_interpret_content_recon2m2(content=content)
+    # Change content for each combination of original and novel identifiers.
+    for row in curation_metabolites:
+        # Construct targets to recognize original and novel identifiers.
+        # Use trailing underscore to match complete identifiers.
         original_elements = [row["identifier_original"], "_"]
         original_target = "".join(original_elements)
         novel_elements = [row["identifier_novel"], "_"]
         novel_target = "".join(novel_elements)
-        # Change identifiers of metabolites
+        # Change identifiers of metabolites.
         for metabolite in reference["metabolites"].findall(
-        "version:species", reference["space"]
+            "version:species", reference["space"]
         ):
-            # Determine whether to change metabolite's identifier
+            # Determine whether to change metabolite's identifier.
             if original_target in metabolite.attrib["id"]:
                 metabolite.attrib["id"] = metabolite.attrib["id"].replace(
                     original_target, novel_target
                 )
-        # Change identifiers of reactions' metabolites
+        # Change identifiers of reactions' metabolites.
         for reaction in reference["reactions"].findall(
-        "version:reaction", reference["space"]
+            "version:reaction", reference["space"]
         ):
-            # Search reaction's metabolites
+            # Search reaction's metabolites.
             for metabolite in reaction.iter(
-            "{http://www.sbml.org/sbml/level2/version4}speciesReference"
+                "{http://www.sbml.org/sbml/level2/version4}speciesReference"
             ):
-                # Determine whether to change metabolite's identifier
+                # Determine whether to change metabolite's identifier.
                 if original_target in metabolite.attrib["species"]:
                     metabolite.attrib["species"] = (
                         metabolite.attrib["species"].replace(
                             original_target, novel_target
                         )
                     )
-    # Return content with changes
+    # Return content with changes.
     return reference["content"]
 
 
-def write_product(directory=None, content=None):
+def write_product(directory=None, information=None):
     """
-    Writes product content to file
+    Writes product information to file
 
     arguments:
         directory (str): directory for product files
-        content (object): content from file in Systems Biology Markup Language
-            (XML)
-
-    returns:
+        information (object): information to write to file
 
     raises:
+
+    returns:
 
     """
 
     path_file = os.path.join(
-        directory, "recon2m2_metanetx_reconciliation.xml"
+        directory, "recon2m2_reconciliation.xml"
     )
     # Write information to file
-    content.write(path_file, xml_declaration=False)
+    information.write(path_file, xml_declaration=False)
 
 
 ###############################################################################
@@ -378,10 +417,27 @@ def execute_procedure(origin=None, destination=None, clean=None):
 
     """
 
-    print("Executing reconciliation procedure...")
-
-    # Read source information from file
+    # Report status.
+    print("... executing reconciliation procedure ...")
+    # Read source information from file.
     source = read_source(directory=origin)
+    # Change model's content.
+    # Correct content.
+    content_compartment = change_model_compartment(
+        content=source["content"]
+    )
+    content_boundary = change_model_boundary(content=content_compartment)
+    content_prefix = remove_model_identifier_prefix(
+        content=content_boundary
+    )
+    content_metabolites = change_model_metabolites(
+        curation_metabolites=source["curation_metabolites"],
+        content=content_prefix
+    )
+    #Write product information to file.
+    write_product(directory=destination, information=content_metabolites)
+
+    print("complete")
 
     # TODO: should I do the filtering before or after MetaNetX???
     # TODO: before might facilitate or improve reconciliation to MetaNetX... although it's sort of less convenient.
@@ -392,18 +448,3 @@ def execute_procedure(origin=None, destination=None, clean=None):
     # TODO: remove all boundary metabolites
     # TODO: remove all BIOMASS metabolites
     # TODO: remove all BIOMASS reactions
-
-
-    if False:
-        # Correct content
-        model_compartment = change_model_compartment(content=source["model"])
-        model_boundary = change_model_boundary(content=content_compartment)
-        model_prefix = remove_model_identifier_prefix(content=content_boundary)
-        model_identifier = change_model_metabolites_identifiers(
-            metabolites_identifiers=source["curation_metabolites"],
-            content=model_prefix
-        )
-        #Write product content to file
-        write_product(content=model_identifier)
-
-    pass

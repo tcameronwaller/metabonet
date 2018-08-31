@@ -12,6 +12,7 @@ Imports:
     shutil: Package to perform file operations.
     importlib: Package to import packages and modules.
     argparse: Package to interpret user parameters from terminal.
+    textwrap: Package to format text.
     csv: Package to organize information in text.
     copy: Package to copy objects.
     pickle: Package to preserve information.
