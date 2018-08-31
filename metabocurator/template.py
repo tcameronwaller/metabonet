@@ -82,6 +82,13 @@ License:
 ###############################################################################
 # Functionality
 
+#directory = os.path.join(
+#    os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
+#    "project"
+#)
+
+
+
 ###############################################################################
 # Procedure
 

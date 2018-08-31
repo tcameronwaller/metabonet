@@ -103,7 +103,7 @@ def parse_arguments():
         description="Curate model of metabolism for definition of networks."
     )
     parser.add_argument(
-        "-s", "--source", dest="source", type=str, required=True,
+        "-o", "--origin", dest="origin", type=str, required=True,
         help="Directory of source files."
     )
     parser.add_argument(
@@ -166,7 +166,7 @@ def execute_procedure():
     # Execute procedure.
     if arguments.reconciliation:
         reconciliation.execute_procedure(
-            source=arguments.source,
+            origin=arguments.origin,
             destination=arguments.destination,
             clean=arguments.clean
         )

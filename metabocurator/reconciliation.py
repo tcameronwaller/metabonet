@@ -85,10 +85,6 @@ import copy
 
 # Packages and modules from third parties
 
-#import numpy
-#import pandas
-#import scipy
-
 # Packages and modules from local source
 
 import utility
@@ -97,42 +93,39 @@ import utility
 # Functionality
 
 
-def read_source():
+def read_source(directory=None):
     """
     Reads and organizes source information from file
 
     arguments:
+        directory (str): directory of source files
+
+    raises:
 
     returns:
         (object): source information
 
-    raises:
-
     """
 
     # Specify directories and files
-    directory = os.path.join(
-        os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-        "project_metabolism", "metabolism_models", "homo_sapiens",
-        "recon_2-m-2"
+    path_model = os.path.join(directory, "recon2m2.xml")
+    path_metabolites = os.path.join(
+        directory, "reconciliation_metabolites.tsv"
     )
-    path_file_model = os.path.join(
-        directory, "recon2m2.xml"
-    )
-    path_file_metabolites_identifiers = os.path.join(
-        directory, "curation_reconciliation_metabolites.tsv"
-    )
+    #path_reactions = os.path.join(
+    #    directory, "reconciliation_reactions.tsv"
+    #)
     # Read information from file
-    content = et.parse(path_file_model)
-    metabolites_identifiers = utility.read_file_table(
-        path_file=path_file_metabolites_identifiers,
+    model = et.parse(path_model)
+    curation_metabolites = utility.read_file_table(
+        path_file=path_metabolites,
         names=None,
         delimiter="\t"
     )
     # Compile and return information
     return {
-        "content": content,
-        "metabolites_identifiers": metabolites_identifiers
+        "model": model,
+        "curation_metabolites": curation_metabolites
     }
 
 
@@ -341,11 +334,12 @@ def change_model_metabolites_identifiers(
     return reference["content"]
 
 
-def write_product(content=None):
+def write_product(directory=None, content=None):
     """
     Writes product content to file
 
     arguments:
+        directory (str): directory for product files
         content (object): content from file in Systems Biology Markup Language
             (XML)
 
@@ -355,12 +349,6 @@ def write_product(content=None):
 
     """
 
-    # Specify directories and files
-    directory = os.path.join(
-        os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-        "project_metabolism", "metabolism_models", "homo_sapiens",
-        "recon_2-m-2"
-    )
     path_file = os.path.join(
         directory, "recon2m2_metanetx_reconciliation.xml"
     )
@@ -372,12 +360,15 @@ def write_product(content=None):
 # Procedure
 
 
-def execute_procedure(source=None, destination=None, clean=None):
+def execute_procedure(origin=None, destination=None, clean=None):
     """
     Function to execute module's main behavior.
 
+    The purpose of this procedure is to reconcile the metabolic model to be
+    compatible with MetaNetX.
+
     arguments:
-        source (str): directory of source files
+        origin (str): directory of source files
         destination (str): directory for product files
         clean (bool): whether to remove intermediate files
 
@@ -390,16 +381,29 @@ def execute_procedure(source=None, destination=None, clean=None):
     print("Executing reconciliation procedure...")
 
     # Read source information from file
+    source = read_source(directory=origin)
 
-    # TODO: Adapt this to pull in multiple files from the specified directory.
-    source = read_source()
-    # Correct content
-    content_compartment = change_model_compartment(content=source["content"])
-    content_boundary = change_model_boundary(content=content_compartment)
-    content_prefix = remove_model_identifier_prefix(content=content_boundary)
-    content_identifier = change_model_metabolites_identifiers(
-        metabolites_identifiers=source["metabolites_identifiers"],
-        content=content_prefix
-    )
-    #Write product content to file
-    write_product(content=content_identifier)
+    # TODO: should I do the filtering before or after MetaNetX???
+    # TODO: before might facilitate or improve reconciliation to MetaNetX... although it's sort of less convenient.
+    # TODO: decision... reconciliation should ONLY focus on reconciliation for optimal import to MetaNetX
+    # TODO: deal with filtering afterwards.
+
+    # TODO: remove all boundary exchange/demand reactions
+    # TODO: remove all boundary metabolites
+    # TODO: remove all BIOMASS metabolites
+    # TODO: remove all BIOMASS reactions
+
+
+    if False:
+        # Correct content
+        model_compartment = change_model_compartment(content=source["model"])
+        model_boundary = change_model_boundary(content=content_compartment)
+        model_prefix = remove_model_identifier_prefix(content=content_boundary)
+        model_identifier = change_model_metabolites_identifiers(
+            metabolites_identifiers=source["curation_metabolites"],
+            content=model_prefix
+        )
+        #Write product content to file
+        write_product(content=model_identifier)
+
+    pass
