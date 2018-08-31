@@ -200,12 +200,14 @@ def execute_procedure():
     arguments = parse_arguments()
     # Execute procedure.
     if arguments.reconciliation:
+        # Execute reconciliation procedure.
         reconciliation.execute_procedure(
             origin=arguments.origin,
             destination=arguments.destination,
             clean=arguments.clean
         )
     elif arguments.adaptation:
+        # Execute adaptation procedure.
         pass
 
 
