@@ -79,6 +79,8 @@ import textwrap
 # Custom
 
 import reconciliation
+import extraction
+import enhancement
 
 #dir()
 #importlib.reload()
@@ -200,6 +202,8 @@ def execute_procedure():
     arguments = parse_arguments()
     # Execute procedure.
     if arguments.reconciliation:
+        # Report status.
+        print("... executing reconciliation procedure ...")
         # Execute reconciliation procedure.
         reconciliation.execute_procedure(
             origin=arguments.origin,
@@ -207,11 +211,33 @@ def execute_procedure():
             clean=arguments.clean
         )
     elif arguments.adaptation:
+        # Report status.
+        print("... executing adaptation procedure ...")
         # Execute adaptation procedure.
-        pass
+        extraction.execute_procedure(
+            origin=arguments.origin,
+            destination=arguments.destination,
+            clean=arguments.clean
+        )
+        if False:
+            enhancement.execute_procedure(
+                origin=arguments.origin,
+                destination=arguments.destination,
+                clean=arguments.clean
+            )
+            # TODO: spit out a report after enhancement for sake of curation...
 
 
-    pass
+            curation.execute_procedure(
+                origin=arguments.origin,
+                destination=arguments.destination,
+                clean=arguments.clean
+            )
+            conversion.execute_procedure(
+                origin=arguments.origin,
+                destination=arguments.destination,
+                clean=arguments.clean
+            )
 
 
 if (__name__ == "__main__"):

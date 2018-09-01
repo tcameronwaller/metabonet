@@ -135,49 +135,6 @@ def read_source(directory=None):
     }
 
 
-def copy_interpret_content_recon2m2(content=None):
-    """
-    Copies and interprets content from Recon 2M.2
-
-    This function copies and interprets content from a metabolic model in
-    Systems Biology Markup Language (SBML), a form of Extensible Markup
-    Language (XML).
-
-    arguments:
-        content (object): content from Recon 2M.2 in SBML
-
-    raises:
-
-    returns:
-        (object): references to definition of name space and sections within
-            content
-
-    """
-
-    # Copy content.
-    content_copy = copy.deepcopy(content)
-    # Define name space.
-    space = {
-        "version": "http://www.sbml.org/sbml/level2/version4",
-        "syntax": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    }
-    # Set references to sections within content.
-    sbml = content_copy.getroot()
-    model = sbml[0]
-    compartments = model[1]
-    metabolites = model[2]
-    reactions = model[3]
-    # Compile and return information.
-    return {
-        "space": space,
-        "content": content_copy,
-        "model": model,
-        "compartments": compartments,
-        "metabolites": metabolites,
-        "reactions": reactions
-    }
-
-
 def change_model_boundary(content=None):
     """
     Changes annotations for a model's boundary
@@ -197,7 +154,7 @@ def change_model_boundary(content=None):
     """
 
     # Copy and interpret content.
-    reference = copy_interpret_content_recon2m2(content=content)
+    reference = utility.copy_interpret_content_recon2m2(content=content)
     # Correct designation of model's boundary in metabolites.
     for metabolite in reference["metabolites"].findall(
         "version:species", reference["space"]
@@ -249,7 +206,7 @@ def change_model_compartments(curation_compartments=None, content=None):
     """
 
     # Copy and interpret content.
-    reference = copy_interpret_content_recon2m2(content=content)
+    reference = utility.copy_interpret_content_recon2m2(content=content)
     # Change content for each combination of original and novel information.
     for row in curation_compartments:
         # Detmerine whether to change compartment's name.
@@ -318,7 +275,7 @@ def remove_model_metabolite_prefix(content=None):
     """
 
     # Copy and interpret content.
-    reference = copy_interpret_content_recon2m2(content=content)
+    reference = utility.copy_interpret_content_recon2m2(content=content)
     # Remove prefixes from identifiers for metabolites.
     for metabolite in reference["metabolites"].findall(
     "version:species", reference["space"]
@@ -377,7 +334,7 @@ def change_model_metabolites(curation_metabolites=None, content=None):
     """
 
     # Copy and interpret content.
-    reference = copy_interpret_content_recon2m2(content=content)
+    reference = utility.copy_interpret_content_recon2m2(content=content)
     # Change content for each combination of original and novel identifiers.
     for row in curation_metabolites:
         # Construct targets to recognize original and novel identifiers.
@@ -428,10 +385,11 @@ def write_product(directory=None, information=None):
 
     """
 
+    # Specify directories and files.
     path_file = os.path.join(
         directory, "recon2m2_reconciliation.xml"
     )
-    # Write information to file
+    # Write information to file.
     information.write(path_file, xml_declaration=False)
 
 
@@ -451,14 +409,12 @@ def execute_procedure(origin=None, destination=None, clean=None):
         destination (str): directory for product files
         clean (bool): whether to remove intermediate files
 
-    returns:
-
     raises:
+
+    returns:
 
     """
 
-    # Report status.
-    print("... executing reconciliation procedure ...")
     # Read source information from file.
     source = read_source(directory=origin)
     # Change model's content.
@@ -477,13 +433,3 @@ def execute_procedure(origin=None, destination=None, clean=None):
     )
     #Write product information to file.
     write_product(directory=destination, information=content_metabolites)
-
-    # TODO: should I do the filtering before or after MetaNetX???
-    # TODO: before might facilitate or improve reconciliation to MetaNetX... although it's sort of less convenient.
-    # TODO: decision... reconciliation should ONLY focus on reconciliation for optimal import to MetaNetX
-    # TODO: deal with filtering afterwards.
-
-    # TODO: remove all boundary exchange/demand reactions
-    # TODO: remove all boundary metabolites
-    # TODO: remove all BIOMASS metabolites
-    # TODO: remove all BIOMASS reactions

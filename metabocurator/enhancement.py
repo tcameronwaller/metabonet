@@ -246,33 +246,6 @@ def extract_hmdb_metabolites_references(hmdb=None):
     return metabolites_references
 
 
-def extract_recon2m2_reactions_names(recon2m2=None):
-    """
-    Extracts reactions' names from Recon 2M.2
-
-    arguments:
-        recon2m2 (object): content from Recon 2M.2 in SBML
-
-    returns:
-        (dict<str>): names of reactions from Recon 2M.2
-
-    raises:
-
-    """
-
-    # Copy and interpret content
-    reference = utility.copy_interpret_content_recon2m2(content=recon2m2)
-    reactions_names = {}
-    for reaction in reference["reactions"].findall(
-        "version:reaction", reference["space"]
-    ):
-        identifier_recon2m2 = reaction.attrib["id"]
-        name = reaction.attrib["name"]
-        reactions_names[identifier_recon2m2] = name
-    # Return content with changes
-    return reactions_names
-
-
 def enhance_metabolites(
     metabolites_original=None, hmdb_metabolites_references=None
 ):
@@ -454,41 +427,6 @@ def collect_hmdb_entries_references(
         "chebi": chebi,
         "kegg": kegg
     }
-
-
-def enhance_reactions_names(
-    recon2m2_reactions_names=None, reactions_original=None
-):
-    """
-    Enhances reactions by including names from Recon 2M.2
-
-    arguments:
-        recon2m2_reactions_names (dict<str>): names of reactions from Recon
-        2M.2
-        reactions_original (dict<dict>): information about reactions
-
-    returns:
-        (dict<dict>): information about reactions
-
-    raises:
-
-    """
-
-    # Copy information
-    reactions_novel = copy.deepcopy(reactions_original)
-    for key, record in reactions_novel.items():
-        identifier_metanetx = record["identifier"]
-        # Reconciliation matches some multiple reactions from Recon 2M.2 to a
-        # single reaction in MetaNetX
-        identifiers_recon2m2 = record["references"]["recon2m2"]
-        identifiers_recon2m2_split = identifiers_recon2m2.split(";")
-        identifier_recon2m2 = identifiers_recon2m2_split[0]
-        if identifier_recon2m2 in recon2m2_reactions_names:
-            name = recon2m2_reactions_names[identifier_recon2m2]
-        else:
-            name = ""
-        reactions_novel[key]["name"] = name
-    return reactions_novel
 
 
 def change_compartments(
@@ -1371,19 +1309,10 @@ def main():
     hmdb_metabolites_references = extract_hmdb_metabolites_references(
         hmdb=source["hmdb"]
     )
-    # Extract reactions' names from Recon 2M.2
-    recon2m2_reactions_names = extract_recon2m2_reactions_names(
-        recon2m2=source["recon2m2"]
-    )
     # Enhance metabolites' references
     metabolites_references = enhance_metabolites(
         metabolites_original=source["metabolites"],
         hmdb_metabolites_references=hmdb_metabolites_references
-    )
-    # Enhance reactions' names
-    reactions_names = enhance_reactions_names(
-        recon2m2_reactions_names=recon2m2_reactions_names,
-        reactions_original=source["reactions"]
     )
 
     # TODO: Move change procedures to before the enhancement from HMDB...
