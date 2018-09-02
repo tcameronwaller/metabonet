@@ -715,8 +715,6 @@ def extract_reaction_references(
     }
 
 
-
-
 def extract_metabolites(metabolites_source=None):
     """
     Extracts information from source about metabolites
@@ -871,6 +869,7 @@ def write_product(directory=None, information=None):
     path_metabolites = os.path.join(
         directory, "extraction_metabolites.pickle"
     )
+    #path_recon2m2 = os.path.join(directory, "recon2m2_reactions_names.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
         pickle.dump(information["compartments"], file_product)
@@ -880,6 +879,12 @@ def write_product(directory=None, information=None):
         pickle.dump(information["reactions"], file_product)
     with open(path_metabolites, "wb") as file_product:
         pickle.dump(information["metabolites"], file_product)
+    #utility.write_file_table(
+    #    information=information["reactions_names"],
+    #    path_file=path_recon2m2,
+    #    names=["identifier", "name"],
+    #    delimiter="\t"
+    #)
 
 
 ###############################################################################
@@ -921,14 +926,15 @@ def execute_procedure(origin=None, destination=None, clean=None):
         genes_source=source["genes"],
         processes=processes
     )
-    # Extract information about metabolites
+    # Extract information about metabolites.
     metabolites = extract_metabolites(metabolites_source=source["metabolites"])
-    # Compile information
-    metabolism_sets_entities = {
+    # Compile information.
+    information = {
         "compartments": compartments,
         "processes": processes,
         "reactions": reactions,
-        "metabolites": metabolites
+        "metabolites": metabolites,
+        "reactions_names": list(reactions_names.values())
     }
     #Write product information to file
-    write_product(directory=destination, information=metabolism_sets_entities)
+    write_product(directory=destination, information=information)

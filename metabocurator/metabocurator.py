@@ -153,8 +153,20 @@ def parse_arguments():
         help="Reconcile model to MetaNetX."
     )
     procedure.add_argument(
-        "-a", "--adaptation", dest="adaptation", action="store_true",
-        help="Adapt model from MetaNetX."
+        "-e", "--extraction", dest="extraction", action="store_true",
+        help="Extract information from MetaNetX."
+    )
+    procedure.add_argument(
+        "-a", "--enhancement", dest="enhancement", action="store_true",
+        help="Enhance information."
+    )
+    procedure.add_argument(
+        "-c", "--curation", dest="curation", action="store_true",
+        help="Curate information."
+    )
+    procedure.add_argument(
+        "-t", "--conversion", dest="conversion", action="store_true",
+        help="Convert information to formats for export."
     )
     parser.add_argument(
         "-x", "--clean", dest="clean", action="store_true",
@@ -210,34 +222,42 @@ def execute_procedure():
             destination=arguments.destination,
             clean=arguments.clean
         )
-    elif arguments.adaptation:
+    elif arguments.extraction:
         # Report status.
-        print("... executing adaptation procedure ...")
-        # Execute adaptation procedure.
+        print("... executing extraction procedure ...")
+        # Execute extraction procedure.
         extraction.execute_procedure(
             origin=arguments.origin,
             destination=arguments.destination,
             clean=arguments.clean
         )
-        if False:
-            enhancement.execute_procedure(
-                origin=arguments.origin,
-                destination=arguments.destination,
-                clean=arguments.clean
-            )
-            # TODO: spit out a report after enhancement for sake of curation...
-
-
-            curation.execute_procedure(
-                origin=arguments.origin,
-                destination=arguments.destination,
-                clean=arguments.clean
-            )
-            conversion.execute_procedure(
-                origin=arguments.origin,
-                destination=arguments.destination,
-                clean=arguments.clean
-            )
+    elif arguments.enhancement:
+        # Report status.
+        print("... executing enhancement procedure ...")
+        # Execute enhancement procedure.
+        enhancement.execute_procedure(
+            origin=arguments.origin,
+            destination=arguments.destination,
+            clean=arguments.clean
+        )
+    elif arguments.curation:
+        # Report status.
+        print("... executing curation procedure ...")
+        # Execute curation procedure.
+        curation.execute_procedure(
+            origin=arguments.origin,
+            destination=arguments.destination,
+            clean=arguments.clean
+        )
+    elif arguments.conversion:
+        # Report status.
+        print("... executing conversion procedure ...")
+        # Execute conversion procedure.
+        conversion.execute_procedure(
+            origin=arguments.origin,
+            destination=arguments.destination,
+            clean=arguments.clean
+        )
 
 
 if (__name__ == "__main__"):

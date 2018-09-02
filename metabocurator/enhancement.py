@@ -94,94 +94,47 @@ import utility
 # Functionality
 
 
-def read_source():
+def read_source(directory=None):
     """
     Reads and organizes source information from file
 
     arguments:
+        directory (str): directory of source files
+
+    raises:
 
     returns:
         (object): source information
 
-    raises:
-
     """
 
-    # Specify directories and files
-    directory = os.path.join(
-        os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-        "project_metabolism", "metabolism_models", "homo_sapiens",
-        "recon_2-m-2"
-    )
-    path_file_hmdb = os.path.join(directory, "hmdb_metabolites.xml")
-    path_file_recon2m2 = os.path.join(directory, "recon2m2.xml")
-    path_file_compartments = os.path.join(
+    # Specify directories and files.
+    path_hmdb = os.path.join(directory, "hmdb_metabolites.xml")
+    path_compartments = os.path.join(
         directory, "extraction_compartments.pickle"
     )
-    path_file_processes = os.path.join(
-        directory, "extraction_processes.pickle"
-    )
-    path_file_metabolites = os.path.join(
+    path_processes = os.path.join(directory, "extraction_processes.pickle")
+    path_reactions = os.path.join(directory, "extraction_reactions.pickle")
+    path_metabolites = os.path.join(
         directory, "extraction_metabolites.pickle"
     )
-    path_file_reactions = os.path.join(
-        directory, "extraction_reactions.pickle"
-    )
-    path_file_changer_compartments = os.path.join(
-        directory, "curation_enhancement_compartments.tsv"
-    )
-    path_file_changer_processes = os.path.join(
-        directory, "curation_enhancement_processes.tsv"
-    )
-    path_file_changer_metabolites = os.path.join(
-        directory, "curation_enhancement_metabolites.tsv"
-    )
-    path_file_changer_reactions = os.path.join(
-        directory, "curation_enhancement_reactions.tsv"
-    )
-    # Read information from file
-    recon2m2 = et.parse(path_file_recon2m2)
-    hmdb = et.parse(path_file_hmdb)
-    with open(path_file_compartments, "rb") as file_source:
+    # Read information from file.
+    hmdb = et.parse(path_hmdb)
+    with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
-    with open(path_file_processes, "rb") as file_source:
+    with open(path_processes, "rb") as file_source:
         processes = pickle.load(file_source)
-    with open(path_file_metabolites, "rb") as file_source:
-        metabolites = pickle.load(file_source)
-    with open(path_file_reactions, "rb") as file_source:
+    with open(path_reactions, "rb") as file_source:
         reactions = pickle.load(file_source)
-    changer_compartments = utility.read_file_table(
-        path_file=path_file_changer_compartments,
-        names=None,
-        delimiter="\t"
-    )
-    changer_processes = utility.read_file_table(
-        path_file=path_file_changer_processes,
-        names=None,
-        delimiter="\t"
-    )
-    changer_metabolites = utility.read_file_table(
-        path_file=path_file_changer_metabolites,
-        names=None,
-        delimiter="\t"
-    )
-    changer_reactions = utility.read_file_table(
-        path_file=path_file_changer_reactions,
-        names=None,
-        delimiter="\t"
-    )
-    # Compile and return information
+    with open(path_metabolites, "rb") as file_source:
+        metabolites = pickle.load(file_source)
+    # Compile and return information.
     return {
-        "recon2m2": recon2m2,
         "hmdb": hmdb,
         "compartments": compartments,
         "processes": processes,
-        "metabolites": metabolites,
         "reactions": reactions,
-        "changer_compartments": changer_compartments,
-        "changer_processes": changer_processes,
-        "changer_metabolites": changer_metabolites,
-        "changer_reactions": changer_reactions
+        "metabolites": metabolites
     }
 
 
@@ -199,14 +152,14 @@ def extract_hmdb_metabolites_references(hmdb=None):
 
     """
 
-    # Interpret content
+    # Interpret content.
     reference = utility.interpret_content_hmdb(content=hmdb)
-    # Extract information for metabolites
+    # Extract information for metabolites.
     metabolites_references = {}
     for metabolite in reference["metabolites"].findall(
         "base:metabolite", reference["space"]
     ):
-        # HMDB identifiers
+        # HMDB identifiers.
         identifier_hmdb_primary = metabolite.find(
             "base:accession", reference["space"]
         ).text
@@ -218,13 +171,13 @@ def extract_hmdb_metabolites_references(hmdb=None):
             "base:accession", reference["space"]
         ):
             identifiers_hmdb.append(identifier.text)
-        # Name
+        # Name.
         name = metabolite.find("base:name", reference["space"]).text
-        # PubChem identifier
+        # PubChem identifier.
         identifier_pubchem = metabolite.find(
             "base:pubchem_compound_id", reference["space"]
         ).text
-        # Chemical Entities of Biological Interest (ChEBI) identifier
+        # Chemical Entities of Biological Interest (ChEBI) identifier.
         identifier_chebi = metabolite.find(
             "base:chebi_id", reference["space"]
         ).text
@@ -247,15 +200,15 @@ def extract_hmdb_metabolites_references(hmdb=None):
 
 
 def enhance_metabolites(
-    metabolites_original=None, hmdb_metabolites_references=None
+    metabolites_original=None, metabolites_references=None
 ):
     """
     Enhances information about metabolites
 
     arguments:
         metabolites_original (dict<dict>): information about metabolites
-        hmdb_metabolites_references (dict<dict>): metabolites' references from
-            HMDB
+        metabolites_references (dict<dict>): metabolites' references from Human
+            Metabolome Database (HMDB)
 
     returns:
         (dict<dict>): information about metabolites
@@ -270,7 +223,7 @@ def enhance_metabolites(
         # Enhance information about metabolite
         metabolite_novel = enhance_metabolite(
             metabolite_original=record,
-            hmdb_metabolites_references=hmdb_metabolites_references
+            metabolites_references=metabolites_references
         )
         # Compile information
         metabolites_novel[metabolite_novel["identifier"]] = metabolite_novel
@@ -278,15 +231,15 @@ def enhance_metabolites(
 
 
 def enhance_metabolite(
-    metabolite_original=None, hmdb_metabolites_references=None
+    metabolite_original=None, metabolites_references=None
 ):
     """
     Enhances information about a metabolite
 
     arguments:
         metabolite_original (dict): information about a metabolite
-        hmdb_metabolites_references (dict<dict>): metabolites' references from
-            HMDB
+        metabolites_references (dict<dict>): metabolites' references from Human
+            Metabolome Database (HMDB)
 
     returns:
         (dict): information about a metabolite
@@ -300,22 +253,22 @@ def enhance_metabolite(
     # Determine supplemental references from entries in HMDB
     references_supplemental = enhance_metabolite_references(
         references_original=metabolite_novel["references"],
-        hmdb_metabolites_references=hmdb_metabolites_references
+        metabolites_references=metabolites_references
     )
     metabolite_novel["references"] = references_supplemental
     return metabolite_novel
 
 
 def enhance_metabolite_references(
-    references_original=None, hmdb_metabolites_references=None
+    references_original=None, metabolites_references=None
 ):
     """
     Enhances information about a metabolite by including references from HMDB
 
     arguments:
         references_original (dict): references about a metabolite
-        hmdb_metabolites_references (dict<dict>): metabolites' references from
-            HMDB
+        metabolites_references (dict<dict>): metabolites' references from Human
+            Metabolome Database (HMDB)
 
     returns:
         (dict): references about a metabolite
@@ -332,11 +285,11 @@ def enhance_metabolite_references(
     # Find entries from HMDB that match
     hmdb_keys = filter_hmdb_entries_identifiers(
         identifiers=metabolite_references_hmdb,
-        hmdb_metabolites_references=hmdb_metabolites_references
+        metabolites_references=metabolites_references
     )
     # Extract references from entries in HMDB
     hmdb_references = collect_hmdb_entries_references(
-        keys=hmdb_keys, hmdb_metabolites_references=hmdb_metabolites_references
+        keys=hmdb_keys, metabolites_references=metabolites_references
     )
     # Combine supplemental references to original references
     references_novel["hmdb"] = utility.collect_unique_elements(
@@ -355,15 +308,15 @@ def enhance_metabolite_references(
 
 
 def filter_hmdb_entries_identifiers(
-    identifiers=None, hmdb_metabolites_references=None
+    identifiers=None, metabolites_references=None
 ):
     """
     Filters entries from HMDB by their identifiers
 
     arguments:
         identifiers (list<str>): identifiers by which to find entries in HMDB
-        hmdb_metabolites_references (dict<dict>): metabolites' references from
-            HMDB
+        metabolites_references (dict<dict>): metabolites' references from Human
+            Metabolome Database (HMDB)
 
     returns:
         (list<str>): keys of entries in HMDB
@@ -373,7 +326,7 @@ def filter_hmdb_entries_identifiers(
     """
 
     keys = []
-    for key, record in hmdb_metabolites_references.items():
+    for key, record in metabolites_references.items():
         hmdb_entry_identifiers = record["hmdb"]
         # Determine whether any of entry's identifiers match the metabolite's
         # references
@@ -388,15 +341,15 @@ def filter_hmdb_entries_identifiers(
 
 
 def collect_hmdb_entries_references(
-    keys=None, hmdb_metabolites_references=None
+    keys=None, metabolites_references=None
 ):
     """
     Extracts references from entries in HMDB
 
     arguments:
         keys (list<str>): keys of entries in HMDB
-        hmdb_metabolites_references (dict<dict>): metabolites' references from
-            HMDB
+        metabolites_references (dict<dict>): metabolites' references from Human
+            Metabolome Database (HMDB)
 
     returns:
         (dict<list<str>>): references
@@ -411,7 +364,7 @@ def collect_hmdb_entries_references(
     kegg = []
     for key in keys:
         # Only include primary accession identifiers in collection
-        record = hmdb_metabolites_references[key]
+        record = metabolites_references[key]
         hmdb.append(record["identifier"])
         # Only include valid identifiers in the collection
         if (record["pubchem"] is not None) and (len(record["pubchem"]) > 0):
@@ -427,231 +380,6 @@ def collect_hmdb_entries_references(
         "chebi": chebi,
         "kegg": kegg
     }
-
-
-def change_compartments(
-    changer_compartments=None, compartments_original=None,
-    reactions_original=None
-):
-    """
-    Changes information about specific compartments and relevant reactions
-
-    arguments:
-        changer_compartments (list<dict<str>>): information to change about
-            specific compartments
-        compartments_original (dict<dict>): information about processes
-        reactions_original (dict<dict>): information about reactions
-
-    returns:
-        (dict<dict<dict>>): information about compartments and reactions
-
-    raises:
-
-    """
-
-    # Copy information
-    compartments_novel = copy.deepcopy(compartments_original)
-    reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_compartments:
-        identifier_original = record["identifier_original"]
-        identifier_novel = record["identifier_novel"]
-        name_original = record["name_original"]
-        name_novel = record["name_novel"]
-        # Determine method to change information
-        match_identifiers = identifier_original == identifier_novel
-        match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
-            if identifier_original in compartments_novel:
-                compartments_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in compartments_novel:
-                # Remove
-                del compartments_novel[identifier_original]
-                # Remove relevant reactions
-                removals = []
-                for key, record_reaction in reactions_novel.items():
-                    # Determine whether any of reaction's participants are in
-                    # the compartment
-                    match = determine_reaction_compartment(
-                        compartment=identifier_original,
-                        reaction=record_reaction
-                    )
-                    if match:
-                        # Remove
-                        removals.append(key)
-                for removal in removals:
-                    del reactions_novel[removal]
-    # Compile and return information
-    return {
-        "compartments": compartments_novel,
-        "reactions": reactions_novel
-    }
-
-
-def determine_reaction_compartment(compartment=None, reaction=None):
-    """
-    Determines whether any of reaction's participants are in a compartment
-
-    arguments:
-        compartment (str): identifier of a compartment
-        reaction (dict): information about a reaction
-
-    returns:
-        (bool): whether any of reaction's participants are in the compartment
-
-    raises:
-
-    """
-
-    participants = reaction["participants"]
-    for participant in participants:
-        if participant["compartment"] == compartment:
-            return True
-    return False
-
-
-def change_processes(
-    changer_processes=None, processes_original=None, reactions_original=None
-):
-    """
-    Changes information about specific processes and relevant reactions
-
-    arguments:
-        changer_processes (list<dict<str>>): information to change about
-            specific processes
-        processes_original (dict<dict>): information about processes
-        reactions_original (dict<dict>): information about reactions
-
-    returns:
-        (dict<dict<dict>>): information about processes and reactions
-
-    raises:
-
-    """
-
-    # Copy information
-    processes_novel = copy.deepcopy(processes_original)
-    reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_processes:
-        identifier_original = record["identifier_original"]
-        identifier_novel = record["identifier_novel"]
-        name_original = record["name_original"]
-        name_novel = record["name_novel"]
-        # Determine method to change information
-        match_identifiers = identifier_original == identifier_novel
-        match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
-            if identifier_original in processes_novel:
-                processes_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in processes_novel:
-                # Remove
-                del processes_novel[identifier_original]
-            if identifier_novel in processes_novel:
-                # Replace
-                for record_reaction in reactions_novel.values():
-                    processes_reaction = record_reaction["processes"]
-                    if identifier_original in processes_reaction:
-                        for index, process in enumerate(processes_reaction):
-                            if process == identifier_original:
-                                processes_reaction[index] = identifier_novel
-    # Compile and return information
-    return {
-        "processes": processes_novel,
-        "reactions": reactions_novel
-    }
-
-
-def change_metabolites(
-    changer_metabolites=None, metabolites_original=None, reactions_original=None
-):
-    """
-    Changes information about specific metabolites and relevant reactions
-
-    arguments:
-        changer_metabolites (list<dict<str>>): information to change about
-            specific metabolites
-        metabolites_original (dict<dict>): information about metabolites
-        reactions_original (dict<dict>): information about reactions
-
-    returns:
-        (dict<dict<dict>>): information about metabolites and reactions
-
-    raises:
-
-    """
-
-    # Copy information
-    metabolites_novel = copy.deepcopy(metabolites_original)
-    reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_metabolites:
-        identifier_original = record["identifier_original"]
-        identifier_novel = record["identifier_novel"]
-        name_original = record["name_original"]
-        name_novel = record["name_novel"]
-        # Determine method to change information
-        match_identifiers = identifier_original == identifier_novel
-        match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
-            if identifier_original in metabolites_novel:
-                metabolites_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in metabolites_novel:
-                # Remove
-                del metabolites_novel[identifier_original]
-            if identifier_novel in metabolites_novel:
-                # Replace
-                for record_reaction in reactions_novel.values():
-                    participants = record_reaction["participants"]
-                    for participant in participants:
-                        if participant["metabolite"] == identifier_original:
-                            participant["metabolite"] = identifier_novel
-    # Compile and return information
-    return {
-        "metabolites": metabolites_novel,
-        "reactions": reactions_novel
-    }
-
-
-def change_reactions(changer_reactions=None, reactions_original=None):
-    """
-    Changes information about specific reactions
-
-    arguments:
-        changer_reactions (list<dict<str>>): information to change about
-            specific reactions
-        reactions_original (dict<dict>): information about reactions
-
-    returns:
-        (dict<dict>): information about reactions
-
-    raises:
-
-    """
-
-    # Copy information
-    reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_reactions:
-        identifier_original = record["identifier_original"]
-        identifier_novel = record["identifier_novel"]
-        name_original = record["name_original"]
-        name_novel = record["name_novel"]
-        # Determine method to change information
-        match_identifiers = identifier_original == identifier_novel
-        match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
-            if identifier_original in reactions_novel:
-                reactions_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in reactions_novel:
-                # Remove
-                del reactions_novel[identifier_original]
-    # Return information
-    return reactions_novel
 
 
 def include_reactions_behaviors(reactions_original=None):
@@ -742,6 +470,64 @@ def determine_reaction_conversion(reaction=None):
     )
 
 
+def collect_reaction_participants_value(
+    key=None, criteria=None, participants=None
+):
+    """
+    Collects a value from a reaction's specific participants
+
+    arguments:
+        key (str): key of value to collect from each participant
+        criteria (dict<list>): criteria by which to select participants
+        participants (list<dict>): information about a reaction's participants
+
+    returns:
+        (list<str>): values from a reaction's participants
+
+    raises:
+
+    """
+
+    participants_match = filter_reaction_participants(
+        criteria=criteria, participants=participants
+    )
+    return utility.collect_value_from_records(
+        key=key, records=participants_match
+    )
+
+
+def filter_reaction_participants(criteria=None, participants=None):
+    """
+    Filters a reaction's participants by multiple criteria
+
+    arguments:
+        criteria (dict<list>): criteria by which to select participants
+        participants (list<dict>): information about a reaction's participants
+
+    returns:
+        (list<dict>): information about a reaction's participants
+
+    raises:
+
+    """
+
+    def match(participant):
+        if "metabolites" in criteria:
+            match_metabolite = participant["metabolite"] in criteria["metabolites"]
+        else:
+            match_metabolite = True
+        if "compartments" in criteria:
+            match_compartment = participant["compartment"] in criteria["compartments"]
+        else:
+            match_compartment = True
+        if "roles" in criteria:
+            match_role = participant["role"] in criteria["roles"]
+        else:
+            match_role = True
+        return match_metabolite and match_compartment and match_role
+    return list(filter(match, participants))
+
+
 def determine_reaction_dispersal(reaction=None):
     """
     Determines whether a reaction involves metabolites in multiple compartments
@@ -829,62 +615,7 @@ def collect_reaction_transports(reaction=None):
     return transports
 
 
-def filter_reaction_participants(criteria=None, participants=None):
-    """
-    Filters a reaction's participants by multiple criteria
 
-    arguments:
-        criteria (dict<list>): criteria by which to select participants
-        participants (list<dict>): information about a reaction's participants
-
-    returns:
-        (list<dict>): information about a reaction's participants
-
-    raises:
-
-    """
-
-    def match(participant):
-        if "metabolites" in criteria:
-            match_metabolite = participant["metabolite"] in criteria["metabolites"]
-        else:
-            match_metabolite = True
-        if "compartments" in criteria:
-            match_compartment = participant["compartment"] in criteria["compartments"]
-        else:
-            match_compartment = True
-        if "roles" in criteria:
-            match_role = participant["role"] in criteria["roles"]
-        else:
-            match_role = True
-        return match_metabolite and match_compartment and match_role
-    return list(filter(match, participants))
-
-
-def collect_reaction_participants_value(
-    key=None, criteria=None, participants=None
-):
-    """
-    Collects a value from a reaction's specific participants
-
-    arguments:
-        key (str): key of value to collect from each participant
-        criteria (dict<list>): criteria by which to select participants
-        participants (list<dict>): information about a reaction's participants
-
-    returns:
-        (list<str>): values from a reaction's participants
-
-    raises:
-
-    """
-
-    participants_match = filter_reaction_participants(
-        criteria=criteria, participants=participants
-    )
-    return utility.collect_value_from_records(
-        key=key, records=participants_match
-    )
 
 
 def include_reactions_transport_processes(reactions_original=None):
@@ -1233,121 +964,109 @@ def find_index_reactions_replicates_identifier(
     return utility.find_index(match, reactions_replicates)
 
 
-def write_product(information=None):
+def determine_reaction_compartment(compartment=None, reaction=None):
     """
-    Writes product information to file
+    Determines whether any of reaction's participants are in a compartment
 
     arguments:
-        information (dict): product information
+        compartment (str): identifier of a compartment
+        reaction (dict): information about a reaction
 
     returns:
+        (bool): whether any of reaction's participants are in the compartment
 
     raises:
 
     """
 
-    # Specify directories and files
-    directory = os.path.join(
-        os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-        "project_metabolism", "metabolism_models", "homo_sapiens",
-        "recon_2-m-2"
-    )
-    #path_file_hmdb = os.path.join(
-    #    directory, "enhancement_hmdb_metabolites_references.csv"
-    #)
-    #path_file_recon2m2 = os.path.join(
-    #    directory, "enhancement_recon2m2_reactions_names.csv"
-    #)
-    path_file_compartments = os.path.join(
+    participants = reaction["participants"]
+    for participant in participants:
+        if participant["compartment"] == compartment:
+            return True
+    return False
+
+
+def write_product(directory=None, information=None):
+    """
+    Writes product information to file
+
+    arguments:
+        directory (str): directory for product files
+        information (object): information to write to file
+
+    raises:
+
+    returns:
+
+    """
+
+    # Specify directories and files.
+    path_compartments = os.path.join(
         directory, "enhancement_compartments.pickle"
     )
-    path_file_processes = os.path.join(
+    path_processes = os.path.join(
         directory, "enhancement_processes.pickle"
     )
-    path_file_metabolites = os.path.join(
-        directory, "enhancement_metabolites.pickle"
-    )
-    path_file_reactions = os.path.join(
+    path_reactions = os.path.join(
         directory, "enhancement_reactions.pickle"
     )
-    # Write information to file
+    path_metabolites = os.path.join(
+        directory, "enhancement_metabolites.pickle"
+    )
+    #path_hmdb = os.path.join(directory, "hmdb_metabolites.tsv")
+    # Write information to file.
+    with open(path_compartments, "wb") as file_product:
+        pickle.dump(information["compartments"], file_product)
+    with open(path_processes, "wb") as file_product:
+        pickle.dump(information["processes"], file_product)
+    with open(path_reactions, "wb") as file_product:
+        pickle.dump(information["reactions"], file_product)
+    with open(path_metabolites, "wb") as file_product:
+        pickle.dump(information["metabolites"], file_product)
     #utility.write_file_table(
-    #    information=information["hmdb_metabolites_references"],
-    #    path_file=path_file_hmdb,
+    #    information=information["hmdb_metabolites"],
+    #    path_file=path_hmdb,
     #    names=["identifier", "name", "hmdb", "pubchem", "chebi", "kegg"],
     #    delimiter="\t"
     #)
-    #utility.write_file_table(
-    #    information=information["recon2m2_reactions_names"],
-    #    path_file=path_file_recon2m2,
-    #    names=["identifier", "name"],
-    #    delimiter="\t"
-    #)
-    with open(path_file_compartments, "wb") as file_product:
-        pickle.dump(information["compartments"], file_product)
-    with open(path_file_processes, "wb") as file_product:
-        pickle.dump(information["processes"], file_product)
-    with open(path_file_metabolites, "wb") as file_product:
-        pickle.dump(information["metabolites"], file_product)
-    with open(path_file_reactions, "wb") as file_product:
-        pickle.dump(information["reactions"], file_product)
 
 
 ###############################################################################
 # Procedure
 
 
-def main():
+def execute_procedure(origin=None, destination=None, clean=None):
     """
-    This function defines the main activity of the module.
+    Function to execute module's main behavior.
+
+    The purpose of this procedure is to curate information about metabolic
+    entities and sets.
+
+    arguments:
+        origin (str): directory of source files
+        destination (str): directory for product files
+        clean (bool): whether to remove intermediate files
+
+    raises:
+
+    returns:
+
     """
 
-    # Read source information from file
-    source = read_source()
-
-    # Extract metabolites' references from Human Metabolome Database
-    hmdb_metabolites_references = extract_hmdb_metabolites_references(
+    # Read source information from file.
+    source = read_source(directory=origin)
+    # Extract metabolites' references from Human Metabolome Database.
+    metabolites_references = extract_hmdb_metabolites_references(
         hmdb=source["hmdb"]
     )
-    # Enhance metabolites' references
-    metabolites_references = enhance_metabolites(
+    # Enhance metabolites' references.
+    metabolites = enhance_metabolites(
         metabolites_original=source["metabolites"],
-        hmdb_metabolites_references=hmdb_metabolites_references
+        metabolites_references=metabolites_references
     )
-
-    # TODO: Move change procedures to before the enhancement from HMDB...
-
-
-    # Change procedures allow custom changes to metabolites and reactions
-    # Change compartments' information
-    compartments_change = change_compartments(
-        changer_compartments=source["changer_compartments"],
-        compartments_original=source["compartments"],
-        reactions_original=reactions_names
-    )
-    # Change processes information
-    processes_change = change_processes(
-        changer_processes=source["changer_processes"],
-        processes_original=source["processes"],
-        reactions_original=compartments_change["reactions"]
-    )
-    # Change metabolites' information
-    metabolites_change = change_metabolites(
-        changer_metabolites=source["changer_metabolites"],
-        metabolites_original=metabolites_references,
-        reactions_original=processes_change["reactions"]
-    )
-    # Change reactions' information
-    reactions_change = change_reactions(
-        changer_reactions=source["changer_reactions"],
-        reactions_original=metabolites_change["reactions"]
-    )
-
-
-
-    # Include information about reactions' behavior
+    # Include information about reactions' behavior.
     reactions_behavior = include_reactions_behaviors(
-        reactions_original=reactions_change
+        reactions_original=source["reactions"]
     )
     # Include transport reactions in processes
     reactions_process = include_reactions_transport_processes(
@@ -1357,19 +1076,13 @@ def main():
     reactions_replication = include_reactions_replications(
         reactions_original=reactions_process
     )
-    #Write product information to file
+    # Compile information.
     information = {
-        "hmdb_metabolites_references": list(
-            hmdb_metabolites_references.values()
-        ),
-        "recon2m2_reactions_names": list(recon2m2_reactions_names.values()),
-        "compartments": compartments_change["compartments"],
-        "processes": processes_change["processes"],
-        "metabolites": metabolites_change["metabolites"],
-        "reactions": reactions_replication
+        "compartments": source["compartments"],
+        "processes": source["processes"],
+        "metabolites": metabolites,
+        "reactions": reactions_replication,
+        "hmdb_metabolites": list(metabolites_references.values()),
     }
-    write_product(information=information)
-
-
-if __name__ == "__main__":
-    main()
+    #Write product information to file
+    write_product(directory=destination, information=information)
