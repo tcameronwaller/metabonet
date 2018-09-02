@@ -88,7 +88,7 @@ import enhancement
 ###############################################################################
 # Functionality
 
-def parse_arguments():
+def define_interpret_arguments():
     """
     Defines and interprets arguments from terminal.
 
@@ -140,17 +140,13 @@ def parse_arguments():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "-o", "--origin", dest="origin", type=str, required=True,
-        help="Directory of source files."
-    )
-    parser.add_argument(
-        "-d", "--destination", dest="destination", type=str, required=True,
-        help="Directory for product files."
+        "-d", "--directory", dest="directory", type=str, required=True,
+        help="Path to directory for source and product files."
     )
     procedure = parser.add_mutually_exclusive_group(required=True)
     procedure.add_argument(
         "-r", "--reconciliation", dest="reconciliation", action="store_true",
-        help="Reconcile model to MetaNetX."
+        help="Reconcile information from model to MetaNetX."
     )
     procedure.add_argument(
         "-e", "--extraction", dest="extraction", action="store_true",
@@ -165,10 +161,10 @@ def parse_arguments():
         help="Curate information."
     )
     procedure.add_argument(
-        "-t", "--conversion", dest="conversion", action="store_true",
+        "-v", "--conversion", dest="conversion", action="store_true",
         help="Convert information to formats for export."
     )
-    parser.add_argument(
+    procedure.add_argument(
         "-x", "--clean", dest="clean", action="store_true",
         help="Clean intermediate files."
     )
@@ -211,52 +207,49 @@ def execute_procedure():
     """
 
     # Parse arguments from terminal.
-    arguments = parse_arguments()
+    arguments = define_interpret_arguments()
     # Execute procedure.
     if arguments.reconciliation:
         # Report status.
         print("... executing reconciliation procedure ...")
         # Execute reconciliation procedure.
         reconciliation.execute_procedure(
-            origin=arguments.origin,
-            destination=arguments.destination,
-            clean=arguments.clean
+            directory=arguments.directory
         )
     elif arguments.extraction:
         # Report status.
         print("... executing extraction procedure ...")
         # Execute extraction procedure.
         extraction.execute_procedure(
-            origin=arguments.origin,
-            destination=arguments.destination,
-            clean=arguments.clean
+            directory=arguments.directory
         )
     elif arguments.enhancement:
         # Report status.
         print("... executing enhancement procedure ...")
         # Execute enhancement procedure.
         enhancement.execute_procedure(
-            origin=arguments.origin,
-            destination=arguments.destination,
-            clean=arguments.clean
+            directory=arguments.directory
         )
     elif arguments.curation:
         # Report status.
         print("... executing curation procedure ...")
         # Execute curation procedure.
         curation.execute_procedure(
-            origin=arguments.origin,
-            destination=arguments.destination,
-            clean=arguments.clean
+            directory=arguments.directory
         )
     elif arguments.conversion:
         # Report status.
         print("... executing conversion procedure ...")
         # Execute conversion procedure.
         conversion.execute_procedure(
-            origin=arguments.origin,
-            destination=arguments.destination,
-            clean=arguments.clean
+            directory=arguments.directory
+        )
+    elif arguments.clean:
+        # Report status.
+        print("... executing clean procedure ...")
+        # Execute conversion procedure.
+        clean.execute_procedure(
+            directory=arguments.directory
         )
 
 

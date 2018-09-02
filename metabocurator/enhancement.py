@@ -1035,7 +1035,7 @@ def write_product(directory=None, information=None):
 # Procedure
 
 
-def execute_procedure(origin=None, destination=None, clean=None):
+def execute_procedure(directory=None):
     """
     Function to execute module's main behavior.
 
@@ -1043,9 +1043,7 @@ def execute_procedure(origin=None, destination=None, clean=None):
     entities and sets.
 
     arguments:
-        origin (str): directory of source files
-        destination (str): directory for product files
-        clean (bool): whether to remove intermediate files
+        directory (str): path to directory for source and product files
 
     raises:
 
@@ -1059,11 +1057,13 @@ def execute_procedure(origin=None, destination=None, clean=None):
     metabolites_references = extract_hmdb_metabolites_references(
         hmdb=source["hmdb"]
     )
+    print("success extraction from hmdb")
     # Enhance metabolites' references.
     metabolites = enhance_metabolites(
         metabolites_original=source["metabolites"],
         metabolites_references=metabolites_references
     )
+    print("success enhancing metabolites...")
     # Include information about reactions' behavior.
     reactions_behavior = include_reactions_behaviors(
         reactions_original=source["reactions"]
@@ -1076,6 +1076,7 @@ def execute_procedure(origin=None, destination=None, clean=None):
     reactions_replication = include_reactions_replications(
         reactions_original=reactions_process
     )
+    print("done enhancing reactions...")
     # Compile information.
     information = {
         "compartments": source["compartments"],

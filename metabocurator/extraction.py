@@ -891,7 +891,7 @@ def write_product(directory=None, information=None):
 # Procedure
 
 
-def execute_procedure(origin=None, destination=None, clean=None):
+def execute_procedure(directory=None):
     """
     Function to execute module's main behavior.
 
@@ -899,9 +899,7 @@ def execute_procedure(origin=None, destination=None, clean=None):
     entities and sets from MetaNetX.
 
     arguments:
-        origin (str): directory of source files
-        destination (str): directory for product files
-        clean (bool): whether to remove intermediate files
+        directory (str): path to directory for source and product files
 
     raises:
 

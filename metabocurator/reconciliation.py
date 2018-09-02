@@ -386,8 +386,10 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
+    path = os.path.join(directory, "reconciliation")
+    utility.confirm_path_directory(path)
     path_file = os.path.join(
-        directory, "recon2m2_reconciliation.xml"
+        path, "recon2m2_reconciliation.xml"
     )
     # Write information to file.
     information.write(path_file, xml_declaration=False)
@@ -397,7 +399,7 @@ def write_product(directory=None, information=None):
 # Procedure
 
 
-def execute_procedure(origin=None, destination=None, clean=None):
+def execute_procedure(directory=None):
     """
     Function to execute module's main behavior.
 
@@ -405,9 +407,7 @@ def execute_procedure(origin=None, destination=None, clean=None):
     compatible with MetaNetX.
 
     arguments:
-        origin (str): directory of source files
-        destination (str): directory for product files
-        clean (bool): whether to remove intermediate files
+        directory (str): path to directory for source and product files
 
     raises:
 
@@ -416,7 +416,7 @@ def execute_procedure(origin=None, destination=None, clean=None):
     """
 
     # Read source information from file.
-    source = read_source(directory=origin)
+    source = read_source(directory=directory)
     # Change model's content.
     # Correct content.
     content_boundary = change_model_boundary(content=source["content"])
@@ -432,4 +432,4 @@ def execute_procedure(origin=None, destination=None, clean=None):
         content=content_prefix
     )
     #Write product information to file.
-    write_product(directory=destination, information=content_metabolites)
+    write_product(directory=directory, information=content_metabolites)

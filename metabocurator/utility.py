@@ -32,6 +32,25 @@ import pickle
 # Functionality
 
 
+def confirm_path_directory(path=None):
+    """
+    Confirms that a path to a directory exists.
+
+    Creates a directory if it does not already exist.
+
+    arguments:
+        path (str): path to directory
+
+    raises:
+
+    returns:
+
+    """
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def copy_interpret_content_recon2m2(content=None):
     """
     Copies and interprets content from Recon 2M.2
