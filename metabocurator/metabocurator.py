@@ -79,6 +79,7 @@ import textwrap
 # Custom
 
 import reconciliation
+import simplification
 import extraction
 import enhancement
 
@@ -147,6 +148,10 @@ def define_interpret_arguments():
     procedure.add_argument(
         "-r", "--reconciliation", dest="reconciliation", action="store_true",
         help="Reconcile information from model to MetaNetX."
+    )
+    procedure.add_argument(
+        "-s", "--simplification", dest="simplification", action="store_true",
+        help="Simplify information from Human Metabolome Database."
     )
     procedure.add_argument(
         "-e", "--extraction", dest="extraction", action="store_true",
@@ -223,6 +228,13 @@ def execute_procedure():
         extraction.execute_procedure(
             directory=arguments.directory
         )
+    elif arguments.simplification:
+        # Report status.
+        print("... executing simplification procedure ...")
+        # Execute simplification procedure.
+        simplification.execute_procedure(
+            directory=arguments.directory
+        )
     elif arguments.enhancement:
         # Report status.
         print("... executing enhancement procedure ...")
@@ -247,7 +259,7 @@ def execute_procedure():
     elif arguments.clean:
         # Report status.
         print("... executing clean procedure ...")
-        # Execute conversion procedure.
+        # Execute clean procedure.
         clean.execute_procedure(
             directory=arguments.directory
         )

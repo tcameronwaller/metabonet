@@ -78,7 +78,6 @@ import shutil
 import csv
 import copy
 import pickle
-import xml.etree.ElementTree as et
 
 # Packages and modules from third parties
 
@@ -109,17 +108,15 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_hmdb = os.path.join(directory, "hmdb_metabolites.xml")
-    path_compartments = os.path.join(
-        directory, "extraction_compartments.pickle"
-    )
-    path_processes = os.path.join(directory, "extraction_processes.pickle")
-    path_reactions = os.path.join(directory, "extraction_reactions.pickle")
-    path_metabolites = os.path.join(
-        directory, "extraction_metabolites.pickle"
-    )
+    path_hmdb = os.path.join(directory, "hmdb_metabolites_references.pickle")
+    path = os.path.join(directory, "extraction")
+    path_compartments = os.path.join(path, "extraction_compartments.pickle")
+    path_processes = os.path.join(path, "extraction_processes.pickle")
+    path_reactions = os.path.join(path, "extraction_reactions.pickle")
+    path_metabolites = os.path.join(path, "extraction_metabolites.pickle")
     # Read information from file.
-    hmdb = et.parse(path_hmdb)
+    with open(path_hmdb, "rb") as file_source:
+        metabolites_references = pickle.load(file_source)
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
     with open(path_processes, "rb") as file_source:
@@ -130,73 +127,12 @@ def read_source(directory=None):
         metabolites = pickle.load(file_source)
     # Compile and return information.
     return {
-        "hmdb": hmdb,
+        "metabolites_references": metabolites_references,
         "compartments": compartments,
         "processes": processes,
         "reactions": reactions,
         "metabolites": metabolites
     }
-
-
-def extract_hmdb_metabolites_references(hmdb=None):
-    """
-    Extracts metabolites' references from Human Metabolome Database (HMDB)
-
-    arguments:
-        hmdb (object): content from HMDB in XML
-
-    returns:
-        (dict<dict>): metabolites' references from HMDB
-
-    raises:
-
-    """
-
-    # Interpret content.
-    reference = utility.interpret_content_hmdb(content=hmdb)
-    # Extract information for metabolites.
-    metabolites_references = {}
-    for metabolite in reference["metabolites"].findall(
-        "base:metabolite", reference["space"]
-    ):
-        # HMDB identifiers.
-        identifier_hmdb_primary = metabolite.find(
-            "base:accession", reference["space"]
-        ).text
-        identifiers_hmdb_secondary = metabolite.find(
-            "base:secondary_accessions", reference["space"]
-        )
-        identifiers_hmdb = [identifier_hmdb_primary]
-        for identifier in identifiers_hmdb_secondary.findall(
-            "base:accession", reference["space"]
-        ):
-            identifiers_hmdb.append(identifier.text)
-        # Name.
-        name = metabolite.find("base:name", reference["space"]).text
-        # PubChem identifier.
-        identifier_pubchem = metabolite.find(
-            "base:pubchem_compound_id", reference["space"]
-        ).text
-        # Chemical Entities of Biological Interest (ChEBI) identifier.
-        identifier_chebi = metabolite.find(
-            "base:chebi_id", reference["space"]
-        ).text
-        # Kyoto Encyclopedia of Genes and Genomes (KEGG) identifier
-        identifier_kegg = metabolite.find(
-            "base:kegg_id", reference["space"]
-        ).text
-        # Compile information
-        record = {
-            "identifier": identifier_hmdb_primary,
-            "name": name,
-            "hmdb": identifiers_hmdb,
-            "pubchem": identifier_pubchem,
-            "chebi": identifier_chebi,
-            "kegg": identifier_kegg
-        }
-        metabolites_references[identifier_hmdb_primary] = record
-    # Return information
-    return metabolites_references
 
 
 def enhance_metabolites(
@@ -1001,19 +937,12 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path_compartments = os.path.join(
-        directory, "enhancement_compartments.pickle"
-    )
-    path_processes = os.path.join(
-        directory, "enhancement_processes.pickle"
-    )
-    path_reactions = os.path.join(
-        directory, "enhancement_reactions.pickle"
-    )
-    path_metabolites = os.path.join(
-        directory, "enhancement_metabolites.pickle"
-    )
-    #path_hmdb = os.path.join(directory, "hmdb_metabolites.tsv")
+    path = os.path.join(directory, "enhancement")
+    utility.confirm_path_directory(path)
+    path_compartments = os.path.join(path, "enhancement_compartments.pickle")
+    path_processes = os.path.join(path, "enhancement_processes.pickle")
+    path_reactions = os.path.join(path, "enhancement_reactions.pickle")
+    path_metabolites = os.path.join(path, "enhancement_metabolites.pickle")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
         pickle.dump(information["compartments"], file_product)
@@ -1023,12 +952,6 @@ def write_product(directory=None, information=None):
         pickle.dump(information["reactions"], file_product)
     with open(path_metabolites, "wb") as file_product:
         pickle.dump(information["metabolites"], file_product)
-    #utility.write_file_table(
-    #    information=information["hmdb_metabolites"],
-    #    path_file=path_hmdb,
-    #    names=["identifier", "name", "hmdb", "pubchem", "chebi", "kegg"],
-    #    delimiter="\t"
-    #)
 
 
 ###############################################################################
@@ -1051,17 +974,15 @@ def execute_procedure(directory=None):
 
     """
 
+    print("beginning enhancement procedure")
+
     # Read source information from file.
-    source = read_source(directory=origin)
-    # Extract metabolites' references from Human Metabolome Database.
-    metabolites_references = extract_hmdb_metabolites_references(
-        hmdb=source["hmdb"]
-    )
-    print("success extraction from hmdb")
+    source = read_source(directory=directory)
+    print("read source successfully")
     # Enhance metabolites' references.
     metabolites = enhance_metabolites(
         metabolites_original=source["metabolites"],
-        metabolites_references=metabolites_references
+        metabolites_references=source["metabolites_references"]
     )
     print("success enhancing metabolites...")
     # Include information about reactions' behavior.
@@ -1082,8 +1003,7 @@ def execute_procedure(directory=None):
         "compartments": source["compartments"],
         "processes": source["processes"],
         "metabolites": metabolites,
-        "reactions": reactions_replication,
-        "hmdb_metabolites": list(metabolites_references.values()),
+        "reactions": reactions_replication
     }
     #Write product information to file
-    write_product(directory=destination, information=information)
+    write_product(directory=directory, information=information)

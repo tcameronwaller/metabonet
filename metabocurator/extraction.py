@@ -111,15 +111,16 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_model = os.path.join(directory, "recon2m2.xml")
-    path_genes = os.path.join(directory, "recon2m2_metanetx_genes.tsv")
+    path = os.path.join(directory, "reconciliation")
+    path_model = os.path.join(path, "recon2m2_reconciliation.xml")
+    path_genes = os.path.join(path, "recon2m2_metanetx_genes.tsv")
     path_compartments = os.path.join(
-        directory, "recon2m2_metanetx_compartments.tsv"
+        path, "recon2m2_metanetx_compartments.tsv"
     )
     path_metabolites = os.path.join(
-        directory, "recon2m2_metanetx_metabolites.tsv"
+        path, "recon2m2_metanetx_metabolites.tsv"
     )
-    path_reactions = os.path.join(directory, "recon2m2_metanetx_reactions.tsv")
+    path_reactions = os.path.join(path, "recon2m2_metanetx_reactions.tsv")
     # Read information from file.
     model = et.parse(path_model)
     compartments = utility.read_file_table(
@@ -857,18 +858,12 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path_compartments = os.path.join(
-        directory, "extraction_compartments.pickle"
-    )
-    path_processes = os.path.join(
-        directory, "extraction_processes.pickle"
-    )
-    path_reactions = os.path.join(
-        directory, "extraction_reactions.pickle"
-    )
-    path_metabolites = os.path.join(
-        directory, "extraction_metabolites.pickle"
-    )
+    path = os.path.join(directory, "extraction")
+    utility.confirm_path_directory(path)
+    path_compartments = os.path.join(path, "extraction_compartments.pickle")
+    path_processes = os.path.join(path, "extraction_processes.pickle")
+    path_reactions = os.path.join(path, "extraction_reactions.pickle")
+    path_metabolites = os.path.join(path, "extraction_metabolites.pickle")
     #path_recon2m2 = os.path.join(directory, "recon2m2_reactions_names.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
@@ -908,7 +903,7 @@ def execute_procedure(directory=None):
     """
 
     # Read source information from file.
-    source = read_source(directory=origin)
+    source = read_source(directory=directory)
     # Extract information about compartments.
     compartments = extract_compartments(
         compartments_source=source["compartments"]
@@ -935,4 +930,4 @@ def execute_procedure(directory=None):
         "reactions_names": list(reactions_names.values())
     }
     #Write product information to file
-    write_product(directory=destination, information=information)
+    write_product(directory=directory, information=information)
