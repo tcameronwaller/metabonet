@@ -174,7 +174,7 @@ def curate_compartments(
 
     """
 
-    # Copy information
+    # Copy information.
     compartments_novel = copy.deepcopy(compartments_original)
     reactions_novel = copy.deepcopy(reactions_original)
     for record in compartments_curation:
@@ -183,13 +183,15 @@ def curate_compartments(
         identifier_novel = record["identifier_novel"]
         name_original = record["name_original"]
         name_novel = record["name_novel"]
-        # Determine method to change information
+        # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
         if identifier_novel is None:
             if identifier_original in compartments_novel:
                 # Remove compartment.
                 del compartments_novel[identifier_original]
+                # Removal of a compartment justifies removal of any reactions
+                # within that compartment.
                 # Remove relevant reactions.
                 removals = []
                 for key, record_reaction in reactions_novel.items():
@@ -208,7 +210,7 @@ def curate_compartments(
             # Change name.
             if identifier_original in compartments_novel:
                 compartments_novel[identifier_original]["name"] = name_novel
-    # Compile and return information
+    # Compile and return information.
     return {
         "compartments": compartments_novel,
         "reactions": reactions_novel
@@ -256,33 +258,45 @@ def curate_processes(
 
     """
 
-    # Copy information
+    # Copy information.
     processes_novel = copy.deepcopy(processes_original)
     reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_processes:
+    for record in processes_curation:
+        # Interpretation.
         identifier_original = record["identifier_original"]
         identifier_novel = record["identifier_novel"]
         name_original = record["name_original"]
         name_novel = record["name_novel"]
-        # Determine method to change information
+        # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
+        if identifier_novel is None:
             if identifier_original in processes_novel:
-                processes_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
+                # Remove process.
+                del processes_novel[identifier_original]
+                # Removal of a process does not justify removal of any
+                # reactions that participate in that process.
+        elif not match_identifiers:
+            # Change identifier.
             if identifier_original in processes_novel:
-                # Remove
+                # Remove process.
                 del processes_novel[identifier_original]
             if identifier_novel in processes_novel:
-                # Replace
+                # Replace.
                 for record_reaction in reactions_novel.values():
                     processes_reaction = record_reaction["processes"]
                     if identifier_original in processes_reaction:
                         for index, process in enumerate(processes_reaction):
                             if process == identifier_original:
                                 processes_reaction[index] = identifier_novel
+                        # Collect unique values.
+                        processes_reaction_novel = utility
+                            .collect_unique_elements(processes_reaction)
+                        record_reaction["processes"] = processes_reaction_novel
+        elif not match_names:
+            # Change name.
+            if identifier_original in processes_novel:
+                processes_novel[identifier_original]["name"] = name_novel
     # Compile and return information
     return {
         "processes": processes_novel,
