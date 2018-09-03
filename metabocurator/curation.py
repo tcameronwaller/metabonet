@@ -99,22 +99,19 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_compartments = os.path.join(
-        directory, "enhancement_compartments.pickle"
-    )
-    path_processes = os.path.join(directory, "enhancement_processes.pickle")
-    path_reactions = os.path.join(directory, "enhancement_reactions.pickle")
-    path_metabolites = os.path.join(
-        directory, "enhancement_metabolites.pickle"
-    )
-    path_curation_compartments = os.path.join(
+    path_compartments_curation = os.path.join(
         directory, "curation_compartments.tsv"
     )
-    path_curation_processes = os.path.join(directory, "curation_processes.tsv")
-    path_curation_reactions = os.path.join(directory, "curation_reactions.tsv")
-    path_curation_metabolites = os.path.join(
+    path_processes_curation = os.path.join(directory, "curation_processes.tsv")
+    path_reactions_curation = os.path.join(directory, "curation_reactions.tsv")
+    path_metabolites_curation = os.path.join(
         directory, "curation_metabolites.tsv"
     )
+    path = os.path.join(directory, "enhancement")
+    path_compartments = os.path.join(path, "enhancement_compartments.pickle")
+    path_processes = os.path.join(path, "enhancement_processes.pickle")
+    path_reactions = os.path.join(path, "enhancement_reactions.pickle")
+    path_metabolites = os.path.join(path, "enhancement_metabolites.pickle")
     # Read information from file.
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
@@ -124,23 +121,23 @@ def read_source(directory=None):
         reactions = pickle.load(file_source)
     with open(path_metabolites, "rb") as file_source:
         metabolites = pickle.load(file_source)
-    curation_compartments = utility.read_file_table(
-        path_file=path_curation_compartments,
+    compartments_curation = utility.read_file_table(
+        path_file=path_compartments_curation,
         names=None,
         delimiter="\t"
     )
-    curation_processes = utility.read_file_table(
-        path_file=path_curation_processes,
+    processes_curation = utility.read_file_table(
+        path_file=path_processes_curation,
         names=None,
         delimiter="\t"
     )
-    curation_metabolites = utility.read_file_table(
-        path_file=path_curation_metabolites,
+    reactions_curation = utility.read_file_table(
+        path_file=path_reactions_curation,
         names=None,
         delimiter="\t"
     )
-    curation_reactions = utility.read_file_table(
-        path_file=path_curation_reactions,
+    metabolites_curation = utility.read_file_table(
+        path_file=path_metabolites_curation,
         names=None,
         delimiter="\t"
     )
@@ -150,24 +147,24 @@ def read_source(directory=None):
         "processes": processes,
         "reactions": reactions,
         "metabolites": metabolites,
-        "curation_compartments": curation_compartments,
-        "curation_processes": curation_processes,
-        "curation_reactions": curation_reactions,
-        "curation_metabolites": curation_metabolites,
+        "compartments_curation": compartments_curation,
+        "processes_curation": processes_curation,
+        "reactions_curation": reactions_curation,
+        "metabolites_curation": metabolites_curation,
     }
 
 
-def change_compartments(
-    changer_compartments=None, compartments_original=None,
+def curate_compartments(
+    compartments_curation=None, compartments_original=None,
     reactions_original=None
 ):
     """
-    Changes information about specific compartments and relevant reactions
+    Curates information about specific compartments and relevant reactions.
 
     arguments:
-        changer_compartments (list<dict<str>>): information to change about
+        compartments_curation (list<dict<str>>): information to change about
             specific compartments
-        compartments_original (dict<dict>): information about processes
+        compartments_original (dict<dict>): information about compartments
         reactions_original (dict<dict>): information about reactions
 
     returns:
@@ -180,7 +177,8 @@ def change_compartments(
     # Copy information
     compartments_novel = copy.deepcopy(compartments_original)
     reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_compartments:
+    for record in compartments_curation:
+        # Interpretation.
         identifier_original = record["identifier_original"]
         identifier_novel = record["identifier_novel"]
         name_original = record["name_original"]
@@ -188,19 +186,15 @@ def change_compartments(
         # Determine method to change information
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
+        if identifier_novel is None:
             if identifier_original in compartments_novel:
-                compartments_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in compartments_novel:
-                # Remove
+                # Remove compartment.
                 del compartments_novel[identifier_original]
-                # Remove relevant reactions
+                # Remove relevant reactions.
                 removals = []
                 for key, record_reaction in reactions_novel.items():
                     # Determine whether any of reaction's participants are in
-                    # the compartment
+                    # the compartment.
                     match = determine_reaction_compartment(
                         compartment=identifier_original,
                         reaction=record_reaction
@@ -210,6 +204,10 @@ def change_compartments(
                         removals.append(key)
                 for removal in removals:
                     del reactions_novel[removal]
+        if not match_names:
+            # Change name.
+            if identifier_original in compartments_novel:
+                compartments_novel[identifier_original]["name"] = name_novel
     # Compile and return information
     return {
         "compartments": compartments_novel,
@@ -217,14 +215,36 @@ def change_compartments(
     }
 
 
-def change_processes(
-    changer_processes=None, processes_original=None, reactions_original=None
-):
+def determine_reaction_compartment(compartment=None, reaction=None):
     """
-    Changes information about specific processes and relevant reactions
+    Determines whether any of reaction's participants are in a compartment
 
     arguments:
-        changer_processes (list<dict<str>>): information to change about
+        compartment (str): identifier of a compartment
+        reaction (dict): information about a reaction
+
+    returns:
+        (bool): whether any of reaction's participants are in the compartment
+
+    raises:
+
+    """
+
+    participants = reaction["participants"]
+    for participant in participants:
+        if participant["compartment"] == compartment:
+            return True
+    return False
+
+
+def curate_processes(
+    processes_curation=None, processes_original=None, reactions_original=None
+):
+    """
+    Curates information about specific processes and relevant reactions.
+
+    arguments:
+        processes_curation (list<dict<str>>): information to change about
             specific processes
         processes_original (dict<dict>): information about processes
         reactions_original (dict<dict>): information about reactions
@@ -270,14 +290,14 @@ def change_processes(
     }
 
 
-def change_metabolites(
-    changer_metabolites=None, metabolites_original=None, reactions_original=None
+def curate_metabolites(
+    metabolites_curation=None, metabolites_original=None, reactions_original=None
 ):
     """
-    Changes information about specific metabolites and relevant reactions
+    Curates information about specific metabolites and relevant reactions.
 
     arguments:
-        changer_metabolites (list<dict<str>>): information to change about
+        metabolites_curation (list<dict<str>>): information to change about
             specific metabolites
         metabolites_original (dict<dict>): information about metabolites
         reactions_original (dict<dict>): information about reactions
@@ -322,12 +342,12 @@ def change_metabolites(
     }
 
 
-def change_reactions(changer_reactions=None, reactions_original=None):
+def curate_reactions(reactions_curation=None, reactions_original=None):
     """
-    Changes information about specific reactions
+    Curates information about specific reactions.
 
     arguments:
-        changer_reactions (list<dict<str>>): information to change about
+        reactions_curation (list<dict<str>>): information to change about
             specific reactions
         reactions_original (dict<dict>): information about reactions
 
@@ -383,28 +403,37 @@ def execute_procedure(directory=None):
     # Read source information from file.
     source = read_source(directory=origin)
 
+    # TODO: progress...
+
 
     # Change procedures allow custom changes to metabolites and reactions
     # Curate information about compartments.
-    compartments = change_compartments(
-        changer_compartments=source["changer_compartments"],
+    compartments_reactions = curate_compartments(
+        compartments_curation=source["compartments_curation"],
         compartments_original=source["compartments"],
-        reactions_original=reactions_names
+        reactions_original=source["reactions"]
     )
     # Curate information about processes.
-    processes = change_processes(
-        changer_processes=source["changer_processes"],
+    processes_reactions = curate_processes(
+        processes_curation=source["processes_curation"],
         processes_original=source["processes"],
-        reactions_original=compartments_change["reactions"]
-    )
-    # Curate information about reactions.
-    reactions = change_reactions(
-        changer_reactions=source["changer_reactions"],
-        reactions_original=metabolites_change["reactions"]
+        reactions_original=compartments_reactions["reactions"]
     )
     # Curate information about metabolites.
-    metabolites = change_metabolites(
-        changer_metabolites=source["changer_metabolites"],
-        metabolites_original=metabolites_references,
-        reactions_original=processes_change["reactions"]
+    metabolites_reactions = curate_metabolites(
+        metabolites_curation=source["metabolites_curation"],
+        metabolites_original=source["metabolites"],
+        reactions_original=processes_reactions["reactions"]
     )
+    # Curate information about reactions.
+    reactions = curate_reactions(
+        reactions_curation=source["reactions_curation"],
+        reactions_original=metabolites_reactions["reactions"]
+    )
+    # Compile information.
+    information = {
+        "compartments": compartments_reactions["compartments"],
+        "processes": processes_reactions["processes"],
+        "metabolites": metabolites_reactions["metabolites"],
+        "reactions": reactions
+    }

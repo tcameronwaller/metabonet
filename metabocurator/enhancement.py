@@ -897,28 +897,6 @@ def find_index_reactions_replicates_identifier(
     return utility.find_index(match, reactions_replicates)
 
 
-def determine_reaction_compartment(compartment=None, reaction=None):
-    """
-    Determines whether any of reaction's participants are in a compartment
-
-    arguments:
-        compartment (str): identifier of a compartment
-        reaction (dict): information about a reaction
-
-    returns:
-        (bool): whether any of reaction's participants are in the compartment
-
-    raises:
-
-    """
-
-    participants = reaction["participants"]
-    for participant in participants:
-        if participant["compartment"] == compartment:
-            return True
-    return False
-
-
 def prepare_report_metabolites(metabolites=None):
     """
     Prepares report of information about metabolites for review.
