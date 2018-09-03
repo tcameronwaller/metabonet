@@ -144,7 +144,7 @@ def write_file_table(
     # Write information to file
     #with open(out_file_path_model, "w") as out_file:
     #    out_file.write(content_identifier)
-    with open(path_file, "w", newline="") as file_product:
+    with open(path_file, "w") as file_product:
         writer = csv.DictWriter(
             file_product, fieldnames=names, delimiter=delimiter
         )
@@ -305,40 +305,6 @@ def filter_common_elements(list_one=None, list_two=None):
     def match(element_two=None):
         return element_two in list_one
     return list(filter(match, list_two))
-
-
-def interpret_content_hmdb(content=None):
-    """
-    Copies and interprets content from Human Metabolome Database (HMDB)
-
-    This function copies and interprets content from the Human Metabolome
-    Database in Extensible Markup Language (XML).
-
-    arguments:
-        content (object): content from HMDB in XML
-
-    returns:
-        (object): references to definition of name space and sections within
-            content
-
-    raises:
-
-    """
-
-    # Define name space
-    space = {
-        "base": "http://www.hmdb.ca"
-    }
-    # Set references to sections within content
-    metabolites = content.getroot()
-    #for child in metabolites[0]:
-    #    print(child.tag)
-    # Compile information
-    return {
-        "space": space,
-        "content": content,
-        "metabolites": metabolites
-    }
 
 
 ###############################################################################

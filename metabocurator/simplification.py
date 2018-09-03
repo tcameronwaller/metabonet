@@ -119,12 +119,27 @@ def read_source(directory=None):
 
 
 def construct_tag(tag=None, space=None, spaces=None):
+    """
+    Constructs complete tag for name space in Extensible Markup Language (XML).
+
+    arguments:
+        tag (str): name of element's tag
+        space (str): name name space within XML document
+        spaces (dict<str>): name spaces within XML document
+
+    raises:
+
+    returns:
+        (str): complete name of tag
+
+    """
+
     return "{" + spaces[space] + "}" + tag
 
 
 def extract_hmdb_metabolites_references(hmdb=None):
     """
-    Extracts metabolites' references from Human Metabolome Database (HMDB)
+    Extracts metabolites' references from Human Metabolome Database (HMDB).
 
     arguments:
         hmdb (str): path to file of HMDB in XML
@@ -160,11 +175,11 @@ def extract_hmdb_metabolites_references(hmdb=None):
                 tag_accession = construct_tag(
                     tag="accession", space=space, spaces=spaces
                 )
-                hmdb_primary = metabolite.find(tag_accession).text
+                hmdb_primary = element.find(tag_accession).text
                 tag_secondary = construct_tag(
                     tag="secondary_accessions", space=space, spaces=spaces
                 )
-                hmdb_secondary = metabolite.find(tag_secondary)
+                hmdb_secondary = element.find(tag_secondary)
                 identifiers_hmdb = [hmdb_primary]
                 for identifier in hmdb_secondary.findall(tag_accession):
                     identifiers_hmdb.append(identifier.text)
@@ -178,20 +193,20 @@ def extract_hmdb_metabolites_references(hmdb=None):
                 tag_pubchem = construct_tag(
                     tag="pubchem_compound_id", space=space, spaces=spaces
                 )
-                identifier_pubchem = metabolite.find(tag_pubchem).text
+                identifier_pubchem = element.find(tag_pubchem).text
                 # Chemical Entities of Biological Interest (ChEBI) identifier.
                 tag_chebi = construct_tag(
                     tag="chebi_id", space=space, spaces=spaces
                 )
-                identifier_chebi = metabolite.find(tag_chebi).text
+                identifier_chebi = element.find(tag_chebi).text
                 # Kyoto Encyclopedia of Genes and Genomes (KEGG) identifier.
                 tag_kegg = construct_tag(
                     tag="kegg_id", space=space, spaces=spaces
                 )
-                identifier_kegg = metabolite.find(tag_kegg).text
+                identifier_kegg = element.find(tag_kegg).text
                 # Compile information
                 record = {
-                    "identifier": identifier_hmdb_primary,
+                    "identifier": hmdb_primary,
                     "name": name,
                     "hmdb": identifiers_hmdb,
                     "pubchem": identifier_pubchem,
@@ -202,7 +217,7 @@ def extract_hmdb_metabolites_references(hmdb=None):
                 # Clear memory.
                 element.clear()
     # Report.
-    print("Extraction complete for " + str(metabolites) + " metabolites!")
+    print("Extraction complete for " + str(count) + " metabolites!")
     # Return information.
     return metabolites_references
 
@@ -255,19 +270,16 @@ def execute_procedure(directory=None):
 
     """
 
-    print("beginning simplification procedure")
-
     # Read source information from file.
     source = read_source(directory=directory)
     # Extract metabolites' references from Human Metabolome Database.
     metabolites_references = extract_hmdb_metabolites_references(
         hmdb=source["hmdb"]
     )
-    if False:
-        # Compile information.
-        information = {
-            "references_object": metabolites_references,
-            "references_list": list(metabolites_references.values())
-        }
-        #Write product information to file
-        write_product(directory=directory, information=information)
+    # Compile information.
+    information = {
+        "references_object": metabolites_references,
+        "references_list": list(metabolites_references.values())
+    }
+    #Write product information to file
+    write_product(directory=directory, information=information)
