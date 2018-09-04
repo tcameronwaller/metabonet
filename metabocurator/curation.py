@@ -206,7 +206,7 @@ def curate_compartments(
                         removals.append(key)
                 for removal in removals:
                     del reactions_novel[removal]
-        if not match_names:
+        elif not match_names:
             # Change name.
             if identifier_original in compartments_novel:
                 compartments_novel[identifier_original]["name"] = name_novel
@@ -276,27 +276,28 @@ def curate_processes(
                 del processes_novel[identifier_original]
                 # Removal of a process does not justify removal of any
                 # reactions that participate in that process.
-        elif not match_identifiers:
-            # Change identifier.
-            if identifier_original in processes_novel:
-                # Remove process.
-                del processes_novel[identifier_original]
-            if identifier_novel in processes_novel:
-                # Replace.
-                for record_reaction in reactions_novel.values():
-                    processes_reaction = record_reaction["processes"]
-                    if identifier_original in processes_reaction:
-                        for index, process in enumerate(processes_reaction):
-                            if process == identifier_original:
-                                processes_reaction[index] = identifier_novel
-                        # Collect unique values.
-                        processes_reaction_novel = utility
-                            .collect_unique_elements(processes_reaction)
-                        record_reaction["processes"] = processes_reaction_novel
-        elif not match_names:
-            # Change name.
-            if identifier_original in processes_novel:
-                processes_novel[identifier_original]["name"] = name_novel
+        else:
+            if not match_identifiers:
+                # Change identifier.
+                # Remove original.
+                if identifier_original in processes_novel:
+                    del processes_novel[identifier_original]
+                # Replace with novel.
+                if identifier_novel in processes_novel:
+                    for reaction in reactions_novel.values():
+                        processes = reaction["processes"]
+                        if identifier_original in processes:
+                            for index, process in enumerate(processes):
+                                if process == identifier_original:
+                                    processes[index] = identifier_novel
+                            # Collect unique values.
+                            processes_unique = utility
+                                .collect_unique_elements(processes)
+                            reaction["processes"] = processes_unique
+            if not match_names:
+                # Change name.
+                if identifier_novel in processes_novel:
+                    processes_novel[identifier_novel]["name"] = name_novel
     # Compile and return information
     return {
         "processes": processes_novel,
@@ -323,33 +324,47 @@ def curate_metabolites(
 
     """
 
-    # Copy information
+    # Copy information.
     metabolites_novel = copy.deepcopy(metabolites_original)
     reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_metabolites:
+    for record in metabolites_curation:
+        # Interpretation.
         identifier_original = record["identifier_original"]
         identifier_novel = record["identifier_novel"]
         name_original = record["name_original"]
         name_novel = record["name_novel"]
-        # Determine method to change information
+        # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
+        if identifier_novel is None:
             if identifier_original in metabolites_novel:
-                metabolites_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in metabolites_novel:
-                # Remove
+                # Remove metabolite.
                 del metabolites_novel[identifier_original]
-            if identifier_novel in metabolites_novel:
-                # Replace
-                for record_reaction in reactions_novel.values():
-                    participants = record_reaction["participants"]
-                    for participant in participants:
-                        if participant["metabolite"] == identifier_original:
-                            participant["metabolite"] = identifier_novel
-    # Compile and return information
+                # Remove metabolite from relevant reactions.
+                for reaction in reactions_novel.values():
+                    participants = reaction["participants"]
+                    for index, party in enumerate(participants):
+                        if party["metabolite"] == identifier_original:
+                            del participants[index]
+        else:
+            if not match_identifiers:
+                # Change identifier.
+                # Remove original.
+                if identifier_original in metabolites_novel:
+                    del metabolites_novel[identifier_original]
+                # Replace with novel.
+                if identifier_novel in metabolites_novel:
+                    # Replace metabolite in relevant reactions.
+                    for reaction in reactions_novel.values():
+                        participants = reaction["participants"]
+                        for party in participants:
+                            if party["metabolite"] == identifier_original:
+                                party["metabolite"] = identifier_novel
+            if not match_names:
+                # Change name.
+                if identifier_novel in metabolites_novel:
+                    metabolites_novel[identifier_novel]["name"] = name_novel
+    # Compile and return information.
     return {
         "metabolites": metabolites_novel,
         "reactions": reactions_novel
@@ -372,24 +387,25 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
 
     """
 
-    # Copy information
+    # Copy information.
     reactions_novel = copy.deepcopy(reactions_original)
     for record in changer_reactions:
+        # Interpretation.
         identifier_original = record["identifier_original"]
         identifier_novel = record["identifier_novel"]
         name_original = record["name_original"]
         name_novel = record["name_novel"]
-        # Determine method to change information
+        # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if match_identifiers and not match_names:
-            # Change name
+        if identifier_novel is None:
+            if identifier_original in reactions_novel:
+                # Remove reaction.
+                del reactions_novel[identifier_original]
+        elif not match_names:
+            # Change name.
             if identifier_original in reactions_novel:
                 reactions_novel[identifier_original]["name"] = name_novel
-        elif match_names and not match_identifiers:
-            if identifier_original in reactions_novel:
-                # Remove
-                del reactions_novel[identifier_original]
     # Return information
     return reactions_novel
 
@@ -416,10 +432,6 @@ def execute_procedure(directory=None):
 
     # Read source information from file.
     source = read_source(directory=origin)
-
-    # TODO: progress...
-
-
     # Change procedures allow custom changes to metabolites and reactions
     # Curate information about compartments.
     compartments_reactions = curate_compartments(
