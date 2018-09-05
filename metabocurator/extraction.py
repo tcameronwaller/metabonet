@@ -106,7 +106,7 @@ def read_source(directory=None):
     raises:
 
     returns:
-        (object): source information
+        (dict): source information
 
     """
 

@@ -109,11 +109,12 @@ def read_source(directory=None):
 
     # Specify directories and files.
     path_model = os.path.join(directory, "recon2m2.xml")
+    path_customization = os.path.join(directory, "customization")
     path_compartments = os.path.join(
-        directory, "reconciliation_compartments.tsv"
+        path_customization, "reconciliation_compartments.tsv"
     )
     path_metabolites = os.path.join(
-        directory, "reconciliation_metabolites.tsv"
+        path_customization, "reconciliation_metabolites.tsv"
     )
     # Read information from file.
     content = et.parse(path_model)

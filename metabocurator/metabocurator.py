@@ -91,9 +91,9 @@ import conversion
 ###############################################################################
 # Functionality
 
-def define_interpret_arguments():
+def define_parse_arguments():
     """
-    Defines and interprets arguments from terminal.
+    Defines and parses arguments from terminal.
 
     arguments:
 
@@ -214,7 +214,7 @@ def execute_procedure():
     """
 
     # Parse arguments from terminal.
-    arguments = define_interpret_arguments()
+    arguments = define_parse_arguments()
     # Execute procedure.
     if arguments.reconciliation:
         # Report status.

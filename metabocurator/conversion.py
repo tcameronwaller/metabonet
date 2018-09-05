@@ -228,8 +228,14 @@ def convert_reactions_text(reactions=None):
         compartments = utility.collect_value_from_records(
             key="compartment", records=reaction["participants"]
         )
+        compartments_unique = utility.collect_unique_elements(
+            elements_original=compartments
+        )
         metabolites = utility.collect_value_from_records(
             key="metabolite", records=reaction["participants"]
+        )
+        metabolites_unique = utility.collect_unique_elements(
+            elements_original=metabolites
         )
         # Transports.
         transport_metabolites = utility.collect_value_from_records(
@@ -246,8 +252,8 @@ def convert_reactions_text(reactions=None):
             "identifier": reaction["identifier"],
             "name": reaction["name"],
             "equation": reaction["equation"],
-            "metabolites": ";".join(metabolites),
-            "compartments": ";".join(compartments),
+            "metabolites": ";".join(metabolites_unique),
+            "compartments": ";".join(compartments_unique),
             "processes": ";".join(reaction["processes"]),
             "genes": ";".join(reaction["genes"]),
             "reversibility": reaction["reversibility"],

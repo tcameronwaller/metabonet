@@ -728,7 +728,12 @@ def collect_reaction_transport_processes(
 
 def include_reactions_replications(reactions_original=None):
     """
-    Includes information about reactions' replications
+    Includes information about reactions' replications.
+
+    Replicate reactions involve participation of reactants and products that
+    are identical metabolites but not necessarily identical compartments.
+    Consideration of replication is necessary to avoid redundancy when
+    compartments are irrelevant.
 
     arguments:
         reactions_original (dict<dict>): information about reactions

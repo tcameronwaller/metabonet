@@ -83,25 +83,38 @@ import argparse
 ###############################################################################
 # Functionality
 
-def parse_arguments():
+def define_parse_arguments():
     """
-    Defines and interprets arguments from terminal.
+    Defines and parses arguments from terminal.
 
     arguments:
 
+    raises:
+
     returns:
         (object): arguments from terminal
-
-    raises:
 
     """
 
     # Define arguments.
     parser = argparse.ArgumentParser(
-        description="Define custom networks from metabolic models."
+        description=textwrap.dedent("""\
+            --------------------------------------------------
+
+            Define custom networks from metabolic models.
+
+            --------------------------------------------------
+        """),
+        epilog=textwrap.dedent("""\
+
+            --------------------------------------------------
+
+            --------------------------------------------------
+        """),
+        formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "-s", "--source", dest="source", type=str, required=True,
+        "-o", "--origin", dest="origin", type=str, required=True,
         help="Directory of source files."
     )
     parser.add_argument(
@@ -123,7 +136,7 @@ def parse_arguments():
         help="Simplify by replication method."
     )
     parser.add_argument(
-        "-c", "--compartmentalize", dest="compartmentalization",
+        "-c", "--compartmentalize", dest="compartmentalization", required=True,
         action="store_true", help="Compartmentalize metabolites."
     )
     parser.add_argument(
@@ -132,6 +145,38 @@ def parse_arguments():
     )
     # Parse arguments.
     return parser.parse_args()
+
+
+def interpret_arguments(arguments=None):
+    """
+    Interprets arguments from terminal.
+
+    arguments:
+        arguments (object): arguments from terminal
+
+    raises:
+
+    returns:
+        (dict): parameters
+
+    """
+
+    origin = arguments.origin
+    destination = arguments.destination
+    if arguments.omission:
+        method = "omission"
+    elif arguments.replication:
+        method = "replication"
+    compartmentalization = arguments.compartmentalization
+    clean = arguments.clean
+    # Compile and return information.
+    return {
+        "origin": origin,
+        "destination": destination,
+        "method": method,
+        "compartmentalization": compartmentalization,
+        "clean": clean
+    }
 
 
 def evaluate_source(directory=None):
@@ -151,7 +196,7 @@ def evaluate_source(directory=None):
 
 
     # TODO: Make sure necessary input files are available, etc...
-    pass
+    return True
 
 ###############################################################################
 # Procedure
@@ -170,17 +215,25 @@ def execute_procedure():
     """
 
     # Parse arguments from terminal.
-    arguments = parse_arguments()
+    arguments = define_parse_arguments()
+    # Interpret arguments from terminal.
+    parameters = interpret_arguments(arguments=arguments)
     # Evaluate arguments *** input files.
     match = evaluate_source(directory=arguments.source)
     if match:
         # Execute procedure.
+        # Filtration.
+        # TODO: Consider including filters by compartments and processes.
+        # Candidacy.
+        # TODO: which reactions are relevant (compartment)
+        # Simplification.
+        # Network.
         pass
+
     else:
         # Display explanatory error message.
         # TODO: especially explain the necessary input files...
         pass
-
     pass
 
 

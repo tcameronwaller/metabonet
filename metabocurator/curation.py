@@ -108,13 +108,18 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
+    path_customization = os.path.join(directory, "customization")
     path_compartments_curation = os.path.join(
-        directory, "curation_compartments.tsv"
+        path_customization, "curation_compartments.tsv"
     )
-    path_processes_curation = os.path.join(directory, "curation_processes.tsv")
-    path_reactions_curation = os.path.join(directory, "curation_reactions.tsv")
+    path_processes_curation = os.path.join(
+        path_customization, "curation_processes.tsv"
+    )
+    path_reactions_curation = os.path.join(
+        path_customization, "curation_reactions.tsv"
+    )
     path_metabolites_curation = os.path.join(
-        directory, "curation_metabolites.tsv"
+        path_customization, "curation_metabolites.tsv"
     )
     path = os.path.join(directory, "enhancement")
     path_compartments = os.path.join(path, "enhancement_compartments.pickle")
