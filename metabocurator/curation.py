@@ -306,7 +306,9 @@ def curate_processes(
 
 
 def curate_metabolites(
-    metabolites_curation=None, metabolites_original=None, reactions_original=None
+    metabolites_curation=None,
+    metabolites_original=None,
+    reactions_original=None
 ):
     """
     Curates information about specific metabolites and relevant reactions.
@@ -349,17 +351,27 @@ def curate_metabolites(
         else:
             if not match_identifiers:
                 # Change identifier.
-                # Remove original.
-                if identifier_original in metabolites_novel:
+                if (identifier_original in metabolites_novel) and
+                    (identifier_novel not in metabolites_novel):
+                    # Copy original record.
+                    metabolite_novel = copy.deepcopy(
+                        metabolites_novel[identifier_original]
+                    )
+                    # Change identifier.
+                    metabolite_novel["identifier"] = identifier_novel
+                    # Replace original record with novel record.
                     del metabolites_novel[identifier_original]
-                # Replace with novel.
-                if identifier_novel in metabolites_novel:
-                    # Replace metabolite in relevant reactions.
-                    for reaction in reactions_novel.values():
-                        participants = reaction["participants"]
-                        for party in participants:
-                            if party["metabolite"] == identifier_original:
-                                party["metabolite"] = identifier_novel
+                    metabolites_novel[identifier_novel] = metabolite_novel
+                elif (identifier_original in metabolites_novel) and
+                    (identifier_novel in metabolites_novel):
+                    # Remove original record.
+                    del metabolites_novel[identifier_original]
+                # Replace metabolite in relevant reactions.
+                for reaction in reactions_novel.values():
+                    participants = reaction["participants"]
+                    for party in participants:
+                        if party["metabolite"] == identifier_original:
+                            party["metabolite"] = identifier_novel
             if not match_names:
                 # Change name.
                 if identifier_novel in metabolites_novel:

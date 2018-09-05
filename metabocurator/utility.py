@@ -152,6 +152,27 @@ def write_file_table(
         writer.writerows(information)
 
 
+def match_string_in_list(string=None, list=None):
+    """
+    Determines whether any elements in a list are identical to a search text.
+
+    arguments:
+        text (str): string for which to search
+        sequence (list<str>): sequence of string elements
+
+    raises:
+
+    returns:
+        (bool): whether the string exists in the list
+
+    """
+
+    for element in list:
+        if string == element:
+            return True
+    return False
+
+
 def find(match=None, sequence=None):
     """
     Finds the first element in a sequence to match a condition, otherwise none

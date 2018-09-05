@@ -953,6 +953,12 @@ def prepare_report_reactions(reactions=None):
 
     records = []
     for reaction in reactions.values():
+        compartments = utility.collect_value_from_records(
+            key="compartment", records=reaction["participants"]
+        )
+        metabolites = utility.collect_value_from_records(
+            key="metabolite", records=reaction["participants"]
+        )
         record = {
             "identifier": reaction["identifier"],
             "name": reaction["name"],
@@ -961,11 +967,90 @@ def prepare_report_reactions(reactions=None):
             "dispersal": reaction["dispersal"],
             "transport": reaction["transport"],
             "replication": reaction["replication"],
+            "metabolites": metabolites,
+            "compartments": compartments,
             "processes": reaction["processes"],
-            "genes": reaction["genes"]
+            "genes": reaction["genes"],
+            "reference_metanetx": reaction["references"]["metanetx"]
         }
         records.append(record)
     return records
+
+
+def filter_reactions(reactions_original=None):
+    """
+    Filters reactions by relevance to contextual metabolic network.
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+
+    returns:
+        (dict<dict>): information about reactions
+
+    raises:
+
+    """
+
+    reactions_novel = {}
+    for reaction in reactions_original.values():
+        match, record = filter_reaction(reaction=reaction)
+        if match:
+            reactions_novel[reaction["identifier"]] = record
+    return reactions_novel
+
+
+def filter_reaction(reaction=None):
+    """
+    Filters a reaction by relevance to contextual metabolic network.
+
+    arguments:
+        reaction (dict): information about a reaction
+
+    returns:
+        (tuple<bool, dict>): whether reaction passes filters, and report
+
+    raises:
+
+    """
+
+    # Name.
+    # Biomass and protein degradation are irrelevant.
+    name = (
+        reaction["name"] == "Generic human biomass reaction" or
+        reaction["name"] == "Protein degradation"
+    )
+    # Compartment.
+    # Boundary is irrelevant.
+    compartments = utility.collect_value_from_records(
+        key="compartment", records=reaction["participants"]
+    )
+    compartment = utility.match_string_in_list(
+        string="BOUNDARY", list=compartments
+    )
+    # Metabolite.
+    # Biomass is irrelevant.
+    metabolites = utility.collect_value_from_records(
+        key="metabolite", records=reaction["participants"]
+    )
+    metabolite = utility.match_string_in_list(
+        string="BIOMASS", list=metabolites
+    )
+    # Reference.
+    # MetaNetX reaction MNXR01 is for a meaningless proton exchange.
+    reference = reaction["references"]["metanetx"][0] == "MNXR01"
+    # Determine whether reaction passes filters.
+    filter = name or compartment or metabolite or reference
+    # Prepare report.
+    record = {
+        "identifier_original": reaction["identifier"],
+        "identifier_novel": "None",
+        "name": name,
+        "compartment": compartment,
+        "metabolite": metabolite,
+        "reference": reference
+    }
+    # Return information.
+    return (filter, record)
 
 
 def write_product(directory=None, information=None):
@@ -991,6 +1076,7 @@ def write_product(directory=None, information=None):
     path_metabolites = os.path.join(path, "enhancement_metabolites.pickle")
     path_metabolites_report = os.path.join(path, "metabolites_report.tsv")
     path_reactions_report = os.path.join(path, "reactions_report.tsv")
+    path_reactions_filter = os.path.join(path, "reactions_filter.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
         pickle.dump(information["compartments"], file_product)
@@ -1016,12 +1102,19 @@ def write_product(directory=None, information=None):
     )
     names_reactions = [
         "identifier", "name", "reversibility", "conversion", "dispersal",
-        "transport", "replication", "processes", "genes"
+        "transport", "replication", "metabolites", "compartments", "processes",
+        "genes", "reference_metanetx"
     ]
     utility.write_file_table(
         information=information["reactions_report"],
         path_file=path_reactions_report,
         names=names_reactions,
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["reactions_filter"],
+        path_file=path_reactions_filter,
+        names=information["reactions_filter"][0].keys(),
         delimiter="\t"
     )
 
@@ -1072,6 +1165,10 @@ def execute_procedure(directory=None):
     reactions_report = prepare_report_reactions(
         reactions=reactions_replication
     )
+    # Filter reactions.
+    reactions_filter = filter_reactions(
+        reactions_original=reactions_replication
+    )
     # Compile information.
     information = {
         "compartments": source["compartments"],
@@ -1079,7 +1176,8 @@ def execute_procedure(directory=None):
         "metabolites": metabolites,
         "reactions": reactions_replication,
         "metabolites_report": metabolites_report,
-        "reactions_report": reactions_report
+        "reactions_report": reactions_report,
+        "reactions_filter": list(reactions_filter.values())
     }
     #Write product information to file
     write_product(directory=directory, information=information)
