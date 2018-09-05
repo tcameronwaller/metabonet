@@ -249,16 +249,37 @@ def collect_value_from_records(key=None, records=None):
         key (str): key of value in each record
         records (list<dict>): sequence of records
 
+    raises:
+
     returns:
         (list): values from records
-
-    raises:
 
     """
 
     def access(record):
         return record[key]
     return list(map(access, records))
+
+
+def collect_values_from_records(key=None, records=None):
+    """
+    Collects values from multiple records.
+
+    arguments:
+        key (str): key of value in each record
+        records (list<dict>): sequence of records
+
+    raises:
+
+    returns:
+        (list): values from records
+
+    """
+
+    collection = []
+    for record in records:
+        collection.extend(record[key])
+    return collection
 
 
 def compare_lists_by_inclusion(list_one=None, list_two=None):

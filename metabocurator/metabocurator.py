@@ -83,6 +83,7 @@ import simplification
 import extraction
 import enhancement
 import curation
+import conversion
 
 #dir()
 #importlib.reload()

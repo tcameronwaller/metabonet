@@ -703,7 +703,7 @@ def extract_reaction_references(
     )
     # Compile and return information
     return {
-        "recon2m2": recon2m2,
+        "recon2m2": [recon2m2],
         "rhea": rhea,
         "bigg": bigg,
         "metanetx": metanetx_current,

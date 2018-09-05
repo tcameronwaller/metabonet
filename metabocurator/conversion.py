@@ -136,7 +136,8 @@ def convert_dymetabonet(
     compartments=None, processes=None, reactions=None, metabolites=None
 ):
     """
-    Reads and organizes source information from file
+    Converts information about metabolic entities and sets to format for web
+    applications.
 
     arguments:
         compartments (dict<dict>): information about compartments
@@ -157,6 +158,164 @@ def convert_dymetabonet(
         "metabolites": metabolites,
         "reactions": reactions,
     }
+
+
+def convert_compartments_text(compartments=None):
+    """
+    Converts information about compartments to text format.
+
+    arguments:
+        compartments (dict<dict>): information about compartments
+
+    raises:
+
+    returns:
+        (list<dict>): information about compartments
+
+    """
+
+    records = []
+    for compartment in compartments.values():
+        record = {
+            "identifier": compartment["identifier"],
+            "name": compartment["name"]
+        }
+        records.append(record)
+    return records
+
+
+def convert_processes_text(processes=None):
+    """
+    Converts information about processes to text format.
+
+    arguments:
+        processes (dict<dict>): information about processes
+
+    raises:
+
+    returns:
+        (list<dict>): information about processes
+
+    """
+
+    records = []
+    for process in processes.values():
+        record = {
+            "identifier": process["identifier"],
+            "name": process["name"]
+        }
+        records.append(record)
+    return records
+
+
+def convert_reactions_text(reactions=None):
+    """
+    Converts information about reactions to text format.
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+
+    returns:
+        (list<dict>): information about reactions
+
+    raises:
+
+    """
+
+    records = []
+    for reaction in reactions.values():
+        # Participants.
+        compartments = utility.collect_value_from_records(
+            key="compartment", records=reaction["participants"]
+        )
+        metabolites = utility.collect_value_from_records(
+            key="metabolite", records=reaction["participants"]
+        )
+        # Transports.
+        transport_metabolites = utility.collect_value_from_records(
+            key="metabolite", records=reaction["transports"]
+        )
+        transport_compartments = utility.collect_values_from_records(
+            key="compartments", records=reaction["transports"]
+        )
+        transport_compartments_unique = utility.collect_unique_elements(
+            elements_original=transport_compartments
+        )
+        # Compile information.
+        record = {
+            "identifier": reaction["identifier"],
+            "name": reaction["name"],
+            "equation": reaction["equation"],
+            "metabolites": ";".join(metabolites),
+            "compartments": ";".join(compartments),
+            "processes": ";".join(reaction["processes"]),
+            "genes": ";".join(reaction["genes"]),
+            "reversibility": reaction["reversibility"],
+            "conversion": reaction["conversion"],
+            "dispersal": reaction["dispersal"],
+            "transport": reaction["transport"],
+            "transport_metabolites": ";".join(transport_metabolites),
+            "transport_compartments": ";".join(transport_compartments_unique),
+            "replication": reaction["replication"],
+            "replicates": ";".join(reaction["replicates"]),
+            "reference_metanetx": ";".join(reaction["references"]["metanetx"]),
+            "reference_recon2m2": ";".join(reaction["references"]["recon2m2"]),
+            "reference_kegg": ";".join(reaction["references"]["kegg"]),
+            "reference_reactome": ";".join(reaction["references"]["reactome"]),
+            "reference_metacyc": ";".join(reaction["references"]["metacyc"]),
+            "reference_bigg": ";".join(reaction["references"]["bigg"]),
+            "reference_rhea": ";".join(reaction["references"]["rhea"]),
+            "reference_sabiork": ";".join(reaction["references"]["sabiork"]),
+            "reference_seed": ";".join(reaction["references"]["seed"]),
+            "reference_enzyme_commission":
+                ";".join(reaction["references"]["enzyme_commission"]),
+        }
+        records.append(record)
+    return records
+
+
+def convert_metabolites_text(metabolites=None):
+    """
+    Converts information about metabolites to text format.
+
+    arguments:
+        metabolites (dict<dict>): information about metabolites
+
+    returns:
+        (list<dict>): information about metabolites
+
+    raises:
+
+    """
+
+    records = []
+    for metabolite in metabolites.values():
+        record = {
+            "identifier": metabolite["identifier"],
+            "name": metabolite["name"],
+            "formula": metabolite["formula"],
+            "mass": metabolite["mass"],
+            "charge": metabolite["charge"],
+            "reference_metanetx":
+                ";".join(metabolite["references"]["metanetx"]),
+            "reference_hmdb": ";".join(metabolite["references"]["hmdb"]),
+            "reference_pubchem": ";".join(metabolite["references"]["pubchem"]),
+            "reference_chebi": ";".join(metabolite["references"]["chebi"]),
+            "reference_bigg": ";".join(metabolite["references"]["bigg"]),
+            "reference_kegg": ";".join(metabolite["references"]["kegg"]),
+            "reference_metacyc": ";".join(metabolite["references"]["metacyc"]),
+            "reference_reactome":
+                ";".join(metabolite["references"]["reactome"]),
+            "reference_lipidmaps":
+                ";".join(metabolite["references"]["lipidmaps"]),
+            "reference_sabiork": ";".join(metabolite["references"]["sabiork"]),
+            "reference_seed": ";".join(metabolite["references"]["seed"]),
+            "reference_slm": ";".join(metabolite["references"]["slm"]),
+            "reference_envipath":
+                ";".join(metabolite["references"]["envipath"]),
+        }
+        records.append(record)
+    return records
 
 
 def write_product(directory=None, information=None):
@@ -252,7 +411,6 @@ def execute_procedure(directory=None):
         metabolites=source["metabolites"]
     )
     # Convert information for export in text.
-    # TODO:
     compartments_text = convert_compartments_text(
         compartments=source["compartments"]
     )
@@ -265,10 +423,6 @@ def execute_procedure(directory=None):
     metabolites_text = convert_metabolites_text(
         metabolites=source["metabolites"]
     )
-
-
-
-
     # Compile information.
     information = {
         "dymetabonet": dymetabonet,
