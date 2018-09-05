@@ -1,8 +1,8 @@
 """
-Extract information about metabolic sets and entities from MetaNetX.
+Convert information about metabolic sets and entities to versatile formats.
 
 Title:
-    experiment_group.py
+    conversion
 
 Imports:
     os: This module from The Python Standard Library contains definitions of
@@ -94,113 +94,192 @@ import utility
 # Functionality
 
 
-def read_source():
+def read_source(directory=None):
     """
     Reads and organizes source information from file
 
     arguments:
+        directory (str): directory of source files
+
+    raises:
 
     returns:
         (object): source information
 
+    """
+
+    # Specify directories and files.
+    path = os.path.join(directory, "curation")
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
+    # Read information from file.
+    with open(path_compartments, "rb") as file_source:
+        compartments = pickle.load(file_source)
+    with open(path_processes, "rb") as file_source:
+        processes = pickle.load(file_source)
+    with open(path_reactions, "rb") as file_source:
+        reactions = pickle.load(file_source)
+    with open(path_metabolites, "rb") as file_source:
+        metabolites = pickle.load(file_source)
+    # Compile and return information.
+    return {
+        "compartments": compartments,
+        "processes": processes,
+        "reactions": reactions,
+        "metabolites": metabolites
+    }
+
+
+def convert_dymetabonet(
+    compartments=None, processes=None, reactions=None, metabolites=None
+):
+    """
+    Reads and organizes source information from file
+
+    arguments:
+        compartments (dict<dict>): information about compartments
+        processes (dict<dict>): information about processes
+        reactions (dict<dict>): information about reactions
+        metabolites (dict<dict>): information about metabolites
+
     raises:
+
+    returns:
+        (dict<dict<dict>>): information about metabolic entities and sets
 
     """
 
-    # Specify directories and files
-    directory = os.path.join(
-        os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-        "project_metabolism", "metabolism_models", "homo_sapiens",
-        "recon_2-m-2"
-    )
-    path_file_compartments = os.path.join(
-        directory, "enhancement_compartments.pickle"
-    )
-    path_file_processes = os.path.join(
-        directory, "enhancement_processes.pickle"
-    )
-    path_file_metabolites = os.path.join(
-        directory, "enhancement_metabolites.pickle"
-    )
-    path_file_reactions = os.path.join(
-        directory, "enhancement_reactions.pickle"
-    )
-    # Read information from file
-    with open(path_file_compartments, "rb") as file_source:
-        compartments = pickle.load(file_source)
-    with open(path_file_processes, "rb") as file_source:
-        processes = pickle.load(file_source)
-    with open(path_file_metabolites, "rb") as file_source:
-        metabolites = pickle.load(file_source)
-    with open(path_file_reactions, "rb") as file_source:
-        reactions = pickle.load(file_source)
-    # Compile and return information
     return {
         "compartments": compartments,
         "processes": processes,
         "metabolites": metabolites,
-        "reactions": reactions
+        "reactions": reactions,
     }
 
 
-def write_product(information=None):
+def write_product(directory=None, information=None):
     """
     Writes product information to file
 
     arguments:
-        information (dict): product information
-
-    returns:
+        directory (str): directory for product files
+        information (object): information to write to file
 
     raises:
 
+    returns:
+
     """
 
-    # Specify directories and files
-    directory = os.path.join(
-        os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-        "project_metabolism", "metabolism_models", "homo_sapiens",
-        "recon_2-m-2"
+    # Specify directories and files.
+    path = os.path.join(directory, "conversion")
+    utility.confirm_path_directory(path)
+    path_dymetabonet = os.path.join(path, "metabolism.json")
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
+    path_compartments_text = os.path.join(path, "compartments.tsv")
+    path_processes_text = os.path.join(path, "processes.tsv")
+    path_reactions_text = os.path.join(path, "reactions.tsv")
+    path_metabolites_text = os.path.join(path, "metabolites.tsv")
+    # Write information to file.
+    with open(path_dymetabonet, "w") as file_product:
+        json.dump(information["dymetabonet"], file_product)
+    with open(path_compartments, "wb") as file_product:
+        pickle.dump(information["compartments"], file_product)
+    with open(path_processes, "wb") as file_product:
+        pickle.dump(information["processes"], file_product)
+    with open(path_reactions, "wb") as file_product:
+        pickle.dump(information["reactions"], file_product)
+    with open(path_metabolites, "wb") as file_product:
+        pickle.dump(information["metabolites"], file_product)
+    utility.write_file_table(
+        information=information["compartments_text"],
+        path_file=path_compartments_text,
+        names=information["compartments_text"][0].keys(),
+        delimiter="\t"
     )
-    path_file_metabolism = os.path.join(
-        directory, "metabolism_sets_entities_recon2m2.json"
+    utility.write_file_table(
+        information=information["processes_text"],
+        path_file=path_processes_text,
+        names=information["processes_text"][0].keys(),
+        delimiter="\t"
     )
-    path_file_metabolites_report = os.path.join(
-        directory, "report_metabolites.tsv"
+    utility.write_file_table(
+        information=information["reactions_text"],
+        path_file=path_reactions_text,
+        names=information["reactions_text"][0].keys(),
+        delimiter="\t"
     )
-    path_file_reactions_report = os.path.join(
-        directory, "report_reactions.tsv"
+    utility.write_file_table(
+        information=information["metabolites_text"],
+        path_file=path_metabolites_text,
+        names=information["metabolites_text"][0].keys(),
+        delimiter="\t"
     )
-    # Write information to file
-    with open(path_file_metabolism, "w") as file_product:
-        json.dump(information["metabolism"], file_product)
 
 
 ###############################################################################
 # Procedure
 
 
-def main():
+def execute_procedure(directory=None):
     """
-    This function defines the main activity of the module.
+    Function to execute module's main behavior.
+
+    The purpose of this procedure is to convert information about metabolic
+    entities and sets to versatile formats.
+
+    arguments:
+        directory (str): path to directory for source and product files
+
+    raises:
+
+    returns:
+
     """
 
-    # Read source information from file
-    source = read_source()
-    #Write product information to file
-    metabolism = {
+    # Read source information from file.
+    source = read_source(directory=directory)
+    # Convert information for export to DyMetaboNet.
+    dymetabonet = convert_dymetabonet(
+        compartments=source["compartments"],
+        processes=source["processes"],
+        reactions=source["reactions"],
+        metabolites=source["metabolites"]
+    )
+    # Convert information for export in text.
+    # TODO:
+    compartments_text = convert_compartments_text(
+        compartments=source["compartments"]
+    )
+    processes_text = convert_processes_text(
+        processes=source["processes"]
+    )
+    reactions_text = convert_reactions_text(
+        reactions=source["reactions"]
+    )
+    metabolites_text = convert_metabolites_text(
+        metabolites=source["metabolites"]
+    )
+
+
+
+
+    # Compile information.
+    information = {
+        "dymetabonet": dymetabonet,
         "compartments": source["compartments"],
         "processes": source["processes"],
         "metabolites": source["metabolites"],
         "reactions": source["reactions"],
+        "compartments_text": compartments_text,
+        "processes_text": processes_text,
+        "reactions_text": reactions_text,
+        "metabolites_text": metabolites_text,
     }
-    information = {
-        "metabolism": metabolism,
-        "metabolites_report": metabolites_report,
-        "reactions_report": reactions_report
-    }
-    write_product(information=information)
-
-
-if __name__ == "__main__":
-    main()
+    #Write product information to file.
+    write_product(directory=directory, information=information)

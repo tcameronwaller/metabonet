@@ -2,7 +2,7 @@
 Curate metabolic model Recon 2M.2 for reconciliation to MetaNetX.
 
 Title:
-    experiment_group.py
+    reconciliation
 
 Imports:
     os: This module is from The Python Standard Library. It contains

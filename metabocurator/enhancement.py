@@ -1,8 +1,8 @@
 """
-Extract information about metabolic sets and entities from MetaNetX.
+Enhance information about metabolic sets and entities from MetaNetX.
 
 Title:
-    experiment_group.py
+    enhancement
 
 Imports:
     os: This module from The Python Standard Library contains definitions of
@@ -88,6 +88,7 @@ import pickle
 # Packages and modules from local source
 
 import utility
+import extraction
 
 ###############################################################################
 # Functionality
@@ -897,86 +898,6 @@ def find_index_reactions_replicates_identifier(
     return utility.find_index(match, reactions_replicates)
 
 
-def prepare_report_metabolites(metabolites=None):
-    """
-    Prepares report of information about metabolites for review.
-
-    arguments:
-        metabolites (dict<dict>): information about metabolites
-
-    returns:
-        (list<dict>): information about metabolites
-
-    raises:
-
-    """
-
-    records = []
-    for metabolite in metabolites.values():
-        record = {
-            "identifier": metabolite["identifier"],
-            "name": metabolite["name"],
-            "formula": metabolite["formula"],
-            "mass": metabolite["mass"],
-            "charge": metabolite["charge"],
-            "reference_metanetx": metabolite["references"]["metanetx"],
-            "reference_hmdb": metabolite["references"]["hmdb"],
-            "reference_pubchem": metabolite["references"]["pubchem"],
-            "reference_chebi": metabolite["references"]["chebi"],
-            "reference_bigg": metabolite["references"]["bigg"],
-            "reference_kegg": metabolite["references"]["kegg"],
-            "reference_metacyc": metabolite["references"]["metacyc"],
-            "reference_reactome": metabolite["references"]["reactome"],
-            "reference_lipidmaps": metabolite["references"]["lipidmaps"],
-            "reference_sabiork": metabolite["references"]["sabiork"],
-            "reference_seed": metabolite["references"]["seed"],
-            "reference_slm": metabolite["references"]["slm"],
-            "reference_envipath": metabolite["references"]["envipath"],
-        }
-        records.append(record)
-    return records
-
-
-def prepare_report_reactions(reactions=None):
-    """
-    Prepares report of information about reactions for review.
-
-    arguments:
-        reactions (dict<dict>): information about reactions
-
-    returns:
-        (list<dict>): information about reactions
-
-    raises:
-
-    """
-
-    records = []
-    for reaction in reactions.values():
-        compartments = utility.collect_value_from_records(
-            key="compartment", records=reaction["participants"]
-        )
-        metabolites = utility.collect_value_from_records(
-            key="metabolite", records=reaction["participants"]
-        )
-        record = {
-            "identifier": reaction["identifier"],
-            "name": reaction["name"],
-            "reversibility": reaction["reversibility"],
-            "conversion": reaction["conversion"],
-            "dispersal": reaction["dispersal"],
-            "transport": reaction["transport"],
-            "replication": reaction["replication"],
-            "metabolites": metabolites,
-            "compartments": compartments,
-            "processes": reaction["processes"],
-            "genes": reaction["genes"],
-            "reference_metanetx": reaction["references"]["metanetx"]
-        }
-        records.append(record)
-    return records
-
-
 def filter_reactions(reactions_original=None):
     """
     Filters reactions by relevance to contextual metabolic network.
@@ -1043,7 +964,10 @@ def filter_reaction(reaction=None):
     # Prepare report.
     record = {
         "identifier_original": reaction["identifier"],
-        "identifier_novel": "None",
+        "identifier_novel": "null",
+        "name_original": reaction["name"],
+        "name_novel": reaction["name"],
+        "custom": False,
         "name": name,
         "compartment": compartment,
         "metabolite": metabolite,
@@ -1086,29 +1010,16 @@ def write_product(directory=None, information=None):
         pickle.dump(information["reactions"], file_product)
     with open(path_metabolites, "wb") as file_product:
         pickle.dump(information["metabolites"], file_product)
-    names_metabolites = [
-        "identifier", "name", "formula", "mass", "charge",
-        "reference_metanetx", "reference_hmdb", "reference_pubchem",
-        "reference_chebi", "reference_bigg", "reference_kegg",
-        "reference_metacyc", "reference_reactome", "reference_lipidmaps",
-        "reference_sabiork", "reference_seed", "reference_slm",
-        "reference_envipath"
-    ]
     utility.write_file_table(
         information=information["metabolites_report"],
         path_file=path_metabolites_report,
-        names=names_metabolites,
+        names=information["metabolites_report"][0].keys(),
         delimiter="\t"
     )
-    names_reactions = [
-        "identifier", "name", "reversibility", "conversion", "dispersal",
-        "transport", "replication", "metabolites", "compartments", "processes",
-        "genes", "reference_metanetx"
-    ]
     utility.write_file_table(
         information=information["reactions_report"],
         path_file=path_reactions_report,
-        names=names_reactions,
+        names=information["reactions_report"][0].keys(),
         delimiter="\t"
     )
     utility.write_file_table(
@@ -1150,19 +1061,19 @@ def execute_procedure(directory=None):
     reactions_behavior = include_reactions_behaviors(
         reactions_original=source["reactions"]
     )
-    # Include transport reactions in processes
+    # Include transport reactions in processes.
     reactions_process = include_reactions_transport_processes(
         reactions_original=reactions_behavior
     )
-    # Include information about reactions' replicates
+    # Include information about reactions' replicates.
     reactions_replication = include_reactions_replications(
         reactions_original=reactions_process
     )
-    # Prepare reports of information for review
-    metabolites_report = prepare_report_metabolites(
+    # Prepare reports of information for review.
+    metabolites_report = extraction.prepare_report_metabolites(
         metabolites=metabolites
     )
-    reactions_report = prepare_report_reactions(
+    reactions_report = extraction.prepare_report_reactions(
         reactions=reactions_replication
     )
     # Filter reactions.
@@ -1179,5 +1090,5 @@ def execute_procedure(directory=None):
         "reactions_report": reactions_report,
         "reactions_filter": list(reactions_filter.values())
     }
-    #Write product information to file
+    #Write product information to file.
     write_product(directory=directory, information=information)

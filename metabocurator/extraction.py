@@ -2,7 +2,7 @@
 Extract information about metabolic sets and entities from MetaNetX.
 
 Title:
-    experiment_group.py
+    extraction
 
 Imports:
     os: This module from The Python Standard Library contains definitions of
@@ -843,6 +843,86 @@ def extract_metabolite_references(identifier=None, references_source=None):
     }
 
 
+def prepare_report_metabolites(metabolites=None):
+    """
+    Prepares report of information about metabolites for review.
+
+    arguments:
+        metabolites (dict<dict>): information about metabolites
+
+    returns:
+        (list<dict>): information about metabolites
+
+    raises:
+
+    """
+
+    records = []
+    for metabolite in metabolites.values():
+        record = {
+            "identifier": metabolite["identifier"],
+            "name": metabolite["name"],
+            "formula": metabolite["formula"],
+            "mass": metabolite["mass"],
+            "charge": metabolite["charge"],
+            "reference_metanetx": metabolite["references"]["metanetx"],
+            "reference_hmdb": metabolite["references"]["hmdb"],
+            "reference_pubchem": metabolite["references"]["pubchem"],
+            "reference_chebi": metabolite["references"]["chebi"],
+            "reference_bigg": metabolite["references"]["bigg"],
+            "reference_kegg": metabolite["references"]["kegg"],
+            "reference_metacyc": metabolite["references"]["metacyc"],
+            "reference_reactome": metabolite["references"]["reactome"],
+            "reference_lipidmaps": metabolite["references"]["lipidmaps"],
+            "reference_sabiork": metabolite["references"]["sabiork"],
+            "reference_seed": metabolite["references"]["seed"],
+            "reference_slm": metabolite["references"]["slm"],
+            "reference_envipath": metabolite["references"]["envipath"],
+        }
+        records.append(record)
+    return records
+
+
+def prepare_report_reactions(reactions=None):
+    """
+    Prepares report of information about reactions for review.
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+
+    returns:
+        (list<dict>): information about reactions
+
+    raises:
+
+    """
+
+    records = []
+    for reaction in reactions.values():
+        compartments = utility.collect_value_from_records(
+            key="compartment", records=reaction["participants"]
+        )
+        metabolites = utility.collect_value_from_records(
+            key="metabolite", records=reaction["participants"]
+        )
+        record = {
+            "identifier": reaction["identifier"],
+            "name": reaction["name"],
+            "reversibility": reaction["reversibility"],
+            "conversion": reaction["conversion"],
+            "dispersal": reaction["dispersal"],
+            "transport": reaction["transport"],
+            "replication": reaction["replication"],
+            "metabolites": metabolites,
+            "compartments": compartments,
+            "processes": reaction["processes"],
+            "genes": reaction["genes"],
+            "reference_metanetx": reaction["references"]["metanetx"]
+        }
+        records.append(record)
+    return records
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -864,6 +944,8 @@ def write_product(directory=None, information=None):
     path_processes = os.path.join(path, "extraction_processes.pickle")
     path_reactions = os.path.join(path, "extraction_reactions.pickle")
     path_metabolites = os.path.join(path, "extraction_metabolites.pickle")
+    path_metabolites_report = os.path.join(path, "metabolites_report.tsv")
+    path_reactions_report = os.path.join(path, "reactions_report.tsv")
     #path_recon2m2 = os.path.join(directory, "recon2m2_reactions_names.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
@@ -874,6 +956,18 @@ def write_product(directory=None, information=None):
         pickle.dump(information["reactions"], file_product)
     with open(path_metabolites, "wb") as file_product:
         pickle.dump(information["metabolites"], file_product)
+    utility.write_file_table(
+        information=information["metabolites_report"],
+        path_file=path_metabolites_report,
+        names=information["metabolites_report"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["reactions_report"],
+        path_file=path_reactions_report,
+        names=information["reactions_report"][0].keys(),
+        delimiter="\t"
+    )
     #utility.write_file_table(
     #    information=information["reactions_names"],
     #    path_file=path_recon2m2,
@@ -921,12 +1015,21 @@ def execute_procedure(directory=None):
     )
     # Extract information about metabolites.
     metabolites = extract_metabolites(metabolites_source=source["metabolites"])
+    # Prepare reports of information for review.
+    metabolites_report = prepare_report_metabolites(
+        metabolites=metabolites
+    )
+    reactions_report = prepare_report_reactions(
+        reactions=reactions
+    )
     # Compile information.
     information = {
         "compartments": compartments,
         "processes": processes,
         "reactions": reactions,
         "metabolites": metabolites,
+        "metabolites_report": metabolites_report,
+        "reactions_report": reactions_report,
         "reactions_names": list(reactions_names.values())
     }
     #Write product information to file

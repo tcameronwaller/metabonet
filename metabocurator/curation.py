@@ -1,9 +1,12 @@
 """
-Module to provide template of common structure of modules.
+Curate information about metabolic sets and entities from MetaNetX.
+
+For reliable import, ensure that all values in curation files are in text
+format.
 
 Title:
 
-    template
+    curation
 
 Imports:
 
@@ -72,10 +75,16 @@ License:
 # Installation and importation
 
 # Standard
+import os
+import csv
+import copy
+import pickle
 
 # Relevant
 
 # Custom
+import utility
+import extraction
 
 #dir()
 #importlib.reload()
@@ -186,7 +195,7 @@ def curate_compartments(
         # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if identifier_novel is None:
+        if identifier_novel == "null":
             if identifier_original in compartments_novel:
                 # Remove compartment.
                 del compartments_novel[identifier_original]
@@ -270,7 +279,7 @@ def curate_processes(
         # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if identifier_novel is None:
+        if identifier_novel == "null":
             if identifier_original in processes_novel:
                 # Remove process.
                 del processes_novel[identifier_original]
@@ -291,8 +300,9 @@ def curate_processes(
                                 if process == identifier_original:
                                     processes[index] = identifier_novel
                             # Collect unique values.
-                            processes_unique = utility
-                                .collect_unique_elements(processes)
+                            processes_unique = utility.collect_unique_elements(
+                                processes
+                            )
                             reaction["processes"] = processes_unique
             if not match_names:
                 # Change name.
@@ -338,7 +348,7 @@ def curate_metabolites(
         # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if identifier_novel is None:
+        if identifier_novel == "null":
             if identifier_original in metabolites_novel:
                 # Remove metabolite.
                 del metabolites_novel[identifier_original]
@@ -351,8 +361,10 @@ def curate_metabolites(
         else:
             if not match_identifiers:
                 # Change identifier.
-                if (identifier_original in metabolites_novel) and
-                    (identifier_novel not in metabolites_novel):
+                if (
+                    (identifier_original in metabolites_novel) and
+                    (identifier_novel not in metabolites_novel)
+                ):
                     # Copy original record.
                     metabolite_novel = copy.deepcopy(
                         metabolites_novel[identifier_original]
@@ -362,8 +374,10 @@ def curate_metabolites(
                     # Replace original record with novel record.
                     del metabolites_novel[identifier_original]
                     metabolites_novel[identifier_novel] = metabolite_novel
-                elif (identifier_original in metabolites_novel) and
-                    (identifier_novel in metabolites_novel):
+                elif (
+                    (identifier_original in metabolites_novel) and
+                    (identifier_novel in metabolites_novel)
+                ):
                     # Remove original record.
                     del metabolites_novel[identifier_original]
                 # Replace metabolite in relevant reactions.
@@ -401,7 +415,7 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
 
     # Copy information.
     reactions_novel = copy.deepcopy(reactions_original)
-    for record in changer_reactions:
+    for record in reactions_curation:
         # Interpretation.
         identifier_original = record["identifier_original"]
         identifier_novel = record["identifier_novel"]
@@ -410,7 +424,7 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
         # Determine method to change information.
         match_identifiers = identifier_original == identifier_novel
         match_names = name_original == name_novel
-        if identifier_novel is None:
+        if identifier_novel == "null":
             if identifier_original in reactions_novel:
                 # Remove reaction.
                 del reactions_novel[identifier_original]
@@ -420,6 +434,52 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
                 reactions_novel[identifier_original]["name"] = name_novel
     # Return information
     return reactions_novel
+
+
+def write_product(directory=None, information=None):
+    """
+    Writes product information to file
+
+    arguments:
+        directory (str): directory for product files
+        information (object): information to write to file
+
+    raises:
+
+    returns:
+
+    """
+
+    # Specify directories and files.
+    path = os.path.join(directory, "curation")
+    utility.confirm_path_directory(path)
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
+    path_metabolites_report = os.path.join(path, "metabolites_report.tsv")
+    path_reactions_report = os.path.join(path, "reactions_report.tsv")
+    # Write information to file.
+    with open(path_compartments, "wb") as file_product:
+        pickle.dump(information["compartments"], file_product)
+    with open(path_processes, "wb") as file_product:
+        pickle.dump(information["processes"], file_product)
+    with open(path_reactions, "wb") as file_product:
+        pickle.dump(information["reactions"], file_product)
+    with open(path_metabolites, "wb") as file_product:
+        pickle.dump(information["metabolites"], file_product)
+    utility.write_file_table(
+        information=information["metabolites_report"],
+        path_file=path_metabolites_report,
+        names=information["metabolites_report"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["reactions_report"],
+        path_file=path_reactions_report,
+        names=information["reactions_report"][0].keys(),
+        delimiter="\t"
+    )
 
 
 ###############################################################################
@@ -443,7 +503,7 @@ def execute_procedure(directory=None):
     """
 
     # Read source information from file.
-    source = read_source(directory=origin)
+    source = read_source(directory=directory)
     # Change procedures allow custom changes to metabolites and reactions
     # Curate information about compartments.
     compartments_reactions = curate_compartments(
@@ -468,10 +528,21 @@ def execute_procedure(directory=None):
         reactions_curation=source["reactions_curation"],
         reactions_original=metabolites_reactions["reactions"]
     )
+    # Prepare reports of information for review.
+    metabolites_report = extraction.prepare_report_metabolites(
+        metabolites=metabolites_reactions["metabolites"]
+    )
+    reactions_report = extraction.prepare_report_reactions(
+        reactions=reactions
+    )
     # Compile information.
     information = {
         "compartments": compartments_reactions["compartments"],
         "processes": processes_reactions["processes"],
         "metabolites": metabolites_reactions["metabolites"],
-        "reactions": reactions
+        "reactions": reactions,
+        "metabolites_report": metabolites_report,
+        "reactions_report": reactions_report,
     }
+    #Write product information to file.
+    write_product(directory=directory, information=information)
