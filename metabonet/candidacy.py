@@ -170,6 +170,51 @@ def read_source(directory=None):
     }
 
 
+def collect_candidate_reactions(
+    reactions=None,
+    filtration_compartments=None,
+    filtration_processes=None,
+    simplification_reactions=None,
+    simplification_metabolites=None
+):
+    """
+    Collects information about candidate reactions.
+
+    Evaluate the candidacy of each reaction.
+    A reaction's candidacy depends on the relevance of its behavior in the
+    context of the relevance of compartmentalization in general and the
+    relevance of specific compartments and processes.
+    A reaction's candidacy also depends on the relevance of specific
+    metabolites that are its participants.
+
+    Factors in a reaction's candidacy:
+    1. compartmentalization
+    2. filters by compartments
+    3. filters by processes
+    4. simplification of metabolites
+    5. simplification of reactions
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        filtration_processes (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific processes
+        simplification_reactions (list<dict<str>>): information about whether
+            to simplify representations of specific reactions
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (dict<dict>): information about candidate reactions
+
+    """
+
+    pass
+
+
 ###############################################################################
 # Procedure
 
@@ -192,8 +237,6 @@ def execute_procedure(directory=None):
 
     # Read source information from file.
     source = read_source(directory=directory)
-    # TODO: 1. evaluate reaction candidacy, keeping record only of candidates
-    # TODO: note that any simplification of metabolites affects reaction's relevance
     # TODO: 2. iterate over those candidate reactions to collect candidate metabolites
     # TODO: note that at this point it is appropriate to either omit or replicate
     # TODO: a reaction's metabolites according to the simplification method

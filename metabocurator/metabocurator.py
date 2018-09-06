@@ -80,6 +80,7 @@ import textwrap
 
 import reconciliation
 import simplification
+import provision
 import extraction
 import enhancement
 import curation
@@ -154,6 +155,13 @@ def define_parse_arguments():
     procedure.add_argument(
         "-s", "--simplification", dest="simplification", action="store_true",
         help="Simplify information from Human Metabolome Database."
+    )
+    procedure.add_argument(
+        "-p", "--provision", dest="provision", action="store_true",
+        help=(
+        "Provide nearly comprehensive information from Human Metabolome " +
+        "Database."
+        )
     )
     procedure.add_argument(
         "-e", "--extraction", dest="extraction", action="store_true",
@@ -235,6 +243,13 @@ def execute_procedure():
         print("... executing simplification procedure ...")
         # Execute simplification procedure.
         simplification.execute_procedure(
+            directory=arguments.directory
+        )
+    elif arguments.provision:
+        # Report status.
+        print("... executing provision procedure ...")
+        # Execute provision procedure.
+        provision.execute_procedure(
             directory=arguments.directory
         )
     elif arguments.enhancement:
