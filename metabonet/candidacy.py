@@ -87,6 +87,7 @@ License:
 # Relevant
 
 # Custom
+import utility
 
 #dir()
 #importlib.reload()
@@ -212,7 +213,181 @@ def collect_candidate_reactions(
 
     """
 
-    pass
+    reactions_candidacy = {}
+    for reaction in reactions.values():
+        match, record = collect_candidate_reaction(
+            reaction_identifier= reaction["identifier"],
+            reactions=reactions,
+            filtration_compartments=filtration_compartments,
+            filtration_processes=filtration_processes,
+            simplification_reactions=simplification_reactions,
+            simplification_metabolites=simplification_metabolites
+        )
+        if match:
+            reactions_candidacy[record["identifier"]] = record
+    return reactions_candidacy
+
+
+def collect_candidate_reaction(
+    reaction_identifier=None,
+    reactions=None,
+    filtration_compartments=None,
+    filtration_processes=None,
+    simplification_reactions=None,
+    simplification_metabolites=None
+):
+    """
+    Collects information about a candidate reaction.
+
+    arguments:
+        reaction_identifier (str): identifier of a reaction
+        reactions (dict<dict>): information about reactions
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        filtration_processes (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific processes
+        simplification_reactions (list<dict<str>>): information about whether
+            to simplify representations of specific reactions
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (tuple<bool, dict>): whether reaction is a candidate, and information
+            about the reaction candidate
+
+    """
+
+    # Evaluate reaction's candidacy.
+    candidacy = evalute_reaction_candidacy(
+        reaction_identifier= reaction_identifier,
+        reactions=reactions,
+        filtration_compartments=filtration_compartments,
+        filtration_processes=filtration_processes,
+        simplification_reactions=simplification_reactions,
+        simplification_metabolites=simplification_metabolites
+    )
+
+
+def evaluate_reaction_candidacy(
+    reaction_identifier=None,
+    reactions=None,
+    filtration_compartments=None,
+    filtration_processes=None,
+    simplification_reactions=None,
+    simplification_metabolites=None
+):
+    """
+    Evalutes the candidacy of a reaction.
+
+    arguments:
+        reaction_identifier (str): identifier of a reaction
+        reactions (dict<dict>): information about reactions
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        filtration_processes (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific processes
+        simplification_reactions (list<dict<str>>): information about whether
+            to simplify representations of specific reactions
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (bool): whether reaction is a candidate
+
+    """
+
+    # Simplification.
+    simplification = determine_reaction_simplification(
+        reaction_identifier=reaction_identifier,
+        reactions=reactions,
+        simplification_reactions=simplification_reactions
+    )
+    # Behavior.
+    # TODO: determine whether reaction's behavior is relevant in context of
+    # TODO: compartmentalization.
+    # Process.
+    process = determine_reaction_process(
+        reaction_identifier=reaction_identifier,
+        reactions=reactions,
+        filtration_processes=filtration_processes
+    )
+    # Compartment.
+    # TODO: filter reaction's participants for those that are relevant to
+    # TODO: filters by compartments...
+    # Participation.
+    # TODO: conversion --> relevant reactant and product
+    # TODO: transport --> relevant reactant product in relevant compartments
+    # Redundancy.
+    # TODO: This needs to consider compartmentalization...
+
+
+def determine_reaction_simplification(
+    reaction_identifier=None,
+    simplification_reactions=None
+):
+    """
+    Determines whether a reaction has designation for simplification.
+
+    arguments:
+        reaction_identifier (str): identifier of a reaction
+        simplification_reactions (list<dict<str>>): information about whether
+            to simplify representations of specific reactions
+
+    raises:
+
+    returns:
+        (bool): whether reaction has designation for simplification
+
+    """
+
+    def match_reaction_simplification(record):
+        return record["identifier"] == reaction_identifier
+    match = utility.find(
+        match=match_reaction_simplification,
+        sequence=simplification_reactions
+    )
+    return match is not None
+
+
+def determine_reaction_process(
+    reaction_identifier=None,
+    reactions=None,
+    filtration_processes=None
+):
+    """
+    Determines whether a reaction belongs to any relevant processes.
+
+    arguments:
+        reaction_identifier (str): identifier of a reaction
+        reactions (dict<dict>): information about reactions
+        filtration_processes (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific processes
+
+    raises:
+
+    returns:
+        (bool): whether reaction belongs to relevant process
+
+    """
+
+    reaction = reactions[reaction_identifier]
+    reaction_processes = reaction["processes"]
+    qualifiers = []
+    for process in reaction_processes:
+        def match_reaction_process(record):
+            return record["identifier"] == process
+        record = utility.find(
+            match=match_reaction_process,
+            sequence=filtration_processes
+        )
+        if record is not None:
+            if record["relevance"]:
+                qualifiers.append(record["identifier"])
+    return len(qualifiers) > 0
 
 
 ###############################################################################
@@ -246,7 +421,7 @@ def execute_procedure(directory=None):
     # TODO: over info from the candidates and metabolites and reactions
     # Evaluate reactions' relevance.
     # Collect candidate reactions.
-    reactions_candidates = collect_candidate_reactions(
+    reactions_candidacy = collect_candidate_reactions(
         reactions=source["reactions"],
         filtration_compartments=source["filtration_compartments"],
         filtration_processes=source["filtration_processes"],
@@ -254,7 +429,7 @@ def execute_procedure(directory=None):
         simplification_metabolites=source["simplification_metabolites"]
     )
     # Collect candidate metabolites.
-    metabolites_candidates = collect_candidate_metabolites(
+    metabolites_candidacy = collect_candidate_metabolites(
         metabolites=source["metabolites"],
         compartments=source["compartments"],
         reactions_candidates=reactions_candidates,
