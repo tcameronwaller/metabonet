@@ -10,7 +10,6 @@ Modules:
 
     metabocurator: ...
 
-
 """
 
 ###############################################################################
@@ -28,9 +27,16 @@ Modules:
 
 # Custom
 
-import metabocurator
-import reconciliation
 import utility
+import interface
+import reconciliation
+import extraction
+import extrication
+import provision
+import enhancement
+import curation
+import conversion
+import clean
 
 #dir()
 #importlib.reload()

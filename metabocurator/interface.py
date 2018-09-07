@@ -3,7 +3,7 @@ Module to accept parameters from user and execute procedures.
 
 Title:
 
-    metabocurator
+    interface
 
 Imports:
 
