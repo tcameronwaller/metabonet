@@ -84,7 +84,7 @@ import pickle
 
 # Custom
 import utility
-import extraction
+import conversion
 
 #dir()
 #importlib.reload()
@@ -122,10 +122,10 @@ def read_source(directory=None):
         path_customization, "curation_metabolites.tsv"
     )
     path = os.path.join(directory, "enhancement")
-    path_compartments = os.path.join(path, "enhancement_compartments.pickle")
-    path_processes = os.path.join(path, "enhancement_processes.pickle")
-    path_reactions = os.path.join(path, "enhancement_reactions.pickle")
-    path_metabolites = os.path.join(path, "enhancement_metabolites.pickle")
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
     # Read information from file.
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
@@ -462,8 +462,8 @@ def write_product(directory=None, information=None):
     path_processes = os.path.join(path, "processes.pickle")
     path_reactions = os.path.join(path, "reactions.pickle")
     path_metabolites = os.path.join(path, "metabolites.pickle")
-    path_metabolites_report = os.path.join(path, "metabolites_report.tsv")
-    path_reactions_report = os.path.join(path, "reactions_report.tsv")
+    path_metabolites_report = os.path.join(path, "metabolites.tsv")
+    path_reactions_report = os.path.join(path, "reactions.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
         pickle.dump(information["compartments"], file_product)
@@ -534,10 +534,10 @@ def execute_procedure(directory=None):
         reactions_original=metabolites_reactions["reactions"]
     )
     # Prepare reports of information for review.
-    metabolites_report = extraction.prepare_report_metabolites(
+    metabolites_report = conversion.convert_metabolites_text(
         metabolites=metabolites_reactions["metabolites"]
     )
-    reactions_report = extraction.prepare_report_reactions(
+    reactions_report = conversion.convert_reactions_text(
         reactions=reactions
     )
     # Compile information.

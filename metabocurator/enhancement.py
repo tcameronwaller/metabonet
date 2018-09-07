@@ -88,7 +88,7 @@ import pickle
 # Packages and modules from local source
 
 import utility
-import extraction
+import conversion
 
 ###############################################################################
 # Functionality
@@ -109,15 +109,15 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_hmdb = os.path.join(directory, "hmdb_metabolites_references.pickle")
+    path_hmdb = os.path.join(directory, "extrication", "hmdb_summary.pickle")
     path = os.path.join(directory, "extraction")
-    path_compartments = os.path.join(path, "extraction_compartments.pickle")
-    path_processes = os.path.join(path, "extraction_processes.pickle")
-    path_reactions = os.path.join(path, "extraction_reactions.pickle")
-    path_metabolites = os.path.join(path, "extraction_metabolites.pickle")
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
     # Read information from file.
     with open(path_hmdb, "rb") as file_source:
-        metabolites_references = pickle.load(file_source)
+        summary_hmdb = pickle.load(file_source)
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
     with open(path_processes, "rb") as file_source:
@@ -128,7 +128,7 @@ def read_source(directory=None):
         metabolites = pickle.load(file_source)
     # Compile and return information.
     return {
-        "metabolites_references": metabolites_references,
+        "summary_hmdb": summary_hmdb,
         "compartments": compartments,
         "processes": processes,
         "reactions": reactions,
@@ -137,14 +137,14 @@ def read_source(directory=None):
 
 
 def enhance_metabolites(
-    metabolites_original=None, metabolites_references=None
+    metabolites_original=None, summary_hmdb=None
 ):
     """
     Enhances information about metabolites
 
     arguments:
         metabolites_original (dict<dict>): information about metabolites
-        metabolites_references (dict<dict>): metabolites' references from Human
+        summary_hmdb (dict<dict>): information about metabolites from Human
             Metabolome Database (HMDB)
 
     returns:
@@ -160,7 +160,7 @@ def enhance_metabolites(
         # Enhance information about metabolite
         metabolite_novel = enhance_metabolite(
             metabolite_original=record,
-            metabolites_references=metabolites_references
+            summary_hmdb=summary_hmdb
         )
         # Compile information
         metabolites_novel[metabolite_novel["identifier"]] = metabolite_novel
@@ -168,14 +168,14 @@ def enhance_metabolites(
 
 
 def enhance_metabolite(
-    metabolite_original=None, metabolites_references=None
+    metabolite_original=None, summary_hmdb=None
 ):
     """
     Enhances information about a metabolite
 
     arguments:
         metabolite_original (dict): information about a metabolite
-        metabolites_references (dict<dict>): metabolites' references from Human
+        summary_hmdb (dict<dict>): information about metabolites from Human
             Metabolome Database (HMDB)
 
     returns:
@@ -190,21 +190,21 @@ def enhance_metabolite(
     # Determine supplemental references from entries in HMDB
     references_supplemental = enhance_metabolite_references(
         references_original=metabolite_novel["references"],
-        metabolites_references=metabolites_references
+        summary_hmdb=summary_hmdb
     )
     metabolite_novel["references"] = references_supplemental
     return metabolite_novel
 
 
 def enhance_metabolite_references(
-    references_original=None, metabolites_references=None
+    references_original=None, summary_hmdb=None
 ):
     """
     Enhances information about a metabolite by including references from HMDB
 
     arguments:
         references_original (dict): references about a metabolite
-        metabolites_references (dict<dict>): metabolites' references from Human
+        summary_hmdb (dict<dict>): information about metabolites from Human
             Metabolome Database (HMDB)
 
     returns:
@@ -222,11 +222,11 @@ def enhance_metabolite_references(
     # Find entries from HMDB that match
     hmdb_keys = filter_hmdb_entries_identifiers(
         identifiers=metabolite_references_hmdb,
-        metabolites_references=metabolites_references
+        summary_hmdb=summary_hmdb
     )
     # Extract references from entries in HMDB
     hmdb_references = collect_hmdb_entries_references(
-        keys=hmdb_keys, metabolites_references=metabolites_references
+        keys=hmdb_keys, summary_hmdb=summary_hmdb
     )
     # Combine supplemental references to original references
     references_novel["hmdb"] = utility.collect_unique_elements(
@@ -245,14 +245,14 @@ def enhance_metabolite_references(
 
 
 def filter_hmdb_entries_identifiers(
-    identifiers=None, metabolites_references=None
+    identifiers=None, summary_hmdb=None
 ):
     """
     Filters entries from HMDB by their identifiers
 
     arguments:
         identifiers (list<str>): identifiers by which to find entries in HMDB
-        metabolites_references (dict<dict>): metabolites' references from Human
+        summary_hmdb (dict<dict>): information about metabolites from Human
             Metabolome Database (HMDB)
 
     returns:
@@ -263,7 +263,7 @@ def filter_hmdb_entries_identifiers(
     """
 
     keys = []
-    for key, record in metabolites_references.items():
+    for key, record in summary_hmdb.items():
         hmdb_entry_identifiers = record["hmdb"]
         # Determine whether any of entry's identifiers match the metabolite's
         # references
@@ -278,14 +278,14 @@ def filter_hmdb_entries_identifiers(
 
 
 def collect_hmdb_entries_references(
-    keys=None, metabolites_references=None
+    keys=None, summary_hmdb=None
 ):
     """
     Extracts references from entries in HMDB
 
     arguments:
         keys (list<str>): keys of entries in HMDB
-        metabolites_references (dict<dict>): metabolites' references from Human
+        summary_hmdb (dict<dict>): information about metabolites from Human
             Metabolome Database (HMDB)
 
     returns:
@@ -301,7 +301,7 @@ def collect_hmdb_entries_references(
     kegg = []
     for key in keys:
         # Only include primary accession identifiers in collection
-        record = metabolites_references[key]
+        record = summary_hmdb[key]
         hmdb.append(record["identifier"])
         # Only include valid identifiers in the collection
         if (record["pubchem"] is not None) and (len(record["pubchem"]) > 0):
@@ -999,12 +999,12 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "enhancement")
     utility.confirm_path_directory(path)
-    path_compartments = os.path.join(path, "enhancement_compartments.pickle")
-    path_processes = os.path.join(path, "enhancement_processes.pickle")
-    path_reactions = os.path.join(path, "enhancement_reactions.pickle")
-    path_metabolites = os.path.join(path, "enhancement_metabolites.pickle")
-    path_metabolites_report = os.path.join(path, "metabolites_report.tsv")
-    path_reactions_report = os.path.join(path, "reactions_report.tsv")
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
+    path_metabolites_report = os.path.join(path, "metabolites.tsv")
+    path_reactions_report = os.path.join(path, "reactions.tsv")
     path_reactions_filter = os.path.join(path, "reactions_filter.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:
@@ -1060,7 +1060,7 @@ def execute_procedure(directory=None):
     # Enhance metabolites' references.
     metabolites = enhance_metabolites(
         metabolites_original=source["metabolites"],
-        metabolites_references=source["metabolites_references"]
+        summary_hmdb=source["summary_hmdb"]
     )
     # Include information about reactions' behavior.
     reactions_behavior = include_reactions_behaviors(
@@ -1075,10 +1075,10 @@ def execute_procedure(directory=None):
         reactions_original=reactions_process
     )
     # Prepare reports of information for review.
-    metabolites_report = extraction.prepare_report_metabolites(
+    metabolites_report = conversion.convert_metabolites_text(
         metabolites=metabolites
     )
-    reactions_report = extraction.prepare_report_reactions(
+    reactions_report = conversion.convert_reactions_text(
         reactions=reactions_replication
     )
     # Filter reactions.

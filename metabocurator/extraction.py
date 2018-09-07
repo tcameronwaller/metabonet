@@ -867,7 +867,6 @@ def prepare_report_metabolites(metabolites=None):
             "charge": metabolite["charge"],
             "reference_metanetx": metabolite["references"]["metanetx"],
             "reference_hmdb": metabolite["references"]["hmdb"],
-            "reference_pubchem": metabolite["references"]["pubchem"],
             "reference_chebi": metabolite["references"]["chebi"],
             "reference_bigg": metabolite["references"]["bigg"],
             "reference_kegg": metabolite["references"]["kegg"],
@@ -909,10 +908,6 @@ def prepare_report_reactions(reactions=None):
             "identifier": reaction["identifier"],
             "name": reaction["name"],
             "reversibility": reaction["reversibility"],
-            "conversion": reaction["conversion"],
-            "dispersal": reaction["dispersal"],
-            "transport": reaction["transport"],
-            "replication": reaction["replication"],
             "metabolites": metabolites,
             "compartments": compartments,
             "processes": reaction["processes"],
@@ -940,12 +935,12 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "extraction")
     utility.confirm_path_directory(path)
-    path_compartments = os.path.join(path, "extraction_compartments.pickle")
-    path_processes = os.path.join(path, "extraction_processes.pickle")
-    path_reactions = os.path.join(path, "extraction_reactions.pickle")
-    path_metabolites = os.path.join(path, "extraction_metabolites.pickle")
-    path_metabolites_report = os.path.join(path, "metabolites_report.tsv")
-    path_reactions_report = os.path.join(path, "reactions_report.tsv")
+    path_compartments = os.path.join(path, "compartments.pickle")
+    path_processes = os.path.join(path, "processes.pickle")
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
+    path_metabolites_report = os.path.join(path, "metabolites.tsv")
+    path_reactions_report = os.path.join(path, "reactions.tsv")
     #path_recon2m2 = os.path.join(directory, "recon2m2_reactions_names.tsv")
     # Write information to file.
     with open(path_compartments, "wb") as file_product:

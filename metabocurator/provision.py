@@ -127,121 +127,6 @@ def read_source(directory=None):
     }
 
 
-def construct_tag(tag=None, space=None, spaces=None):
-    """
-    Constructs complete tag for name space in Extensible Markup Language (XML).
-
-    arguments:
-        tag (str): name of element's tag
-        space (str): name name space within XML document
-        spaces (dict<str>): name spaces within XML document
-
-    raises:
-
-    returns:
-        (str): complete name of tag
-
-    """
-
-    return "{" + spaces[space] + "}" + tag
-
-
-def extract_hmdb_summary(hmdb=None):
-    """
-    Extracts metabolites' references from Human Metabolome Database (HMDB).
-
-    arguments:
-        hmdb (str): path to file of HMDB in XML
-
-    raises:
-
-    returns:
-        (dict<dict>): metabolites' references from HMDB
-
-    """
-
-    # Collect references to name space.
-    spaces = {}
-    # Collect references for metabolites.
-    summary_hmdb = {}
-    # Count records.
-    count = 0
-    for event, element in et.iterparse(
-        hmdb, events=('start', 'end', 'start-ns', 'end-ns')
-    ):
-        if event == "start-ns":
-            space = element[0]
-            reference = element[1]
-            spaces[space] = reference
-        if event == "end":
-            if element.tag == construct_tag(
-                tag="metabolite", space=space, spaces=spaces
-            ):
-                # Parse complete for a new metabolite.
-                # Count.
-                count = count + 1
-                # Extract information from record.
-                record = extract_hmdb_record_summary(
-                    element=element,
-                    space=space,
-                    spaces=spaces
-                )
-                summary_hmdb[hmdb_primary] = record
-                # Clear memory.
-                element.clear()
-    # Report.
-    print("Extraction complete for " + str(count) + " metabolites!")
-    # Return information.
-    return summary_hmdb
-
-
-def extract_hmdb_record_summar(element=None, space=None, spaces=None):
-
-    # HMDB identifiers.
-    tag_accession = construct_tag(
-        tag="accession", space=space, spaces=spaces
-    )
-    hmdb_primary = element.find(tag_accession).text
-    tag_secondary = construct_tag(
-        tag="secondary_accessions", space=space, spaces=spaces
-    )
-    hmdb_secondary = element.find(tag_secondary)
-    identifiers_hmdb = [hmdb_primary]
-    for identifier in hmdb_secondary.findall(tag_accession):
-        identifiers_hmdb.append(identifier.text)
-    # Name.
-    #name = element.find("{http://www.hmdb.ca}name").text
-    tag_name = construct_tag(
-        tag="name", space=space, spaces=spaces
-    )
-    name = element.find(tag_name).text
-    # PubChem identifier.
-    tag_pubchem = construct_tag(
-        tag="pubchem_compound_id", space=space, spaces=spaces
-    )
-    identifier_pubchem = element.find(tag_pubchem).text
-    # Chemical Entities of Biological Interest (ChEBI) identifier.
-    tag_chebi = construct_tag(
-        tag="chebi_id", space=space, spaces=spaces
-    )
-    identifier_chebi = element.find(tag_chebi).text
-    # Kyoto Encyclopedia of Genes and Genomes (KEGG) identifier.
-    tag_kegg = construct_tag(
-        tag="kegg_id", space=space, spaces=spaces
-    )
-    identifier_kegg = element.find(tag_kegg).text
-    # Compile and return information.
-    record = {
-        "identifier": hmdb_primary,
-        "name": name,
-        "reference_hmdb": ";".join(identifiers_hmdb),
-        "reference_pubchem": identifier_pubchem,
-        "reference_chebi": identifier_chebi,
-        "reference_kegg": identifier_kegg
-    }
-    return record
-
-
 def transfer_summary_midas(summary_hmdb=None, midas_original=None):
     """
     Transfers information from Human Metabolome Database (HMDB) to MIDAS
@@ -261,7 +146,7 @@ def transfer_summary_midas(summary_hmdb=None, midas_original=None):
     midas_novel = []
     for record_midas in midas_original:
         # Interpretation.
-        identifier_midas = record_midas["identifier_midas"]
+        reference_midas = record_midas["reference_midas"]
         name_original = record_midas["name"]
         reference_hmdb_original = record_midas["reference_hmdb"]
         reference_kegg_original = record_midas["reference_kegg"]
@@ -277,7 +162,7 @@ def transfer_summary_midas(summary_hmdb=None, midas_original=None):
             key_hmdb = keys_hmdb[0]
             record_hmdb = summary_hmdb[key_hmdb]
             record_novel = copy.deepcopy(record_hmdb)
-            record_novel["identifier_midas"] = identifier_midas
+            record_novel["reference_midas"] = reference_midas
             record_novel["name_original"] = name_original
             record_novel["reference_kegg_original"] = reference_kegg_original
             midas_novel.append(record_novel)
@@ -287,7 +172,7 @@ def transfer_summary_midas(summary_hmdb=None, midas_original=None):
             for key in keys_hmdb:
                 record_hmdb[key] = "null"
             record_novel = record_hmdb
-            record_novel["identifier_midas"] = identifier_midas
+            record_novel["reference_midas"] = identifier_midas
             record_novel["name_original"] = name_original
             record_novel["reference_kegg_original"] = reference_kegg_original
             midas_novel.append(record_novel)
@@ -353,16 +238,12 @@ def execute_procedure(directory=None):
 
     # Read source information from file.
     source = read_source(directory=directory)
-    # Extract metabolites' references from Human Metabolome Database.
-    summary_hmdb = extract_hmdb_summary(hmdb=source["hmdb"])
     # Transfer information to MIDAS library.
     midas_novel = transfer_summary_midas(
         summary_hmdb=summary_hmdb, midas_original=source["midas_original"]
     )
     # Compile information.
     information = {
-        "summary_object": summary_hmdb,
-        "summary_list": list(summary_hmdb.values()),
         "midas_novel": midas_novel
     }
     #Write product information to file

@@ -79,12 +79,13 @@ import textwrap
 # Custom
 
 import reconciliation
-import simplification
+import extrication
 import provision
 import extraction
 import enhancement
 import curation
 import conversion
+import clean
 
 #dir()
 #importlib.reload()
@@ -153,14 +154,18 @@ def define_parse_arguments():
         help="Reconcile information from model to MetaNetX."
     )
     procedure.add_argument(
-        "-s", "--simplification", dest="simplification", action="store_true",
-        help="Simplify information from Human Metabolome Database."
+        "-a", "--adaptation", dest="adaptation", action="store_true",
+        help="Execute entire adaptation procedure."
+    )
+    procedure.add_argument(
+        "-t", "--extrication", dest="extrication", action="store_true",
+        help="Collect information from Human Metabolome Database."
     )
     procedure.add_argument(
         "-p", "--provision", dest="provision", action="store_true",
         help=(
-        "Provide nearly comprehensive information from Human Metabolome " +
-        "Database."
+        "Match information from Human Metabolome Database to specific " +
+        "metabolites."
         )
     )
     procedure.add_argument(
@@ -168,7 +173,7 @@ def define_parse_arguments():
         help="Extract information from MetaNetX."
     )
     procedure.add_argument(
-        "-a", "--enhancement", dest="enhancement", action="store_true",
+        "-m", "--enhancement", dest="enhancement", action="store_true",
         help="Enhance information."
     )
     procedure.add_argument(
@@ -231,6 +236,45 @@ def execute_procedure():
         reconciliation.execute_procedure(
             directory=arguments.directory
         )
+    elif arguments.adaptation:
+        # Report status.
+        print("... executing entire adaptation procedure ...")
+        # Execute extraction procedure.
+        # Report status.
+        print("... executing extraction procedure ...")
+        extraction.execute_procedure(
+            directory=arguments.directory
+        )
+        # Execute extrication procedure.
+        # Report status.
+        print("... executing extrication procedure ...")
+        extrication.execute_procedure(
+            directory=arguments.directory
+        )
+        # Execute enhancement procedure.
+        # Report status.
+        print("... executing enhancement procedure ...")
+        enhancement.execute_procedure(
+            directory=arguments.directory
+        )
+        # Execute curation procedure.
+        # Report status.
+        print("... executing curation procedure ...")
+        curation.execute_procedure(
+            directory=arguments.directory
+        )
+        # Execute conversion procedure.
+        # Report status.
+        print("... executing conversion procedure ...")
+        conversion.execute_procedure(
+            directory=arguments.directory
+        )
+        # Execute clean procedure.
+        # Report status.
+        print("... executing clean procedure ...")
+        clean.execute_procedure(
+            directory=arguments.directory
+        )
     elif arguments.extraction:
         # Report status.
         print("... executing extraction procedure ...")
@@ -238,11 +282,11 @@ def execute_procedure():
         extraction.execute_procedure(
             directory=arguments.directory
         )
-    elif arguments.simplification:
+    elif arguments.extrication:
         # Report status.
-        print("... executing simplification procedure ...")
-        # Execute simplification procedure.
-        simplification.execute_procedure(
+        print("... executing extrication procedure ...")
+        # Execute extrication procedure.
+        extrication.execute_procedure(
             directory=arguments.directory
         )
     elif arguments.provision:
