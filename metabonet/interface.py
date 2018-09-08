@@ -173,7 +173,6 @@ def interpret_arguments(arguments=None):
     return {
         "origin": origin,
         "destination": destination,
-        "method": method,
         "compartmentalization": compartmentalization,
         "clean": clean
     }
@@ -222,6 +221,10 @@ def execute_procedure():
     match = evaluate_source(directory=arguments.source)
     if match:
         # Execute procedure.
+        candidacy.execute_procedure(
+            compartmentalization=parameters["compartmentalization"],
+            directory=parameters["directory"]
+        )
         # Filtration.
         # TODO: Consider including filters by compartments and processes.
         # Candidacy.

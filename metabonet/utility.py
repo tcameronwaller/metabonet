@@ -105,5 +105,31 @@ def find(match=None, sequence=None):
     return None
 
 
+def find_all(match=None, sequence=None):
+    """
+    Finds all elements in a sequence to match a condition, otherwise none.
+
+    arguments:
+        match (function): condition for elements to match
+        sequence (list): sequence of elements
+
+    returns:
+        (list<dict> | NoneType): elements from sequence to match condition or
+            none
+
+    raises:
+
+    """
+
+    matches = []
+    for element in sequence:
+        if match(element):
+            matches.append(element)
+    if len(matches) > 0:
+        return matches
+    else:
+        return None
+
+
 ###############################################################################
 # Procedure

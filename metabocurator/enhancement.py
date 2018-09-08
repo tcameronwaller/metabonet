@@ -450,11 +450,15 @@ def filter_reaction_participants(criteria=None, participants=None):
 
     def match(participant):
         if "metabolites" in criteria:
-            match_metabolite = participant["metabolite"] in criteria["metabolites"]
+            match_metabolite = (
+                participant["metabolite"] in criteria["metabolites"]
+            )
         else:
             match_metabolite = True
         if "compartments" in criteria:
-            match_compartment = participant["compartment"] in criteria["compartments"]
+            match_compartment = (
+                participant["compartment"] in criteria["compartments"]
+            )
         else:
             match_compartment = True
         if "roles" in criteria:
@@ -488,7 +492,12 @@ def determine_reaction_dispersal(reaction=None):
 
 def collect_reaction_transports(reaction=None):
     """
-    Collects information about a reaction's transports
+    Collects information about a reaction's transports.
+
+    This procedure applies an overly restrictive definition of transport that
+    requires chemically-identical metabolites in two separate compartments.
+    Some transports involve chemical conversion of substrates as part of
+    transport.
 
     arguments:
         reaction (dict): information about a reaction
