@@ -297,7 +297,7 @@ def determine_reaction_candidacy(
 
     # Relevance.
     relevance = determine_reaction_relevance(
-        reaction_identifier= reaction_identifier,
+        reaction_identifier=reaction_identifier,
         reactions=reactions,
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
@@ -823,8 +823,41 @@ def determine_reaction_redundancy(
 
     """
 
-    # Evaluate all replicate reactions.
-    # Determine whether replicate reaction is relevant.
+    reaction = reactions["reaction_identifier"]
+    replicates = reaction["replicates"]
+    # Determine relevant replicates.
+    def match_relevance(replicate):
+        identity = (replicate == reaction_identifier)
+        relevance = determine_reaction_relevance(
+            reaction_identifier=replicate,
+            reactions=reactions,
+            compartmentalization=compartmentalization,
+            filtration_compartments=filtration_compartments,
+            filtration_processes=filtration_processes,
+            simplification_reactions=simplification_reactions,
+            simplification_metabolites=simplification_metabolites
+        )
+        return not identity and relevance
+    replicates_relevant = list(filter(match_relevance, replicates))
+    # Determine redundant replicates.
+    def match_redundancy(replicate):
+        redundancy = determine_replicate_reactions_redundancy(
+            reaction_one_identifier=reaction_identifier,
+            reaction_two_identifier=replicate,
+            reactions=reactions,
+            compartmentalization=compartmentalization,
+            filtration_compartments=filtration_compartments,
+            simplification_metabolites=simplification_metabolites
+        )
+        return not redundancy
+    replicates_redundant = list(filter(match_redundancy, replicates_relevant))
+    # Determine whether reaction is priority replicate.
+    if len(replicates_redundant) > 0:
+        # TODO: next figure out priority reaction from relevant, redundant replicates
+        # TODO: need to rank the reactions...
+
+
+
     # Determine whether replicate reaction is redundant.
     # Consider reversibility and compartmentalization.
 
@@ -832,6 +865,181 @@ def determine_reaction_redundancy(
     # reaction is the proirity.
     # Use a simple ranking algorithm to compare reactions.
 
+
+
+def determine_replicate_reactions_redundancy(
+    reaction_one_identifier=None,
+    reaction_two_identifier=None
+    reactions=None,
+    compartmentalization=None,
+    filtration_compartments=None,
+    simplification_metabolites=None
+):
+    """
+    Determines whether two replicate reactions are redundant.
+
+    arguments:
+        reaction_one_identifier (str): identifier of a reaction
+        reaction_two_identifier (str): identifier of a reaction
+        reactions (dict<dict>): information about reactions
+        compartmentalization (bool): whether compartmentalization is relevant
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (bool): whether reactions are redundant
+
+    """
+
+    reaction_one = reactions[reaction_one_identifier]
+    reaction_two = reactions[reaction_two_identifier]
+    # Determine whether reactions have redundant reversibility.
+    reversibility = (
+        reaction_one["reversibility"] == reaction_two["reversibility"]
+    )
+    # Determine whether reactions have redundant participants.
+    # Determine relevant participants.
+    participation = determine_reactions_participation_redundancy(
+        reaction_one_identifier=reaction_one_identifier,
+        reaction_two_identifier=reaction_two_identifier,
+        reactions=reactions,
+        compartmentalization=compartmentalization,
+        filtration_compartments=filtration_compartments,
+        simplification_metabolites=simplification_metabolites
+    )
+    # Determine whether reactions are redundant.
+    return reversibility and participation
+
+
+def determine_reactions_participation_redundancy(
+    reaction_one_identifier=None,
+    reaction_two_identifier=None
+    reactions=None,
+    compartmentalization=None,
+    filtration_compartments=None,
+    simplification_metabolites=None
+):
+    """
+    Determines whether two replicate reactions have redundant participation.
+
+    arguments:
+        reaction_one_identifier (str): identifier of a reaction
+        reaction_two_identifier (str): identifier of a reaction
+        reactions (dict<dict>): information about reactions
+        compartmentalization (bool): whether compartmentalization is relevant
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (bool): whether reactions' participants are redundant
+
+    """
+
+    # Determine relevant participants.
+    participants_one = determine_reaction_relevant_participants(
+        reaction_identifier=reaction_one_identifier,
+        reactions=reactions,
+        filtration_compartments=filtration_compartments,
+        simplification_metabolites=simplification_metabolites
+    )
+    participants_two = determine_reaction_relevant_participants(
+        reaction_identifier=reaction_two_identifier,
+        reactions=reactions,
+        filtration_compartments=filtration_compartments,
+        simplification_metabolites=simplification_metabolites
+    )
+    # Determine whether participants are redundant.
+    if compartmentalization:
+        redundancy = determine_participants_attributes_mutual_redundancy(
+            participants_one=participants_one,
+            participants_two=participants_two,
+            attributes=["metabolite", "role", "compartment"]
+        )
+    else:
+        redundancy = determine_participants_attributes_mutual_redundancy(
+            participants_one=participants_one,
+            participants_two=participants_two,
+            attributes=["metabolite", "role"]
+        )
+    return redundancy
+
+
+def determine_participants_attributes_mutual_redundancy(
+    participants_one=None,
+    participants_two=None,
+    attributes=None
+):
+    """
+    Determines whether participants of two reactions are redundant.
+
+    arguments:
+        participants_one (str): participants of a reaction
+        participants_two (str): participants of a reaction
+        attributes (list<str>): names of attributes by which to compare
+            participants
+
+    raises:
+
+    returns:
+        (bool): whether reactions' participants are redundant
+
+    """
+
+    comparison_one = determine_participants_attributes_redundancy(
+        participants_one=participants_one,
+        participants_two=participants_two,
+        attributes=attributes
+    )
+    comparison_two = determine_participants_attributes_redundancy(
+        participants_one=participants_two,
+        participants_two=participants_one,
+        attributes=attributes
+    )
+    return comparison_one and comparison_two
+
+
+def determine_participants_attributes_redundancy(
+    participants_one=None,
+    participants_two=None,
+    attributes=None
+):
+    """
+    Determines whether participants of two reactions are redundant.
+
+    arguments:
+        participants_one (str): participants of a reaction
+        participants_two (str): participants of a reaction
+        attributes (list<str>): names of attributes by which to compare
+            participants
+
+    raises:
+
+    returns:
+        (bool): whether reactions' participants are redundant
+
+    """
+
+    iteration_one = []
+    for participant_one in participants_one:
+        iteration_two = []
+        for participant_two in participants_two:
+            iteration_three = []
+            for attribute in attributes:
+                match = (
+                    participant_one[attribute] == participant_two[attribute]
+                )
+                iteration_three.append(match)
+            iteration_two.append(all(iteration_three))
+        iteration_one.append(any(iteration_two))
+    return all(iteration_one)
 
 
 
