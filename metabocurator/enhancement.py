@@ -391,12 +391,12 @@ def determine_reaction_conversion(reaction=None):
 
     """
 
-    reactant_metabolites = collect_reaction_participants_value(
+    reactant_metabolites = utility.collect_reaction_participants_value(
         key="metabolite",
         criteria={"roles": ["reactant"]},
         participants=reaction["participants"]
     )
-    product_metabolites = collect_reaction_participants_value(
+    product_metabolites = utility.collect_reaction_participants_value(
         key="metabolite",
         criteria={"roles": ["product"]},
         participants=reaction["participants"]
@@ -405,68 +405,6 @@ def determine_reaction_conversion(reaction=None):
         list_one=reactant_metabolites,
         list_two=product_metabolites
     )
-
-
-def collect_reaction_participants_value(
-    key=None, criteria=None, participants=None
-):
-    """
-    Collects a value from a reaction's specific participants
-
-    arguments:
-        key (str): key of value to collect from each participant
-        criteria (dict<list>): criteria by which to select participants
-        participants (list<dict>): information about a reaction's participants
-
-    returns:
-        (list<str>): values from a reaction's participants
-
-    raises:
-
-    """
-
-    participants_match = filter_reaction_participants(
-        criteria=criteria, participants=participants
-    )
-    return utility.collect_value_from_records(
-        key=key, records=participants_match
-    )
-
-
-def filter_reaction_participants(criteria=None, participants=None):
-    """
-    Filters a reaction's participants by multiple criteria
-
-    arguments:
-        criteria (dict<list>): criteria by which to select participants
-        participants (list<dict>): information about a reaction's participants
-
-    returns:
-        (list<dict>): information about a reaction's participants
-
-    raises:
-
-    """
-
-    def match(participant):
-        if "metabolites" in criteria:
-            match_metabolite = (
-                participant["metabolite"] in criteria["metabolites"]
-            )
-        else:
-            match_metabolite = True
-        if "compartments" in criteria:
-            match_compartment = (
-                participant["compartment"] in criteria["compartments"]
-            )
-        else:
-            match_compartment = True
-        if "roles" in criteria:
-            match_role = participant["role"] in criteria["roles"]
-        else:
-            match_role = True
-        return match_metabolite and match_compartment and match_role
-    return list(filter(match, participants))
 
 
 def determine_reaction_dispersal(reaction=None):
@@ -509,12 +447,12 @@ def collect_reaction_transports(reaction=None):
 
     """
 
-    metabolites_reactant = collect_reaction_participants_value(
+    metabolites_reactant = utility.collect_reaction_participants_value(
         key="metabolite",
         criteria={"roles": ["reactant"]},
         participants=reaction["participants"]
     )
-    metabolites_product = collect_reaction_participants_value(
+    metabolites_product = utility.collect_reaction_participants_value(
         key="metabolite",
         criteria={"roles": ["product"]},
         participants=reaction["participants"]
@@ -526,7 +464,7 @@ def collect_reaction_transports(reaction=None):
     transports = []
     for metabolite in metabolites:
         # Determine metabolite's compartments as reactant and product
-        compartments_reactant = collect_reaction_participants_value(
+        compartments_reactant = utility.collect_reaction_participants_value(
             key="compartment",
             criteria={
                 "metabolites": [metabolite],
@@ -534,7 +472,7 @@ def collect_reaction_transports(reaction=None):
             },
             participants=reaction["participants"]
         )
-        compartments_product = collect_reaction_participants_value(
+        compartments_product = utility.collect_reaction_participants_value(
             key="compartment",
             criteria={
                 "metabolites": [metabolite],
@@ -616,7 +554,7 @@ def collect_processes_metabolites_compartments(reactions=None):
         for process in processes:
             if process not in collection:
                 collection[process] = {}
-            metabolites = collect_reaction_participants_value(
+            metabolites = utility.collect_reaction_participants_value(
                 key="metabolite",
                 criteria={},
                 participants=reaction["participants"]
@@ -624,7 +562,7 @@ def collect_processes_metabolites_compartments(reactions=None):
             for metabolite in metabolites:
                 if metabolite not in collection[process]:
                     collection[process][metabolite] = []
-                compartments = collect_reaction_participants_value(
+                compartments = utility.collect_reaction_participants_value(
                     key="compartment",
                     criteria={"metabolites": [metabolite]},
                     participants=reaction["participants"]
@@ -787,12 +725,12 @@ def collect_reactions_replicates(reactions=None):
         identifier = reaction["identifier"]
         # Collect identifiers of metabolites that participate as reactants and
         # products in the reaction
-        reactants = collect_reaction_participants_value(
+        reactants = utility.collect_reaction_participants_value(
             key="metabolite",
             criteria={"roles": ["reactant"]},
             participants=reaction["participants"]
         )
-        products = collect_reaction_participants_value(
+        products = utility.collect_reaction_participants_value(
             key="metabolite",
             criteria={"roles": ["product"]},
             participants=reaction["participants"]
@@ -959,17 +897,13 @@ def filter_reaction(reaction=None):
     compartments = utility.collect_value_from_records(
         key="compartment", records=reaction["participants"]
     )
-    compartment = utility.match_string_in_list(
-        string="BOUNDARY", list=compartments
-    )
+    compartment = ("BOUNDARY" in compartments)
     # Metabolite.
     # Biomass is irrelevant.
     metabolites = utility.collect_value_from_records(
         key="metabolite", records=reaction["participants"]
     )
-    metabolite = utility.match_string_in_list(
-        string="BIOMASS", list=metabolites
-    )
+    metabolite = ("BIOMASS" in metabolites)
     # Reference.
     # MetaNetX reaction MNXR01 is for a meaningless proton exchange.
     reference = reaction["references"]["metanetx"][0] == "MNXR01"

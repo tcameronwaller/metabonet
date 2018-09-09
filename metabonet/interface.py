@@ -70,12 +70,13 @@ License:
 # Installation and importation
 
 # Standard
-
 import argparse
+import textwrap
 
 # Relevant
 
 # Custom
+import candidacy
 
 #dir()
 #importlib.reload()
@@ -114,68 +115,20 @@ def define_parse_arguments():
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "-o", "--origin", dest="origin", type=str, required=True,
-        help="Directory of source files."
+        "-d", "--directory", dest="directory", type=str, required=True,
+        help="Path to directory for source and product files."
     )
     parser.add_argument(
-        "-d", "--destination", dest="destination", type=str, required=True,
-        help="Directory for product files."
-    )
-    #parser.add_argument(
-    #    "-m", "--method", dest="method", type=str,
-    #    choices=["omission", "replication"], default="omission",
-    #    help="Method for simplification (default: %(default)s)."
-    #)
-    method = parser.add_mutually_exclusive_group(required=True)
-    method.add_argument(
-        "-o", "--omission", dest="omission", action="store_true",
-        help="Simplify by omission method."
-    )
-    method.add_argument(
-        "-r", "--replication", dest="replication", action="store_true",
-        help="Simplify by replication method."
+        "-c", "--compartmentalize", dest="compartmentalization",
+        action="store_true", required=False,
+        help="Compartmentalize metabolites."
     )
     parser.add_argument(
-        "-c", "--compartmentalize", dest="compartmentalization", required=True,
-        action="store_true", help="Compartmentalize metabolites."
-    )
-    parser.add_argument(
-        "-x", "--clean", dest="clean", action="store_true",
+        "-x", "--clean", dest="clean", action="store_true", required=False,
         help="Clean intermediate files."
     )
     # Parse arguments.
     return parser.parse_args()
-
-
-def interpret_arguments(arguments=None):
-    """
-    Interprets arguments from terminal.
-
-    arguments:
-        arguments (object): arguments from terminal
-
-    raises:
-
-    returns:
-        (dict): parameters
-
-    """
-
-    origin = arguments.origin
-    destination = arguments.destination
-    if arguments.omission:
-        method = "omission"
-    elif arguments.replication:
-        method = "replication"
-    compartmentalization = arguments.compartmentalization
-    clean = arguments.clean
-    # Compile and return information.
-    return {
-        "origin": origin,
-        "destination": destination,
-        "compartmentalization": compartmentalization,
-        "clean": clean
-    }
 
 
 def evaluate_source(directory=None):
@@ -215,29 +168,18 @@ def execute_procedure():
 
     # Parse arguments from terminal.
     arguments = define_parse_arguments()
-    # Interpret arguments from terminal.
-    parameters = interpret_arguments(arguments=arguments)
-    # Evaluate arguments *** input files.
-    match = evaluate_source(directory=arguments.source)
-    if match:
-        # Execute procedure.
-        candidacy.execute_procedure(
-            compartmentalization=parameters["compartmentalization"],
-            directory=parameters["directory"]
+    # Execute procedure.
+    candidacy.execute_procedure(
+        compartmentalization=arguments.compartmentalization,
+        directory=arguments.directory
+    )
+    if arguments.clean:
+        # Report status.
+        print("... executing clean procedure ...")
+        # Execute clean procedure.
+        clean.execute_procedure(
+            directory=arguments.directory
         )
-        # Filtration.
-        # TODO: Consider including filters by compartments and processes.
-        # Candidacy.
-        # TODO: which reactions are relevant (compartment)
-        # Simplification.
-        # Network.
-        pass
-
-    else:
-        # Display explanatory error message.
-        # TODO: especially explain the necessary input files...
-        pass
-    pass
 
 
 if (__name__ == "__main__"):

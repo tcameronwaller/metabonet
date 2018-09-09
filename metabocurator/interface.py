@@ -70,7 +70,6 @@ License:
 # Installation and importation
 
 # Standard
-
 import argparse
 import textwrap
 
@@ -184,31 +183,13 @@ def define_parse_arguments():
         "-v", "--conversion", dest="conversion", action="store_true",
         help="Convert information to formats for export."
     )
-    procedure.add_argument(
-        "-x", "--clean", dest="clean", action="store_true",
+    parser.add_argument(
+        "-x", "--clean", dest="clean", action="store_true", required=False,
         help="Clean intermediate files."
     )
     # Parse arguments.
     return parser.parse_args()
 
-
-def evaluate_source(directory=None):
-    """
-    Evaluates source files.
-
-    arguments:
-
-        directory (object): arguments from terminal
-
-    raises:
-
-    returns:
-        (bool): whether arguments are adequate
-
-    """
-
-    # TODO: Make sure necessary input files are available, etc...
-    return True
 
 ###############################################################################
 # Procedure
@@ -269,12 +250,6 @@ def execute_procedure():
         conversion.execute_procedure(
             directory=arguments.directory
         )
-        # Execute clean procedure.
-        # Report status.
-        print("... executing clean procedure ...")
-        clean.execute_procedure(
-            directory=arguments.directory
-        )
     elif arguments.extraction:
         # Report status.
         print("... executing extraction procedure ...")
@@ -317,7 +292,7 @@ def execute_procedure():
         conversion.execute_procedure(
             directory=arguments.directory
         )
-    elif arguments.clean:
+    if arguments.clean:
         # Report status.
         print("... executing clean procedure ...")
         # Execute clean procedure.

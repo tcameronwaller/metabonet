@@ -159,6 +159,49 @@ def read_source(directory=None):
     }
 
 
+def copy_interpret_content_recon2m2(content=None):
+    """
+    Copies and interprets content from Recon 2M.2
+
+    This function copies and interprets content from a metabolic model in
+    Systems Biology Markup Language (SBML), a form of Extensible Markup
+    Language (XML).
+
+    arguments:
+        content (object): content from Recon 2M.2 in SBML
+
+    raises:
+
+    returns:
+        (object): references to definition of name space and sections within
+            content
+
+    """
+
+    # Copy content.
+    content_copy = copy.deepcopy(content)
+    # Define name space.
+    space = {
+        "version": "http://www.sbml.org/sbml/level2/version4",
+        "syntax": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    }
+    # Set references to sections within content.
+    sbml = content_copy.getroot()
+    model = sbml[0]
+    compartments = model[1]
+    metabolites = model[2]
+    reactions = model[3]
+    # Compile and return information.
+    return {
+        "space": space,
+        "content": content_copy,
+        "model": model,
+        "compartments": compartments,
+        "metabolites": metabolites,
+        "reactions": reactions
+    }
+
+
 def extract_compartments(compartments_source=None):
     """
     Extracts information from source about compartments
@@ -302,7 +345,7 @@ def extract_reactions_names(model=None):
     """
 
     # Copy and interpret content
-    reference = utility.copy_interpret_content_recon2m2(content=model)
+    reference = copy_interpret_content_recon2m2(content=model)
     reactions_names = {}
     for reaction in reference["reactions"].findall(
         "version:reaction", reference["space"]

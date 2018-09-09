@@ -1,35 +1,91 @@
 """
+Module to provide template of common structure of modules.
+
+Title:
+
+    utility
+
+Imports:
+
+    os: Package to interact with the operating system.
+    sys: Package to interact with the interpreter.
+    shutil: Package to perform file operations.
+    importlib: Package to import packages and modules.
+    argparse: Package to interpret user parameters from terminal.
+    csv: Package to organize information in text.
+    copy: Package to copy objects.
+    pickle: Package to preserve information.
+    numpy: Package to calculate with arrays of numbers.
+    pandas: Package to organize collections of variables.
+
+Classes:
+
+    This module does not contain any classes.
+
+Exceptions:
+
+    This module does not contain any exceptions.
+
+Functions:
+
+    ...
+
+Author:
+
+    Thomas Cameron Waller
+    tcameronwaller@gmail.com
+    Department of Biochemistry
+    University of Utah
+    Room 5520C, Emma Eccles Jones Medical Research Building
+    15 North Medical Drive East
+    Salt Lake City, Utah 84112
+    United States of America
+
+License:
+
+    This file is part of project metabonet
+    (https://github.com/tcameronwaller/metabonet/).
+
+    MetaboNet supports custom definition of metabolic networks.
+    Copyright (C) 2018 Thomas Cameron Waller
+
+    This program is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation, either version 3 of the License, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program.
+    If not, see <http://www.gnu.org/licenses/>.
 """
 
 ###############################################################################
 # Notes
 
-
 ###############################################################################
-# Installation and importation of packages and modules
+# Installation and importation
 
-# Packages and modules from the python standard library
-
+# Standard
 import os
-#import sys
-import shutil
-#import importlib
 import csv
-import copy
-import pickle
 
-# Packages and modules from third parties
+# Relevant
 
-#import numpy
-#import pandas
-
-# Packages and modules from local source
+# Custom
 
 #dir()
 #importlib.reload()
 
 ###############################################################################
 # Functionality
+
+
+# General.
 
 
 def confirm_path_directory(path=None):
@@ -49,49 +105,6 @@ def confirm_path_directory(path=None):
 
     if not os.path.exists(path):
         os.makedirs(path)
-
-
-def copy_interpret_content_recon2m2(content=None):
-    """
-    Copies and interprets content from Recon 2M.2
-
-    This function copies and interprets content from a metabolic model in
-    Systems Biology Markup Language (SBML), a form of Extensible Markup
-    Language (XML).
-
-    arguments:
-        content (object): content from Recon 2M.2 in SBML
-
-    raises:
-
-    returns:
-        (object): references to definition of name space and sections within
-            content
-
-    """
-
-    # Copy content.
-    content_copy = copy.deepcopy(content)
-    # Define name space.
-    space = {
-        "version": "http://www.sbml.org/sbml/level2/version4",
-        "syntax": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    }
-    # Set references to sections within content.
-    sbml = content_copy.getroot()
-    model = sbml[0]
-    compartments = model[1]
-    metabolites = model[2]
-    reactions = model[3]
-    # Compile and return information.
-    return {
-        "space": space,
-        "content": content_copy,
-        "model": model,
-        "compartments": compartments,
-        "metabolites": metabolites,
-        "reactions": reactions
-    }
 
 
 def read_file_table(path_file=None, names=None, delimiter=None):
@@ -152,27 +165,6 @@ def write_file_table(
         writer.writerows(information)
 
 
-def match_string_in_list(string=None, list=None):
-    """
-    Determines whether any elements in a list are identical to a search text.
-
-    arguments:
-        text (str): string for which to search
-        sequence (list<str>): sequence of string elements
-
-    raises:
-
-    returns:
-        (bool): whether the string exists in the list
-
-    """
-
-    for element in list:
-        if string == element:
-            return True
-    return False
-
-
 def find(match=None, sequence=None):
     """
     Finds the first element in a sequence to match a condition, otherwise none
@@ -218,6 +210,32 @@ def find_index(match=None, sequence=None):
     # Not any elements match condition
     # Return -1
     return -1
+
+
+def find_all(match=None, sequence=None):
+    """
+    Finds all elements in a sequence to match a condition, otherwise none.
+
+    arguments:
+        match (function): condition for elements to match
+        sequence (list): sequence of elements
+
+    returns:
+        (list<dict> | NoneType): elements from sequence to match condition or
+            none
+
+    raises:
+
+    """
+
+    matches = []
+    for element in sequence:
+        if match(element):
+            matches.append(element)
+    if len(matches) > 0:
+        return matches
+    else:
+        return None
 
 
 def collect_unique_elements(elements_original=None):
@@ -347,6 +365,69 @@ def filter_common_elements(list_one=None, list_two=None):
     def match(element_two=None):
         return element_two in list_one
     return list(filter(match, list_two))
+
+
+# Metabolic information.
+
+
+def collect_reaction_participants_value(
+    key=None, criteria=None, participants=None
+):
+    """
+    Collects a value from a reaction's specific participants
+
+    arguments:
+        key (str): key of value to collect from each participant
+        criteria (dict<list>): criteria by which to select participants
+        participants (list<dict>): information about a reaction's participants
+
+    returns:
+        (list<str>): values from a reaction's participants
+
+    raises:
+
+    """
+
+    participants_match = filter_reaction_participants(
+        criteria=criteria, participants=participants
+    )
+    return collect_value_from_records(key=key, records=participants_match)
+
+
+def filter_reaction_participants(criteria=None, participants=None):
+    """
+    Filters a reaction's participants by multiple criteria
+
+    arguments:
+        criteria (dict<list>): criteria by which to select participants
+        participants (list<dict>): information about a reaction's participants
+
+    returns:
+        (list<dict>): information about a reaction's participants
+
+    raises:
+
+    """
+
+    def match(participant):
+        if "metabolites" in criteria:
+            match_metabolite = (
+                participant["metabolite"] in criteria["metabolites"]
+            )
+        else:
+            match_metabolite = True
+        if "compartments" in criteria:
+            match_compartment = (
+                participant["compartment"] in criteria["compartments"]
+            )
+        else:
+            match_compartment = True
+        if "roles" in criteria:
+            match_role = participant["role"] in criteria["roles"]
+        else:
+            match_role = True
+        return match_metabolite and match_compartment and match_role
+    return list(filter(match, participants))
 
 
 ###############################################################################

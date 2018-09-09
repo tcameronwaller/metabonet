@@ -437,7 +437,38 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
             # Change name.
             if identifier_original in reactions_novel:
                 reactions_novel[identifier_original]["name"] = name_novel
-    # Return information
+        # Filter references to replicate reactions.
+        # Ensure that all references to reactions are valid.
+        reactions_replicates = filter_reaction_replicates(
+            reactions_original=reactions_novel
+        )
+    # Return information.
+    return reactions_replicates
+
+
+def filter_reaction_replicates(reactions_original=None):
+    """
+    Filters references to replicate reactions.
+
+    arguments:
+        reactions_original (dict<dict>): information about reactions
+
+    returns:
+        (dict<dict>): information about reactions
+
+    raises:
+
+    """
+
+    # Copy information.
+    reactions_novel = copy.deepcopy(reactions_original)
+    for key in reactions_novel.keys():
+        reaction = reactions_novel[key]
+        replicates_original = reaction["replicates"]
+        def match(identifier):
+            return identifier in reactions_novel.keys()
+        replicates_novel = list(filter(match, replicates_original))
+        reactions_novel[key]["replicates"] = replicates_novel
     return reactions_novel
 
 
