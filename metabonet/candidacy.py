@@ -85,6 +85,7 @@ License:
 # Standard
 import os
 import pickle
+import copy
 
 # Relevant
 
@@ -683,11 +684,6 @@ def determine_reaction_transport_participation(
     return len(transports_novel) > 0
 
 
-# TODO: I'll need a separate function for candidate participants...
-# TODO: candidate participants are different from relevant participants
-# TODO: candidate participants include simplification metabolites that are replicated for reaction
-# TODO: candidate participants do not include omitted metabolites
-
 def determine_reaction_relevant_participants(
     reaction_identifier=None,
     reactions=None,
@@ -1101,17 +1097,7 @@ def determine_redundant_reaction_priority(
     return priority
 
 
-
-
-
-
-
-
-
-
-
-
-def collect_candidate_metabolites(
+def collect_candidate_reactions_metabolites(
     metabolites=None,
     reactions=None,
     reactions_candidacy=None,
@@ -1137,29 +1123,338 @@ def collect_candidate_metabolites(
     raises:
 
     returns:
+        (dict<dict>): information about candidate reactions and candidate
+            metabolites
+
+    """
+
+    reactions_candidacy_metabolites = {}
+    metabolites_candidacy = {}
+    for reaction_candidacy in reactions_candidacy.values():
+        candidates = collect_candidate_reaction_metabolites(
+            reaction_candidacy_identifier=reaction_candidacy["identifier"],
+            reactions=reactions,
+            reactions_candidacy=reactions_candidacy,
+            metabolites=metabolites,
+            compartmentalization=compartmentalization,
+            compartments=compartments,
+            filtration_compartments=filtration_compartments,
+            simplification_metabolites=simplification_metabolites
+        )
+        # Collect candidate reaction.
+        reactions_candidacy_metabolites[reaction_candidacy["identifier"]] = (
+            candidates["reaction"]
+        )
+        # Determine whether candidate metabolites are novel.
+        for metabolite in candidates["metabolites"]:
+            if metabolite["identifier"] not in metabolites_candidacy.keys():
+                metabolites_candidacy[metabolite["identifier"]] = metabolite
+    # Compile and return information.
+    return {
+        "reactions": reactions_candidacy_metabolites,
+        "metabolites": metabolites_candidacy
+    }
+
+
+def collect_candidate_reaction_metabolites(
+    reaction_candidacy_identifier=None,
+    metabolites=None,
+    reactions=None,
+    reactions_candidacy=None,
+    compartmentalization=None,
+    compartments=None,
+    filtration_compartments=None,
+    simplification_metabolites=None
+):
+    """
+    Collects information about a candidate reaction's candidate metabolites.
+
+    arguments:
+        reaction_candidacy_identifier (str): identifier of a candidate reaction
+        metabolites (dict<dict>): information about metabolites
+        reactions (dict<dict>): information about reactions
+        reactions_candidacy (dict<dict>): information about candidate reactions
+        compartmentalization (bool): whether compartmentalization is relevant
+        compartments (dict<dict>): information about compartments
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (dict): information about a candidate reaction and its candidate
+            metabolites
+
+    """
+
+    # Access information.
+    reaction_candidacy = copy.deepcopy(
+        reactions_candidacy[reaction_candidacy_identifier]
+    )
+    reaction = reactions[reaction_candidacy["reaction"]]
+    participants = reaction["participants"]
+    # Determine candidate participants.
+    participants_candidacy = determine_reaction_candidate_participants(
+        participants_original=participants,
+        filtration_compartments=filtration_compartments,
+        simplification_metabolites=simplification_metabolites
+    )
+    # Include information about candidate participants in information about
+    # candidate reaction.
+    reaction_candidacy["participants"] = participants_candidacy
+    # Determine candidate metabolites.
+    reaction_metabolites_candidacy = determine_reaction_candidate_metabolites(
+        reaction_candidacy=reaction_candidacy,
+        participants=participants_candidacy,
+        metabolites=metabolites,
+        compartmentalization=compartmentalization,
+        compartments=compartments
+    )
+    # Include references in candidate reaction to candidate metabolites.
+    metabolites_candidacy_identifiers = utility.collect_value_from_records(
+        key="identifier", records=reaction_metabolites_candidacy
+    )
+    reaction_candidacy["metabolites_candidacy"] = (
+        metabolites_candidacy_identifiers
+    )
+    # Compile and return information.
+    return {
+        "reaction": reaction_candidacy,
+        "metabolites": reaction_metabolites_candidacy
+    }
+
+
+def determine_reaction_candidate_participants(
+    participants_original=None,
+    filtration_compartments=None,
+    simplification_metabolites=None
+):
+    """
+    Determines a reaction's candidate participants.
+
+    Candidate participants include metabolites with designations for
+    simplification by replication.
+
+    arguments:
+        participants_original (list<dict<str>>): information about metabolites
+            and compartments that participate in a reaction
+        filtration_compartments (list<dict<str>>): information about whether to
+            remove metabolites and reactions relevant to specific compartments
+        simplification_metabolites (list<dict<str>>): information about whether
+            to simplify representations of specific metabolites
+
+    raises:
+
+    returns:
+        (list<dict<str>>): reaction's candidate participants
+
+    """
+
+    # Collect candidate participants.
+    participants_novel = []
+    for participant in participants_original:
+        # Determine relevance of participant's compartment.
+        compartment = participant["compartment"]
+        compartment_relevance = determine_set_relevance(
+            identifier=compartment,
+            filters=filtration_compartments
+        )
+        # Determine candidacy of participant's metabolite.
+        metabolite = participant["metabolite"]
+        simplification = determine_metabolite_simplification(
+            metabolite_identifier=metabolite,
+            compartment_identifier=compartment,
+            simplification_metabolites=simplification_metabolites
+        )
+        # Metabolites with designation for simplification by replication are
+        # still candidates.
+        metabolite_candidacy = (not simplification["omission"])
+        participant["replication"] = simplification["replication"]
+        # Determine whether participant is a candidate.
+        if metabolite_candidacy and compartment_relevance:
+            participants_novel.append(participant)
+    return participants_novel
+
+
+def determine_reaction_candidate_metabolites(
+    reaction_candidacy=None,
+    participants=None,
+    metabolites=None,
+    compartmentalization=None,
+    compartments=None
+):
+    """
+    Determines a reaction's candidate metabolites.
+
+    arguments:
+        reaction_candidacy (dict): information about a candidate reaction
+        participants (list<dict<str>>): information about metabolites and
+            compartments that participate in a reaction
+        metabolites (dict<dict>): information about metabolites
+        compartmentalization (bool): whether compartmentalization is relevant
+        compartments (dict<dict>): information about compartments
+
+    raises:
+
+    returns:
+        (list<dict<str>>): reaction's candidate metabolites
+
+    """
+
+    metabolites_candidacy = []
+    for participant in participants:
+        # Access information.
+        metabolite_identifier = participant["metabolite"]
+        compartment_identifier = participant["compartment"]
+        metabolite = metabolites[metabolite_identifier]
+        compartment = compartments[compartment_identifier]
+        metabolite_name = metabolite["name"]
+        compartment_name = compartment["name"]
+        replication=participant["replication"]
+        # Candidate metabolite identifier.
+        identifier = determine_candidate_metabolite_identifier(
+            compartmentalization=compartmentalization,
+            replication=replication,
+            metabolite_identifier=metabolite_identifier,
+            compartment_identifier=compartment_identifier,
+            reaction_candidacy_identifier=reaction_candidacy["identifier"]
+        )
+        # Candidate metabolite name.
+        name = determine_candidate_metabolite_name(
+            compartmentalization=compartmentalization,
+            replication=replication,
+            metabolite_name=metabolite_name,
+            compartment_name=compartment_name,
+            reaction_candidacy_name=reaction_candidacy["name"]
+        )
+        # Compartment.
+        if compartmentalization:
+            compartment_reference = compartment_identifier
+        else:
+            compartment_reference = "null"
+        # Compile information.
+        record = {
+            "identifier": identifier,
+            "name": name,
+            "metabolite": metabolite_identifier,
+            "compartment": compartment_reference
+        }
+        metabolites_candidacy.append(record)
+    # Return information.
+    return metabolites_candidacy
+
+
+def determine_candidate_metabolite_identifier(
+    compartmentalization=None,
+    replication=None,
+    metabolite_identifier=None,
+    compartment_identifier=None,
+    reaction_candidacy_identifier=None
+):
+    """
+    Determines a candidate metabolite's identifier.
+
+    arguments:
+        compartmentalization (bool): whether compartmentalization is relevant
+        metabolite_identifier (str): identifier of a metabolite
+        compartment_identifier (str): identifier of a compartment
+        reaction_candidacy_identifier (str): identifier of a candidate reaction
+
+    raises:
+
+    returns:
+        (str): identifier of a candidate metabolite
+
+    """
+
+    if compartmentalization:
+        identifier_one = metabolite_identifier + "_" + compartment_identifier
+    else:
+        identifier_one = metabolite_identifier
+    if replication:
+        identifier_two = (
+            identifier_one + "_-_" + reaction_candidacy_identifier
+        )
+    else:
+        identifier_two = identifier_one
+    return identifier_two
+
+
+def determine_candidate_metabolite_name(
+    compartmentalization=None,
+    replication=None,
+    metabolite_name=None,
+    compartment_name=None,
+    reaction_candidacy_name=None
+):
+    """
+    Determines a candidate metabolite's identifier.
+
+    arguments:
+        compartmentalization (bool): whether compartmentalization is relevant
+        metabolite_identifier (str): identifier of a metabolite
+        compartment_identifier (str): identifier of a compartment
+        reaction_candidacy_name (str): name of a candidate reaction
+
+    raises:
+
+    returns:
+        (str): name of a candidate metabolite
+
+    """
+
+    if compartmentalization:
+        name_one = metabolite_name + " in " + compartment_name
+    else:
+        name_one = metabolite_name
+    if replication:
+        name_two = (
+            name_one + " for " + reaction_candidacy_name
+        )
+    else:
+        name_two = name_one
+    return name_two
+
+
+def collect_candidate_metabolites_reactions(
+    metabolites_candidacy=None,
+    reactions_candidacy=None
+):
+    """
+    Collects information about candidate metabolites.
+
+    arguments:
+        metabolites_candidacy (dict<dict>): information about candidate
+            metabolites
+        reactions_candidacy (dict<dict>): information about candidate reactions
+
+    raises:
+
+    returns:
         (dict<dict>): information about candidate metabolites
 
     """
 
-    if False:
-
-        reactions_candidacy = {}
-        for reaction in reactions.values():
-            candidacy, record = collect_candidate_reaction(
-                reaction_identifier= reaction["identifier"],
-                reactions=reactions,
-                reactions_candidacy=reactions_candidacy,
-                compartmentalization=compartmentalization,
-                filtration_compartments=filtration_compartments,
-                filtration_processes=filtration_processes,
-                simplification_reactions=simplification_reactions,
-                simplification_metabolites=simplification_metabolites
-            )
-            if candidacy:
-                reactions_candidacy[record["identifier"]] = record
-        return reactions_candidacy
-
-
+    # Collect references to candidate reactions in which each candidate
+    # metabolite participates.
+    metabolites_reactions = utility.collect_records_targets_by_categories(
+        target="identifier",
+        category="metabolites_candidacy",
+        records=list(reactions_candidacy.values())
+    )
+    metabolites_candidacy_reactions = {}
+    for metabolite, reactions in metabolites_reactions.items():
+        metabolite_candidacy = copy.deepcopy(
+            metabolites_candidacy[metabolite]
+        )
+        # Collect unique candidate reaction.
+        reactions_unique = utility.collect_unique_elements(reactions)
+        metabolite_candidacy["reactions_candidacy"] = reactions_unique
+        metabolites_candidacy_reactions[metabolite] = metabolite_candidacy
+    # Return information.
+    return metabolites_candidacy_reactions
 
 
 ###############################################################################
@@ -1199,12 +1494,9 @@ def execute_procedure(
     )
     print(list(reactions_candidacy.values())[100])
     # Collect candidate metabolites.
-    # TODO: I need to decide how to organize this procedure.
-    # TODO: Candidate reactions need information about their candidate participants (for network links)
-    # TODO: and their relevant candidate metabolites.
-    # TODO: That process essentially IS the process to collect candidate metabolites, so I think I should organize it within collect_candidate_metabolites
-    # TODO: It might also be nice for candidate metabolites to have references to their candidate reactions, but I can do that in a subsequent step.
-    metabolites_candidacy = collect_candidate_metabolites(
+    # Include references to candidate metabolites with information about
+    # candidate reactions.
+    reactions_metabolites_candidacy = collect_candidate_reactions_metabolites(
         metabolites=source["metabolites"],
         reactions=source["reactions"],
         reactions_candidacy=reactions_candidacy,
@@ -1213,16 +1505,12 @@ def execute_procedure(
         filtration_compartments=source["filtration_compartments"],
         simplification_metabolites=source["simplification_metabolites"]
     )
-
-
-        # TODO: 2. iterate over those candidate reactions to collect candidate metabolites
-        # TODO: note that at this point it is appropriate to either omit or replicate
-        # TODO: a reaction's metabolites according to the simplification method
-        # TODO: ie consider simplification of metabolites when deciding candidacy
-        # TODO: 3. the network procedure should not need to consider filtration
-        # TODO: or simplification at all. It just creates nodes and links and transfers
-        # TODO: over info from the candidates and metabolites and reactions
-
-
-    # TODO: Prepare some sort of report of candidate reactions and metabolites.
-    # TODO: maybe do degrees (counts reactions/metabolites) to inform simplification
+    print(list(reactions_metabolites_candidacy["reactions"].values())[100])
+    print(list(reactions_metabolites_candidacy["metabolites"].values())[100])
+    # Include references to candidate reactions with information about
+    # candidate metabolites.
+    metabolites_candidacy = collect_candidate_metabolites_reactions(
+        reactions_candidacy=reactions_metabolites_candidacy["reactions"],
+        metabolites_candidacy=reactions_metabolites_candidacy["metabolites"],
+    )
+    print(list(metabolites_candidacy.values())[100])

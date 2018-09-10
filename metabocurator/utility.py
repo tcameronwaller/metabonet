@@ -367,6 +367,71 @@ def filter_common_elements(list_one=None, list_two=None):
     return list(filter(match, list_two))
 
 
+def collect_records_targets_by_categories(
+    target=None,
+    category=None,
+    records=None
+):
+    """
+    Collects values of a target attribute that occur together in records with
+    each value of another category attribute.
+    Each record has a single value of the target attribute.
+    Each record can have either a single value or multiple values of the
+    category attribute.
+    These collections do not necessarily include only unique values of the
+    target attribute.
+
+    arguments:
+        target (str): name of attribute in records to collect for each category
+        category (str): name of attribute in records to define categories
+        records (list<dict>): records with target and category attributes
+
+    raises:
+
+    returns:
+        (dict<list<str>>): values of the target attribute that occur together
+            in records with each value of the category attribute
+
+    """
+
+    def collect_record_target_by_category(
+        target_value=None,
+        category_value=None,
+        collection=None,
+    ):
+        # Determine whether collection includes the category's value.
+        if category_value in collection.keys():
+            # Collection includes the category's value.
+            target_values_original = collection[category_value]
+            target_values_novel = target_values_original.append(target_value)
+            # Include target's value in collection.
+            collection[category_value] = target_values_novel
+        else:
+            # Collection does not include the category's value.
+            # Include category's value and target's value in collection.
+            collection[category_value] = [target_value]
+
+    collection = {}
+    for record in records:
+        target_value = record[target]
+        category_values = record[category]
+        if isinstance(category_values, list):
+            for category_value in category_values:
+                collect_record_target_by_category(
+                    target_value=target_value,
+                    category_value=category_value,
+                    collection=collection
+                )
+        else:
+            category_value = category_values
+            collect_record_target_by_category(
+                target_value=target_value,
+                category_value=category_value,
+                collection=collection
+            )
+    return collection
+
+
 # Metabolic information.
 
 
