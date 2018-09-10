@@ -73,6 +73,7 @@ License:
 # Standard
 import os
 import csv
+import copy
 
 # Relevant
 
@@ -397,19 +398,21 @@ def collect_records_targets_by_categories(
     def collect_record_target_by_category(
         target_value=None,
         category_value=None,
-        collection=None,
+        collection_original=None,
     ):
+        collection_novel = copy.deepcopy(collection_original)
         # Determine whether collection includes the category's value.
-        if category_value in collection.keys():
+        if category_value in collection_novel.keys():
             # Collection includes the category's value.
-            target_values_original = collection[category_value]
-            target_values_novel = target_values_original.append(target_value)
+            target_values = collection_novel[category_value]
+            target_values.append(target_value)
             # Include target's value in collection.
-            collection[category_value] = target_values_novel
+            collection_novel[category_value] = target_values
         else:
             # Collection does not include the category's value.
             # Include category's value and target's value in collection.
-            collection[category_value] = [target_value]
+            collection_novel[category_value] = [target_value]
+        return collection_novel
 
     collection = {}
     for record in records:
@@ -417,17 +420,17 @@ def collect_records_targets_by_categories(
         category_values = record[category]
         if isinstance(category_values, list):
             for category_value in category_values:
-                collect_record_target_by_category(
+                collection = collect_record_target_by_category(
                     target_value=target_value,
                     category_value=category_value,
-                    collection=collection
+                    collection_original=collection
                 )
         else:
             category_value = category_values
-            collect_record_target_by_category(
+            collection = collect_record_target_by_category(
                 target_value=target_value,
                 category_value=category_value,
-                collection=collection
+                collection_original=collection
             )
     return collection
 

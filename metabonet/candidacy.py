@@ -1216,8 +1216,14 @@ def collect_candidate_reaction_metabolites(
     metabolites_candidacy_identifiers = utility.collect_value_from_records(
         key="identifier", records=reaction_metabolites_candidacy
     )
-    reaction_candidacy["metabolites_candidacy"] = (
+    metabolites_candidacy_unique = utility.collect_unique_elements(
         metabolites_candidacy_identifiers
+    )
+    reaction_candidacy["metabolites_candidacy"] = (
+        metabolites_candidacy_unique
+    )
+    reaction_candidacy["metabolites_candidacy_count"] = len(
+        metabolites_candidacy_unique
     )
     # Compile and return information.
     return {
@@ -1450,11 +1456,132 @@ def collect_candidate_metabolites_reactions(
             metabolites_candidacy[metabolite]
         )
         # Collect unique candidate reaction.
-        reactions_unique = utility.collect_unique_elements(reactions)
-        metabolite_candidacy["reactions_candidacy"] = reactions_unique
+        reactions_candidacy_unique = utility.collect_unique_elements(
+            reactions
+        )
+        metabolite_candidacy["reactions_candidacy"] = (
+            reactions_candidacy_unique
+        )
+        metabolite_candidacy["reactions_candidacy_count"] = len(
+            reactions_candidacy_unique
+        )
         metabolites_candidacy_reactions[metabolite] = metabolite_candidacy
     # Return information.
     return metabolites_candidacy_reactions
+
+
+def convert_reactions_text(reactions=None):
+    """
+    Converts information about reactions to text format.
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+
+    returns:
+        (list<dict>): information about reactions
+
+    raises:
+
+    """
+
+    records = []
+    for reaction in reactions.values():
+        # Compile information.
+        record = {
+            "identifier": reaction["identifier"],
+            "reaction": reaction["reaction"],
+            "name": reaction["name"],
+            "replicates": ";".join(reaction["replicates"]),
+            "metabolites_candidacy": ";".join(
+                reaction["metabolites_candidacy"]
+            ),
+            "metabolites_candidacy_count": (
+                reaction["metabolites_candidacy_count"]
+            )
+        }
+        records.append(record)
+    records.sort(
+        key=lambda record: record["metabolites_candidacy_count"],
+        reverse=True
+    )
+    return records
+
+
+def convert_metabolites_text(metabolites=None):
+    """
+    Converts information about metabolites to text format.
+
+    arguments:
+        metabolites (dict<dict>): information about metabolites
+
+    returns:
+        (list<dict>): information about metabolites
+
+    raises:
+
+    """
+
+    records = []
+    for metabolite in metabolites.values():
+        record = {
+            "identifier": metabolite["identifier"],
+            "metabolite": metabolite["metabolite"],
+            "name": metabolite["name"],
+            "metabolite": metabolite["metabolite"],
+            "compartment": metabolite["compartment"],
+            "reactions_candidacy": ";".join(
+                metabolite["reactions_candidacy"]
+            ),
+            "reactions_candidacy_count": (
+                metabolite["reactions_candidacy_count"]
+            )
+        }
+        records.append(record)
+    records.sort(
+        key=lambda record: record["reactions_candidacy_count"],
+        reverse=True
+    )
+    return records
+
+
+def write_product(directory=None, information=None):
+    """
+    Writes product information to file
+
+    arguments:
+        directory (str): directory for product files
+        information (object): information to write to file
+
+    raises:
+
+    returns:
+
+    """
+
+    # Specify directories and files.
+    path = os.path.join(directory, "candidacy")
+    utility.confirm_path_directory(path)
+    path_reactions = os.path.join(path, "reactions.pickle")
+    path_metabolites = os.path.join(path, "metabolites.pickle")
+    path_metabolites_report = os.path.join(path, "metabolites.tsv")
+    path_reactions_report = os.path.join(path, "reactions.tsv")
+    # Write information to file.
+    with open(path_reactions, "wb") as file_product:
+        pickle.dump(information["reactions"], file_product)
+    with open(path_metabolites, "wb") as file_product:
+        pickle.dump(information["metabolites"], file_product)
+    utility.write_file_table(
+        information=information["metabolites_report"],
+        path_file=path_metabolites_report,
+        names=information["metabolites_report"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["reactions_report"],
+        path_file=path_reactions_report,
+        names=information["reactions_report"][0].keys(),
+        delimiter="\t"
+    )
 
 
 ###############################################################################
@@ -1492,7 +1619,6 @@ def execute_procedure(
         simplification_reactions=source["simplification_reactions"],
         simplification_metabolites=source["simplification_metabolites"]
     )
-    print(list(reactions_candidacy.values())[100])
     # Collect candidate metabolites.
     # Include references to candidate metabolites with information about
     # candidate reactions.
@@ -1505,12 +1631,25 @@ def execute_procedure(
         filtration_compartments=source["filtration_compartments"],
         simplification_metabolites=source["simplification_metabolites"]
     )
-    print(list(reactions_metabolites_candidacy["reactions"].values())[100])
-    print(list(reactions_metabolites_candidacy["metabolites"].values())[100])
     # Include references to candidate reactions with information about
     # candidate metabolites.
     metabolites_candidacy = collect_candidate_metabolites_reactions(
         reactions_candidacy=reactions_metabolites_candidacy["reactions"],
         metabolites_candidacy=reactions_metabolites_candidacy["metabolites"],
     )
-    print(list(metabolites_candidacy.values())[100])
+    # Prepare reports of information for review.
+    metabolites_report = convert_metabolites_text(
+        metabolites=metabolites_candidacy
+    )
+    reactions_report = convert_reactions_text(
+        reactions=reactions_metabolites_candidacy["reactions"]
+    )
+    # Compile information.
+    information = {
+        "metabolites": metabolites_candidacy,
+        "reactions": reactions_metabolites_candidacy["reactions"],
+        "metabolites_report": metabolites_report,
+        "reactions_report": reactions_report,
+    }
+    #Write product information to file.
+    write_product(directory=directory, information=information)
