@@ -335,7 +335,8 @@ def determine_reaction_candidacy(
         "identifier": reaction_identifier,
         "reaction": reaction_identifier,
         "name": reactions[reaction_identifier]["name"],
-        "replicates": redundancy[1]
+        "replicates": redundancy[1],
+        "reversibility": reactions[reaction_identifier]["reversibility"]
     }
     # Return information.
     return (candidacy, record)
@@ -1197,7 +1198,9 @@ def collect_candidate_reaction_metabolites(
     participants = reaction["participants"]
     # Determine candidate participants.
     participants_candidacy = determine_reaction_candidate_participants(
+        reaction_candidacy_identifier=reaction_candidacy_identifier,
         participants_original=participants,
+        compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
         simplification_metabolites=simplification_metabolites
     )
@@ -1233,7 +1236,9 @@ def collect_candidate_reaction_metabolites(
 
 
 def determine_reaction_candidate_participants(
+    reaction_candidacy_identifier=None,
     participants_original=None,
+    compartmentalization=None,
     filtration_compartments=None,
     simplification_metabolites=None
 ):
@@ -1244,8 +1249,10 @@ def determine_reaction_candidate_participants(
     simplification by replication.
 
     arguments:
+        reaction_candidacy_identifier (str): identifier of a candidate reaction
         participants_original (list<dict<str>>): information about metabolites
             and compartments that participate in a reaction
+        compartmentalization (bool): whether compartmentalization is relevant
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
         simplification_metabolites (list<dict<str>>): information about whether
@@ -1274,12 +1281,20 @@ def determine_reaction_candidate_participants(
             compartment_identifier=compartment,
             simplification_metabolites=simplification_metabolites
         )
+        participant["replication"] = simplification["replication"]
+        # Designate identifier for candidate metabolites for participant.
+        metabolite_candidacy = determine_candidate_metabolite_identifier(
+            compartmentalization=compartmentalization,
+            replication=simplification["replication"],
+            metabolite_identifier=metabolite,
+            compartment_identifier=compartment,
+            reaction_candidacy_identifier=reaction_candidacy_identifier
+        )
+        participant["metabolite_candidacy"] = metabolite_candidacy
+        # Determine whether participant is a candidate.
         # Metabolites with designation for simplification by replication are
         # still candidates.
-        metabolite_candidacy = (not simplification["omission"])
-        participant["replication"] = simplification["replication"]
-        # Determine whether participant is a candidate.
-        if metabolite_candidacy and compartment_relevance:
+        if compartment_relevance and not simplification["omission"]:
             participants_novel.append(participant)
     return participants_novel
 
@@ -1345,7 +1360,8 @@ def determine_reaction_candidate_metabolites(
             "identifier": identifier,
             "name": name,
             "metabolite": metabolite_identifier,
-            "compartment": compartment_reference
+            "compartment": compartment_reference,
+            "replication": replication
         }
         metabolites_candidacy.append(record)
     # Return information.
@@ -1364,6 +1380,8 @@ def determine_candidate_metabolite_identifier(
 
     arguments:
         compartmentalization (bool): whether compartmentalization is relevant
+        replication (bool): whether candidate metabolite has simplification by
+            replication
         metabolite_identifier (str): identifier of a metabolite
         compartment_identifier (str): identifier of a compartment
         reaction_candidacy_identifier (str): identifier of a candidate reaction
@@ -1381,7 +1399,7 @@ def determine_candidate_metabolite_identifier(
         identifier_one = metabolite_identifier
     if replication:
         identifier_two = (
-            identifier_one + "_-_" + reaction_candidacy_identifier
+            identifier_one + "_" + reaction_candidacy_identifier
         )
     else:
         identifier_two = identifier_one

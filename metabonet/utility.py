@@ -435,6 +435,32 @@ def collect_records_targets_by_categories(
     return collection
 
 
+def collect_values_from_records_in_reference(
+    key=None, identifiers=None, reference=None
+):
+    """
+    Collects a single value from a specific record in a reference.
+
+    arguments:
+        key (str): key of value in record
+        identifiers (list<str>): identifiers of records in reference
+        reference (dict<dict<str>>): reference of records
+
+    raises:
+
+    returns:
+        (list<str>): values from records
+
+    """
+
+    values = []
+    for identifier in identifiers:
+        record = reference[identifier]
+        value = record[key]
+        values.append(value)
+    return values
+
+
 # Metabolic information.
 
 

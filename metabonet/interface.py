@@ -77,6 +77,7 @@ import textwrap
 
 # Custom
 import candidacy
+import network
 
 #dir()
 #importlib.reload()
@@ -173,6 +174,8 @@ def execute_procedure():
         compartmentalization=arguments.compartmentalization,
         directory=arguments.directory
     )
+    network.execute_procedure(directory=arguments.directory)
+    # TODO: maybe include a separate module for measurements...
     if arguments.clean:
         # Report status.
         print("... executing clean procedure ...")
