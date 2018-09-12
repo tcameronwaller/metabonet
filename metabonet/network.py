@@ -121,7 +121,9 @@ def read_source(directory=None):
     path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
     path_candidacy = os.path.join(directory, "candidacy")
     path_reactions_candidacy = os.path.join(path_candidacy, "reactions.pickle")
-    path_metabolites_candidacy = os.path.join(path_candidacy, "metabolites.pickle")
+    path_metabolites_candidacy = os.path.join(
+        path_candidacy, "metabolites.pickle"
+    )
     # Read information from file.
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
@@ -223,8 +225,10 @@ def define_reaction_node(
         "identifier": reaction_candidacy["identifier"],
         "reaction": reaction["identifier"],
         "name": reaction_candidacy["name"],
+        "reversibility": reaction_candidacy["reversibility"],
         "replicates": reaction_candidacy["replicates"],
-        "processes": processes_names
+        "processes": processes_names,
+        "type": "reaction"
     }
     # Return information.
     return reaction_node
@@ -317,7 +321,9 @@ def define_metabolite_node(
         "mass": metabolite["mass"],
         "charge": metabolite["charge"],
         "reference_hmdb": metabolite["references"]["hmdb"],
-        "reference_pubchem": metabolite["references"]["pubchem"]
+        "reference_pubchem": metabolite["references"]["pubchem"],
+        "replication": metabolite_candidacy["replication"],
+        "type": "metabolite"
     }
     # Return information.
     return metabolite_node

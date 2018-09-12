@@ -78,6 +78,8 @@ import textwrap
 # Custom
 import candidacy
 import network
+import conversion
+import analysis
 
 #dir()
 #importlib.reload()
@@ -175,6 +177,7 @@ def execute_procedure():
         directory=arguments.directory
     )
     network.execute_procedure(directory=arguments.directory)
+    conversion.execute_procedure(directory=arguments.directory)
     # TODO: maybe include a separate module for measurements...
     if arguments.clean:
         # Report status.
