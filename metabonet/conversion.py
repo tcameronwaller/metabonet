@@ -86,9 +86,9 @@ License:
 import os
 import pickle
 import copy
+import json
 
 # Relevant
-import networkx as ntx
 
 # Custom
 import utility

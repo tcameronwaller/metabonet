@@ -169,6 +169,8 @@ def execute_procedure():
 
     """
 
+    # TODO: I want 2 separate procedures: 1. definition, 2. analysis
+
     # Parse arguments from terminal.
     arguments = define_parse_arguments()
     # Execute procedure.

@@ -88,7 +88,7 @@ import pickle
 import copy
 
 # Relevant
-import networkx as ntx
+#import networkx as ntx
 
 # Custom
 import utility
