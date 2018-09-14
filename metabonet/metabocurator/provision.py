@@ -153,7 +153,7 @@ def transfer_summary_midas(summary_hmdb=None, midas_original=None):
         # Determine whether MIDAS record matches a HMDB record.
         if len(reference_hmdb_original) > 0:
             # Match MIDAS record to HMDB record.
-            keys_hmdb = enhancement.filter_hmdb_entries_identifiers(
+            keys_hmdb = enhancement.filter_hmdb_entries_by_identifiers(
                 identifiers=[reference_hmdb_original],
                 metabolites_references=summary_hmdb
             )

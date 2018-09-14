@@ -163,7 +163,7 @@ def extract_hmdb_summary(hmdb=None):
                 # Clear memory.
                 element.clear()
     # Report.
-    print("Extraction complete for " + str(count) + " metabolites!")
+    print("Extraction complete for " + str(count) + " metabolites.")
     # Return information.
     return summary_hmdb
 
@@ -217,15 +217,14 @@ def extract_hmdb_record_summary(element=None, space=None, spaces=None):
         space=space,
         spaces=spaces
     )
-    references_hmdb_secondary = extract_subelement_values(
+    references_hmdb_values = extract_subelement_values(
         element=hmdb_secondary,
         tag="accession",
         space=space,
         spaces=spaces
     )
-    references_hmdb = utility.collect_unique_elements(
-        [hmdb_primary].extend(references_hmdb_secondary)
-    )
+    references_hmdb_values.append(hmdb_primary)
+    references_hmdb = utility.collect_unique_elements(references_hmdb_values)
     # Name.
     name = extract_subelement_value(
         element=element,
@@ -246,7 +245,8 @@ def extract_hmdb_record_summary(element=None, space=None, spaces=None):
         space=space,
         spaces=spaces
     )
-    synonyms = utility.collect_unique_elements([name].extend(synonyms_values))
+    synonyms_values.append(name)
+    synonyms = utility.collect_unique_elements(synonyms_values)
     # References.
     reference_pubchem = extract_subelement_value(
         element=element,
@@ -373,7 +373,7 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "extrication")
+    path = os.path.join(directory, "extraction")
     utility.confirm_path_directory(path)
     path_pickle = os.path.join(path, "hmdb_summary.pickle")
     path_text = os.path.join(path, "hmdb_summary.tsv")

@@ -976,7 +976,7 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "extraction")
+    path = os.path.join(directory, "collection")
     utility.confirm_path_directory(path)
     path_compartments = os.path.join(path, "compartments.pickle")
     path_processes = os.path.join(path, "processes.pickle")

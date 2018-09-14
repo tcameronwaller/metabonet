@@ -109,8 +109,8 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_hmdb = os.path.join(directory, "extrication", "hmdb_summary.pickle")
-    path = os.path.join(directory, "extraction")
+    path_hmdb = os.path.join(directory, "extraction", "hmdb_summary.pickle")
+    path = os.path.join(directory, "collection")
     path_compartments = os.path.join(path, "compartments.pickle")
     path_processes = os.path.join(path, "processes.pickle")
     path_reactions = os.path.join(path, "reactions.pickle")
@@ -155,11 +155,11 @@ def enhance_metabolites(
     """
 
     metabolites_novel = {}
-    # Iterate on records for metabolites
-    for key, record in metabolites_original.items():
-        # Enhance information about metabolite
+    # Iterate on records for metabolites.
+    for metabolite in metabolites_original.values():
+        # Enhance information about metabolite.
         metabolite_novel = enhance_metabolite(
-            metabolite_original=record,
+            metabolite_original=metabolite,
             summary_hmdb=summary_hmdb
         )
         # Compile information
@@ -185,24 +185,28 @@ def enhance_metabolite(
 
     """
 
-    # Copy information
+    # Copy information.
     metabolite_novel = copy.deepcopy(metabolite_original)
-    # Determine supplemental references from entries in HMDB
-    references_supplemental = enhance_metabolite_references(
+    # Enhance metabolite's references.
+    references_novel = enhance_metabolite_references(
+        name=metabolite_novel["name"],
         references_original=metabolite_novel["references"],
         summary_hmdb=summary_hmdb
     )
-    metabolite_novel["references"] = references_supplemental
+    metabolite_novel["references"] = references_novel
     return metabolite_novel
 
 
 def enhance_metabolite_references(
-    references_original=None, summary_hmdb=None
+    name=None,
+    references_original=None,
+    summary_hmdb=None
 ):
     """
     Enhances information about a metabolite by including references from HMDB
 
     arguments:
+        name (str): name of metabolite
         references_original (dict): references about a metabolite
         summary_hmdb (dict<dict>): information about metabolites from Human
             Metabolome Database (HMDB)
@@ -214,19 +218,18 @@ def enhance_metabolite_references(
 
     """
 
-    # Copy information
+    # Copy information.
     references_novel = copy.deepcopy(references_original)
-    # Each metabolite's record can have references to multiple entries in
-    # HMDB
-    metabolite_references_hmdb = references_novel["hmdb"]
-    # Find entries from HMDB that match
-    hmdb_keys = filter_hmdb_entries_identifiers(
-        identifiers=metabolite_references_hmdb,
+    # Enhance references to HMDB.
+    references_hmdb_original = references_novel["hmdb"]
+    references_hmdb_novel = utility.match_hmdb_entries_by_identifiers_names(
+        identifiers=references_hmdb_original,
+        names=[name],
         summary_hmdb=summary_hmdb
     )
     # Extract references from entries in HMDB
     hmdb_references = collect_hmdb_entries_references(
-        keys=hmdb_keys, summary_hmdb=summary_hmdb
+        keys=references_hmdb_novel, summary_hmdb=summary_hmdb
     )
     # Combine supplemental references to original references
     references_novel["hmdb"] = utility.collect_unique_elements(
@@ -242,39 +245,6 @@ def enhance_metabolite_references(
         references_original["kegg"] + hmdb_references["kegg"]
     )
     return references_novel
-
-
-def filter_hmdb_entries_identifiers(
-    identifiers=None, summary_hmdb=None
-):
-    """
-    Filters entries from HMDB by their identifiers
-
-    arguments:
-        identifiers (list<str>): identifiers by which to find entries in HMDB
-        summary_hmdb (dict<dict>): information about metabolites from Human
-            Metabolome Database (HMDB)
-
-    returns:
-        (list<str>): keys of entries in HMDB
-
-    raises:
-
-    """
-
-    keys = []
-    for key, record in summary_hmdb.items():
-        hmdb_entry_identifiers = record["hmdb"]
-        # Determine whether any of entry's identifiers match the metabolite's
-        # references
-        checks = []
-        for identifier in identifiers:
-            check = identifier in hmdb_entry_identifiers
-            checks.append(check)
-        if any(checks):
-            # The entry matches the metabolite's references
-            keys.append(key)
-    return keys
 
 
 def collect_hmdb_entries_references(
@@ -295,27 +265,30 @@ def collect_hmdb_entries_references(
 
     """
 
-    hmdb = []
-    pubchem = []
-    chebi = []
-    kegg = []
+    references_hmdb = []
+    references_pubchem = []
+    references_chebi = []
+    references_kegg = []
     for key in keys:
-        # Only include primary accession identifiers in collection
+        # Only include primary accession identifiers in HMDB collection.
         record = summary_hmdb[key]
-        hmdb.append(record["identifier"])
-        # Only include valid identifiers in the collection
-        if (record["pubchem"] is not None) and (len(record["pubchem"]) > 0):
-            pubchem.append(record["pubchem"])
-        if (record["chebi"] is not None) and (len(record["chebi"]) > 0):
-            chebi.append(record["chebi"])
-        if (record["kegg"] is not None) and (len(record["kegg"]) > 0):
-            kegg.append(record["kegg"])
+        references_hmdb.append(record["identifier"])
+        # Only include valid identifiers in the collection.
+        pubchem = record["reference_pubchem"]
+        chebi = record["reference_chebi"]
+        kegg = record["reference_kegg"]
+        if (pubchem is not None) and (len(pubchem) > 0):
+            references_pubchem.append(pubchem)
+        if (chebi is not None) and (len(chebi) > 0):
+            references_chebi.append(chebi)
+        if (kegg is not None) and (len(kegg) > 0):
+            references_kegg.append(kegg)
     # Compile and return information
     return {
-        "hmdb": hmdb,
-        "pubchem": pubchem,
-        "chebi": chebi,
-        "kegg": kegg
+        "hmdb": references_hmdb,
+        "pubchem": references_pubchem,
+        "chebi": references_chebi,
+        "kegg": references_kegg
     }
 
 
@@ -1018,10 +991,10 @@ def execute_procedure(directory=None):
         reactions_original=reactions_process
     )
     # Prepare reports of information for review.
-    metabolites_report = conversion.convert_metabolites_text(
+    metabolites_report = metabocurator.conversion.convert_metabolites_text(
         metabolites=metabolites
     )
-    reactions_report = conversion.convert_reactions_text(
+    reactions_report = metabocurator.conversion.convert_reactions_text(
         reactions=reactions_replication
     )
     # Filter reactions.

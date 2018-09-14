@@ -646,6 +646,7 @@ def evaluate_clean_parameters(arguments):
     """
 
     print("... call to clean procedure ...")
+    # TODO: call clean procedures both for the model and network procedures...
 
 
 ###############################################################################
@@ -670,17 +671,6 @@ def execute_procedure():
     arguments = define_interface_parsers()
     # Call the appropriate function.
     arguments.func(arguments)
-
-
-    if False:
-        # TODO: maybe include a separate module for measurements...
-        if arguments.clean:
-            # Report status.
-            print("... executing clean procedure ...")
-            # Execute clean procedure.
-            clean.execute_procedure(
-                directory=arguments.directory
-            )
 
 
 if (__name__ == "__main__"):

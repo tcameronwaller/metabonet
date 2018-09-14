@@ -461,6 +461,156 @@ def collect_values_from_records_in_reference(
     return values
 
 
+def filter_nonempty_elements(elements_original=None):
+    """
+    Filters nonempty elements.
+
+    arguments:
+        elements_original (list<str>): sequence of elements
+
+    returns:
+        (list<str>): non-empty elements
+
+    raises:
+
+    """
+
+    elements_novel = []
+    for element in elements_original:
+        if len(element) > 0:
+            elements_novel.append(element)
+    return elements_novel
+
+
+# Human Metabolome Database (HMDB).
+
+
+def match_hmdb_entries_by_identifiers_names(
+    identifiers=None,
+    names=None,
+    summary_hmdb=None
+):
+
+    """
+    Matches entries from Human Metabolome Database by identifiers or names.
+
+    arguments:
+        identifiers (list<str>): identifiers by which to find entries in HMDB
+        names (list<str>): names by which to find entries in HMDB
+        summary_hmdb (dict<dict>): information about metabolites from Human
+            Metabolome Database (HMDB)
+
+    returns:
+        (list<str>): keys of entries in HMDB
+
+    raises:
+
+    """
+
+    # Test.
+    #hmdb_keys = utility.match_hmdb_entries_by_identifiers_names(
+    #    identifiers=[],
+    #    names=["pyruvate"],
+    #    summary_hmdb=source["summary_hmdb"]
+    #)
+    # HMDB0000243
+
+    # Ensure identifiers and names are not empty.
+    identifiers_valid = filter_nonempty_elements(identifiers)
+    names_valid = filter_nonempty_elements(names)
+    # Determine whether measurement's record include reference to HMDB.
+    if (len(identifiers_valid) > 0):
+        # Measurement's record includes references to HMDB.
+        # Match measurement's record to a entries in HMDB.
+        # Match by identifier.
+        hmdb_keys = filter_hmdb_entries_by_identifiers(
+            identifiers=identifiers_valid,
+            summary_hmdb=summary_hmdb
+        )
+    elif (len(names_valid) > 0):
+        # Measurement's record does not include reference to HMDB.
+        # Match measurement's record to an entry in HMDB.
+        # Attempt to match by name.
+        hmdb_keys = filter_hmdb_entries_by_synonyms(
+            names=names_valid,
+            summary_hmdb=summary_hmdb
+        )
+    else:
+        hmdb_keys = []
+    # Return information.
+    return hmdb_keys
+
+
+def filter_hmdb_entries_by_identifiers(
+    identifiers=None, summary_hmdb=None
+):
+    """
+    Filters entries from HMDB by their identifiers.
+
+    arguments:
+        identifiers (list<str>): identifiers by which to find entries in HMDB
+        summary_hmdb (dict<dict>): information about metabolites from Human
+            Metabolome Database (HMDB)
+
+    returns:
+        (list<str>): keys of entries in HMDB
+
+    raises:
+
+    """
+
+    keys = []
+    for key, record in summary_hmdb.items():
+        hmdb_entry_identifiers = record["references_hmdb"]
+        # Determine whether any of entry's identifiers match the metabolite's
+        # references
+        checks = []
+        for identifier in identifiers:
+            check = identifier in hmdb_entry_identifiers
+            checks.append(check)
+        if any(checks):
+            # The entry matches the metabolite's references.
+            keys.append(key)
+    return keys
+
+
+def filter_hmdb_entries_by_synonyms(
+    names=None, summary_hmdb=None
+):
+    """
+    Filters entries from HMDB by their synonyms.
+
+    arguments:
+        names (list<str>): names by which to find entries in HMDB
+        summary_hmdb (dict<dict>): information about metabolites from Human
+            Metabolome Database (HMDB)
+
+    returns:
+        (list<str>): keys of entries in HMDB
+
+    raises:
+
+    """
+
+    keys = []
+    for key, record in summary_hmdb.items():
+        synonyms = record["synonyms"]
+        synonyms_lower = []
+        for synonym in synonyms:
+            synonyms_lower.append(synonym.lower())
+        # Determine whether any of entry's identifiers match the metabolite's
+        # references
+        checks = []
+        for name in names:
+            name_lower = name.lower()
+            check = name_lower in synonyms_lower
+            checks.append(check)
+        if any(checks):
+            # The entry matches the metabolite's references
+            keys.append(key)
+    return keys
+
+
 # Metabolic information.
 
 

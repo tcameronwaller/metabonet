@@ -565,10 +565,10 @@ def execute_procedure(directory=None):
         reactions_original=metabolites_reactions["reactions"]
     )
     # Prepare reports of information for review.
-    metabolites_report = conversion.convert_metabolites_text(
+    metabolites_report = metabocurator.conversion.convert_metabolites_text(
         metabolites=metabolites_reactions["metabolites"]
     )
-    reactions_report = conversion.convert_reactions_text(
+    reactions_report = metabocurator.conversion.convert_reactions_text(
         reactions=reactions
     )
     # Compile information.

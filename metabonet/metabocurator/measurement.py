@@ -89,7 +89,6 @@ import math
 # Packages and modules from local source
 
 import utility
-import metabocurator.enhancement
 
 ###############################################################################
 # Functionality
@@ -110,15 +109,14 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_measurement = os.path.join(directory, "measurement")
-    path_measurements = os.path.join(path_measurement, "plasma_metabolites.tsv")
-    path_extrication = os.path.join(directory, "extrication")
-    path_hmdb = os.path.join(path_extrication, "hmdb_summary.pickle")
+    path_measurement = os.path.join(directory, "plasma_metabolites.tsv")
+    path_extraction = os.path.join(directory, "extraction")
+    path_hmdb = os.path.join(path_extraction, "hmdb_summary.pickle")
     path_conversion = os.path.join(directory, "conversion")
     path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
     # Read information from file.
     measurements = utility.read_file_table(
-        path_file=path_measurements,
+        path_file=path_measurement,
         names=[
             "set", "subset", "name", "reference_hmdb", "fold", "p_value",
             "q_value"
@@ -126,13 +124,13 @@ def read_source(directory=None):
         delimiter="\t"
     )
     with open(path_hmdb, "rb") as file_source:
-        hmdb = pickle.load(file_source)
+        summary_hmdb = pickle.load(file_source)
     with open(path_metabolites, "rb") as file_source:
         metabolites = pickle.load(file_source)
     # Compile and return information.
     return {
         "measurements": measurements,
-        "hmdb": hmdb,
+        "summary_hmdb": summary_hmdb,
         "metabolites": metabolites
     }
 
@@ -152,12 +150,14 @@ def extract_measurements(records=None):
     """
 
     measurements = []
-    for record in records[2:]:
+    for record in records[2:739]:
+        name_original = record["name"]
+        name_novel = name_original.replace("*", "")
         measurement = {
-            "name": record["name"],
+            "name": name_novel,
             "reference_hmdb": record["reference_hmdb"],
-            "fold": record["fold"],
-            "p_value": record["p_value"]
+            "fold": float(record["fold"]),
+            "p_value": float(record["p_value"])
         }
         measurements.append(measurement)
     return measurements
@@ -186,14 +186,15 @@ def calculate_measurements_log(measurements_original=None):
 
 
 def enhance_measurements_hmdb_references(
-    measurements_original=None, hmdb=None
+    measurements_original=None, summary_hmdb=None
 ):
     """
     Enhances measurements' references to Human Metabolome Database (HMDB).
 
     arguments:
         measurements_original (list<dict>): information about measurements
-        hmdb (dict<dict>): information from HMDB
+        summary_hmdb (dict<dict>): information about metabolites from Human
+            Metabolome Database (HMDB)
 
     raises:
 
@@ -202,35 +203,31 @@ def enhance_measurements_hmdb_references(
 
     """
 
-    pass
+    measurements_novel = []
+    for measurement in measurements_original:
+        reference_hmdb = measurement["reference_hmdb"]
+        name = measurement["name"]
+        hmdb_keys = utility.match_hmdb_entries_by_identifiers_names(
+            identifiers=[reference_hmdb],
+            names=[name],
+            summary_hmdb=summary_hmdb
+        )
+        del measurement["reference_hmdb"]
+        measurement["hmdb"] = hmdb_keys
+        measurements_novel.append(measurement)
+    return measurements_novel
 
-def enhance_measurements_pubchem_references(
-    measurements_original=None, hmdb=None
+
+def match_measurements_to_metabolites(
+    reference=None,
+    measurements_original=None,
+    metabolites=None
 ):
     """
-    Enhances measurements' references to PubChem.
+    Matches measurements to metabolites.
 
     arguments:
-        measurements_original (list<dict>): information about measurements
-        hmdb (dict<dict>): information from HMDB
-
-    raises:
-
-    returns:
-        (list<dict>): information about measurements
-
-    """
-
-    pass
-
-
-def enhance_measurements_metanetx_references(
-    measurements_original=None, metabolites=None
-):
-    """
-    Enhances measurements' references to MetaNetX.
-
-    arguments:
+        reference (str): name of attribute to use for match
         measurements_original (list<dict>): information about measurements
         metabolites (dict<dict>): information about metabolites
 
@@ -241,7 +238,24 @@ def enhance_measurements_metanetx_references(
 
     """
 
-    pass
+    measurements_novel = []
+    for measurement in measurements_original:
+        references_measurement = measurement[reference]
+        # Find metabolites that match the reference.
+        metabolites_matches = []
+        for metabolite in metabolites.values():
+            references_metabolite = metabolite["references"][reference]
+            # Determine whether any measurement references match metabolite
+            # references.
+            matches = utility.filter_common_elements(
+                list_one=references_measurement,
+                list_two=references_metabolite
+            )
+            if len(matches) > 0:
+                metabolites_matches.append(metabolite["identifier"])
+        measurement["metabolites"] = metabolites_matches
+        measurements_novel.append(measurement)
+    return measurements_novel
 
 
 def write_product(directory=None, information=None):
@@ -259,7 +273,7 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "provision")
+    path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
     path_pickle = os.path.join(path, "hmdb_summary.pickle")
     path_text = os.path.join(path, "hmdb_summary.tsv")
@@ -302,9 +316,6 @@ def execute_procedure(directory=None):
     """
 
     # Read source information from file.
-    # TODO: read in the raw measurement table from the publication
-    # TODO: read in the summary of hmdb
-    # TODO: read in curated information about metabolites
     source = read_source(directory=directory)
     # Extract relevant information about measurements.
     measurements = extract_measurements(records=source["measurements"])
@@ -312,30 +323,25 @@ def execute_procedure(directory=None):
     measurements_log = calculate_measurements_log(
         measurements_original=measurements
     )
-    # Match analytes to identifiers for Human Metabolome Database (HMDB),
-    # PubChem, and MetaNetX.
-    # TODO: match records by alternative HMDB identifiers (include these in HMDB summary)
-    # TODO: match records by comparing name to synonymous names for HMDB entry (include these in HMDB summary)
+    # Match analytes to identifiers for Human Metabolome Database (HMDB) and
+    # metabolites.
     measurements_hmdb = enhance_measurements_hmdb_references(
         measurements_original=measurements_log,
-        hmdb=source["hmdb"]
+        summary_hmdb=source["summary_hmdb"]
     )
-    measurements_pubchem = enhance_measurements_pubchem_references(
+    measurements_metabolites = match_measurements_to_metabolites(
+        reference="hmdb",
         measurements_original=measurements_hmdb,
-        hmdb=source["hmdb"]
-    )
-    measurements_metanetx = enhance_measurements_metanetx_references(
-        measurements_original=measurements_pubchem,
         metabolites=source["metabolites"]
     )
     # Filter analytes for those whose differences have p-values < 0.05.
 
     # Convert measurement information to table in text format.
 
-
-    # Compile information.
-    information = {
-        "midas_novel": midas_novel
-    }
-    #Write product information to file
-    write_product(directory=directory, information=information)
+    if False:
+        # Compile information.
+        information = {
+            "midas_novel": midas_novel
+        }
+        #Write product information to file
+        write_product(directory=directory, information=information)
