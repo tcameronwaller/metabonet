@@ -88,7 +88,7 @@ import pickle
 # Packages and modules from local source
 
 import utility
-import conversion
+import metabocurator.conversion
 
 ###############################################################################
 # Functionality

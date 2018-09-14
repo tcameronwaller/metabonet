@@ -12,7 +12,6 @@ Imports:
     shutil: Package to perform file operations.
     importlib: Package to import packages and modules.
     argparse: Package to interpret user parameters from terminal.
-    textwrap: Package to format text.
     csv: Package to organize information in text.
     copy: Package to copy objects.
     pickle: Package to preserve information.
@@ -83,13 +82,6 @@ License:
 ###############################################################################
 # Functionality
 
-#directory = os.path.join(
-#    os.sep, "media", "tcameronwaller", "primary", "data", "local", "work",
-#    "project"
-#)
-
-
-
 ###############################################################################
 # Procedure
 
@@ -100,11 +92,13 @@ def execute_procedure():
 
     arguments:
 
-    raises:
-
     returns:
 
+    raises:
+
     """
+
+    print("accessed test module in metabocurator subpackage!")
 
     pass
 

@@ -87,7 +87,7 @@ import copy
 
 # Packages and modules from local source
 import utility
-import extraction
+import metabocurator.extraction
 
 ###############################################################################
 # Functionality

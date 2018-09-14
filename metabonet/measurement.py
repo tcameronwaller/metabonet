@@ -89,7 +89,7 @@ import math
 # Packages and modules from local source
 
 import utility
-import enhancement
+import metabocurator.enhancement
 
 ###############################################################################
 # Functionality

@@ -78,7 +78,7 @@ import shutil
 import csv
 import copy
 import pickle
-import xml.etree.ElementTree as et
+import math
 
 # Packages and modules from third parties
 
@@ -89,7 +89,7 @@ import xml.etree.ElementTree as et
 # Packages and modules from local source
 
 import utility
-import enhancement
+import metabocurator.enhancement
 
 ###############################################################################
 # Functionality
@@ -110,73 +110,138 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_hmdb = os.path.join(directory, "hmdb_metabolites.xml")
-    path = os.path.join(directory, "provision")
-    path_midas = os.path.join(path, "midas_original.tsv")
+    path_measurement = os.path.join(directory, "measurement")
+    path_measurements = os.path.join(path_measurement, "plasma_metabolites.tsv")
+    path_extrication = os.path.join(directory, "extrication")
+    path_hmdb = os.path.join(path_extrication, "hmdb_summary.pickle")
+    path_conversion = os.path.join(directory, "conversion")
+    path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
     # Read information from file.
-    #hmdb = et.parse(path_hmdb)
-    midas_original = utility.read_file_table(
-        path_file=path_midas,
-        names=None,
+    measurements = utility.read_file_table(
+        path_file=path_measurements,
+        names=[
+            "set", "subset", "name", "reference_hmdb", "fold", "p_value",
+            "q_value"
+        ],
         delimiter="\t"
     )
+    with open(path_hmdb, "rb") as file_source:
+        hmdb = pickle.load(file_source)
+    with open(path_metabolites, "rb") as file_source:
+        metabolites = pickle.load(file_source)
     # Compile and return information.
     return {
-        "hmdb": path_hmdb,
-        "midas_original": midas_original
+        "measurements": measurements,
+        "hmdb": hmdb,
+        "metabolites": metabolites
     }
 
 
-def transfer_summary_midas(summary_hmdb=None, midas_original=None):
+def extract_measurements(records=None):
     """
-    Transfers information from Human Metabolome Database (HMDB) to MIDAS
-    library.
+    Extracts information about measurements.
 
     arguments:
-        summary_hmdb (dict<dict>): information from HMDB
-        midas_original (list<dict<str>>): information in MIDAS
+        records (list<dict>): information from source about measurements
 
     raises:
 
     returns:
-        (list<dict<str>>): information in MIDAS
+        (list<dict>): information about measurements
 
     """
 
-    midas_novel = []
-    for record_midas in midas_original:
-        # Interpretation.
-        reference_midas = record_midas["reference_midas"]
-        name_original = record_midas["name"]
-        reference_hmdb_original = record_midas["reference_hmdb"]
-        reference_kegg_original = record_midas["reference_kegg"]
-        # Determine whether MIDAS record matches a HMDB record.
-        if len(reference_hmdb_original) > 0:
-            # Match MIDAS record to HMDB record.
-            keys_hmdb = enhancement.filter_hmdb_entries_identifiers(
-                identifiers=[reference_hmdb_original],
-                metabolites_references=summary_hmdb
-            )
-            if len(keys_hmdb) > 1:
-                print("found multiple hmdb keys!")
-            key_hmdb = keys_hmdb[0]
-            record_hmdb = summary_hmdb[key_hmdb]
-            record_novel = copy.deepcopy(record_hmdb)
-            record_novel["reference_midas"] = reference_midas
-            record_novel["name_original"] = name_original
-            record_novel["reference_kegg_original"] = reference_kegg_original
-            midas_novel.append(record_novel)
-        else:
-            keys_hmdb = list(summary_hmdb.values())[0].keys()
-            record_hmdb = {}
-            for key in keys_hmdb:
-                record_hmdb[key] = "null"
-            record_novel = record_hmdb
-            record_novel["reference_midas"] = identifier_midas
-            record_novel["name_original"] = name_original
-            record_novel["reference_kegg_original"] = reference_kegg_original
-            midas_novel.append(record_novel)
-    return midas_novel
+    measurements = []
+    for record in records[2:]:
+        measurement = {
+            "name": record["name"],
+            "reference_hmdb": record["reference_hmdb"],
+            "fold": record["fold"],
+            "p_value": record["p_value"]
+        }
+        measurements.append(measurement)
+    return measurements
+
+
+def calculate_measurements_log(measurements_original=None):
+    """
+    Calculates base-2 logarithm of fold change in measurements.
+
+    arguments:
+        records (list<dict>): information about measurements
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    measurements_novel = []
+    for measurement in measurements_original:
+        fold = measurement["fold"]
+        measurement["log_fold"] = math.log(fold, 2)
+        measurements_novel.append(measurement)
+    return measurements_novel
+
+
+def enhance_measurements_hmdb_references(
+    measurements_original=None, hmdb=None
+):
+    """
+    Enhances measurements' references to Human Metabolome Database (HMDB).
+
+    arguments:
+        measurements_original (list<dict>): information about measurements
+        hmdb (dict<dict>): information from HMDB
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    pass
+
+def enhance_measurements_pubchem_references(
+    measurements_original=None, hmdb=None
+):
+    """
+    Enhances measurements' references to PubChem.
+
+    arguments:
+        measurements_original (list<dict>): information about measurements
+        hmdb (dict<dict>): information from HMDB
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    pass
+
+
+def enhance_measurements_metanetx_references(
+    measurements_original=None, metabolites=None
+):
+    """
+    Enhances measurements' references to MetaNetX.
+
+    arguments:
+        measurements_original (list<dict>): information about measurements
+        metabolites (dict<dict>): information about metabolites
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    pass
 
 
 def write_product(directory=None, information=None):
@@ -237,11 +302,37 @@ def execute_procedure(directory=None):
     """
 
     # Read source information from file.
+    # TODO: read in the raw measurement table from the publication
+    # TODO: read in the summary of hmdb
+    # TODO: read in curated information about metabolites
     source = read_source(directory=directory)
-    # Transfer information to MIDAS library.
-    midas_novel = transfer_summary_midas(
-        summary_hmdb=summary_hmdb, midas_original=source["midas_original"]
+    # Extract relevant information about measurements.
+    measurements = extract_measurements(records=source["measurements"])
+    # Calculate base-2 logarithm of fold change.
+    measurements_log = calculate_measurements_log(
+        measurements_original=measurements
     )
+    # Match analytes to identifiers for Human Metabolome Database (HMDB),
+    # PubChem, and MetaNetX.
+    # TODO: match records by alternative HMDB identifiers (include these in HMDB summary)
+    # TODO: match records by comparing name to synonymous names for HMDB entry (include these in HMDB summary)
+    measurements_hmdb = enhance_measurements_hmdb_references(
+        measurements_original=measurements_log,
+        hmdb=source["hmdb"]
+    )
+    measurements_pubchem = enhance_measurements_pubchem_references(
+        measurements_original=measurements_hmdb,
+        hmdb=source["hmdb"]
+    )
+    measurements_metanetx = enhance_measurements_metanetx_references(
+        measurements_original=measurements_pubchem,
+        metabolites=source["metabolites"]
+    )
+    # Filter analytes for those whose differences have p-values < 0.05.
+
+    # Convert measurement information to table in text format.
+
+
     # Compile information.
     information = {
         "midas_novel": midas_novel

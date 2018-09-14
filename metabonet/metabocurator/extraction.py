@@ -217,13 +217,15 @@ def extract_hmdb_record_summary(element=None, space=None, spaces=None):
         space=space,
         spaces=spaces
     )
-    reference_hmdb_secondary = extract_subelement_values(
+    references_hmdb_secondary = extract_subelement_values(
         element=hmdb_secondary,
         tag="accession",
         space=space,
         spaces=spaces
     )
-    reference_hmdb = [hmdb_primary] + reference_hmdb_secondary
+    references_hmdb = utility.collect_unique_elements(
+        [hmdb_primary].extend(references_hmdb_secondary)
+    )
     # Name.
     name = extract_subelement_value(
         element=element,
@@ -231,6 +233,20 @@ def extract_hmdb_record_summary(element=None, space=None, spaces=None):
         space=space,
         spaces=spaces
     )
+    # Synonyms.
+    synonyms_element = extract_subelement(
+        element=element,
+        tag="synonyms",
+        space=space,
+        spaces=spaces
+    )
+    synonyms_values = extract_subelement_values(
+        element=synonyms_element,
+        tag="synonym",
+        space=space,
+        spaces=spaces
+    )
+    synonyms = utility.collect_unique_elements([name].extend(synonyms_values))
     # References.
     reference_pubchem = extract_subelement_value(
         element=element,
@@ -254,10 +270,11 @@ def extract_hmdb_record_summary(element=None, space=None, spaces=None):
     record = {
         "identifier": hmdb_primary,
         "name": name,
-        "hmdb": reference_hmdb,
-        "pubchem": reference_pubchem,
-        "chebi": reference_chebi,
-        "kegg": reference_kegg
+        "synonyms": synonyms,
+        "references_hmdb": references_hmdb,
+        "reference_pubchem": reference_pubchem,
+        "reference_chebi": reference_chebi,
+        "reference_kegg": reference_kegg
     }
     return record
 

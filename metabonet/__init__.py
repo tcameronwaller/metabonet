@@ -22,14 +22,16 @@ Modules:
 ###############################################################################
 # Installation and importation
 
-# Standard
+# Standard.
 
-# Relevant
+# Relevant.
 
-# Custom
-
-import metabonet
-#import utility
-
-#dir()
-#importlib.reload()
+# Custom.
+import metabocurator
+import interface
+import candidacy
+import network
+import conversion
+import clean
+import utility
+import test
