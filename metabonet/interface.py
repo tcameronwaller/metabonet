@@ -136,6 +136,8 @@ def define_general_description():
 
     description = textwrap.dedent("""\
         --------------------------------------------------
+        --------------------------------------------------
+        --------------------------------------------------
 
         Curate model of human metabolism, and define custom networks.
 
@@ -160,9 +162,7 @@ def define_general_epilog():
     epilog = textwrap.dedent("""\
 
         --------------------------------------------------
-
         --------------------------------------------------
-
         --------------------------------------------------
     """)
     return epilog
@@ -248,6 +248,8 @@ def define_model_description():
 
     description = textwrap.dedent("""\
         --------------------------------------------------
+        --------------------------------------------------
+        --------------------------------------------------
 
         MetaboNet's model procedure
 
@@ -330,6 +332,9 @@ def define_model_epilog():
         with metabolic network.
 
         ...
+
+        --------------------------------------------------
+        --------------------------------------------------
         --------------------------------------------------
     """)
     return epilog
@@ -367,13 +372,13 @@ def define_network_subparser(subparsers=None):
         help="Path to root directory for source and product files."
     )
     parser_network.add_argument(
-        "-y", "--candidacy", dest="candiday", action="store_true",
+        "-y", "--candidacy", dest="candidacy", action="store_true",
         help="Determine candidacy of reactions and metabolites for network."
     )
     parser_network.add_argument(
         "-c", "--compartmentalize", dest="compartmentalization",
         action="store_true", required=False,
-        help="Compartmentalize metabolites."
+        help="Compartmentalize metabolites in candidacy procedure."
     )
     parser_network.add_argument(
         "-n", "--network", dest="network", action="store_true",
@@ -394,6 +399,9 @@ def define_network_subparser(subparsers=None):
         "-a", "--analysis", dest="analysis", action="store_true",
         help="Analyze metabolic network."
     )
+    # Define behavior.
+    parser_network.set_defaults(func=evaluate_network_parameters)
+    # Return parser.
     return parser_network
 
 
@@ -411,6 +419,8 @@ def define_network_description():
     """
 
     description = textwrap.dedent("""\
+        --------------------------------------------------
+        --------------------------------------------------
         --------------------------------------------------
 
         MetaboNet's network procedure
@@ -476,6 +486,8 @@ def define_network_epilog():
         ...
 
         --------------------------------------------------
+        --------------------------------------------------
+        --------------------------------------------------
     """)
     return epilog
 
@@ -503,6 +515,9 @@ def define_clean_subparser(subparsers=None):
         "-d", "--directory", dest="directory", type=str, required=True,
         help="Path to root directory for source and product files."
     )
+    # Define behavior.
+    parser_clean.set_defaults(func=evaluate_clean_parameters)
+    # Return parser.
     return parser_clean
 
 
@@ -519,59 +534,118 @@ def evaluate_model_parameters(arguments):
 
     """
 
-    print("hello, you called the model procedure!!!")
-
+    print("... call to model procedure ...")
     # Execute procedure.
     if arguments.reconciliation:
         # Report status.
         print("... executing reconciliation procedure ...")
-        # Execute reconciliation procedure.
+        # Execute procedure.
         metabocurator.reconciliation.execute_procedure(
             directory=arguments.directory
         )
     if arguments.collection:
         # Report status.
         print("... executing collection procedure ...")
-        # Execute collection procedure.
+        # Execute procedure.
         metabocurator.collection.execute_procedure(
             directory=arguments.directory
         )
     if arguments.extraction:
         # Report status.
         print("... executing extraction procedure ...")
-        # Execute extraction procedure.
+        # Execute procedure.
         metabocurator.extraction.execute_procedure(
             directory=arguments.directory
         )
     if arguments.enhancement:
         # Report status.
         print("... executing enhancement procedure ...")
-        # Execute enhancement procedure.
+        # Execute procedure.
         metabocurator.enhancement.execute_procedure(
             directory=arguments.directory
         )
     if arguments.curation:
         # Report status.
         print("... executing curation procedure ...")
-        # Execute curation procedure.
+        # Execute procedure.
         metabocurator.curation.execute_procedure(
             directory=arguments.directory
         )
     if arguments.conversion:
         # Report status.
         print("... executing conversion procedure ...")
-        # Execute conversion procedure.
+        # Execute procedure.
         metabocurator.conversion.execute_procedure(
             directory=arguments.directory
         )
     if arguments.measurement:
         # Report status.
         print("... executing measurement procedure ...")
-        # Execute measurement procedure.
+        # Execute procedure.
         metabocurator.measurement.execute_procedure(
             directory=arguments.directory
         )
 
+
+def evaluate_network_parameters(arguments):
+    """
+    Evaluates parameters for network procedure.
+
+    arguments:
+        arguments (object): arguments from terminal
+
+    raises:
+
+    returns:
+
+    """
+
+    print("... call to network procedure ...")
+    # Execute procedure.
+    if arguments.candidacy:
+        # Report status.
+        print("... executing candidacy procedure ...")
+        # Execute procedure.
+        candidacy.execute_procedure(
+            compartmentalization=arguments.compartmentalization,
+            directory=arguments.directory
+        )
+    if arguments.network:
+        # Report status.
+        print("... executing network procedure ...")
+        # Execute procedure.
+        network.execute_procedure(directory=arguments.directory)
+    if arguments.conversion:
+        # Report status.
+        print("... executing conversion procedure ...")
+        # Execute procedure.
+        conversion.execute_procedure(directory=arguments.directory)
+    if arguments.analysis:
+        # Report status.
+        print("... executing analysis procedure ...")
+        # Execute procedure.
+        analysis.execute_procedure(directory=arguments.directory)
+    if arguments.measurement:
+        # Report status.
+        print("... executing measurement procedure ...")
+        # Execute procedure.
+        measurement.execute_procedure(directory=arguments.directory)
+
+
+def evaluate_clean_parameters(arguments):
+    """
+    Evaluates parameters for clean procedure.
+
+    arguments:
+        arguments (object): arguments from terminal
+
+    raises:
+
+    returns:
+
+    """
+
+    print("... call to clean procedure ...")
 
 
 ###############################################################################
@@ -599,12 +673,6 @@ def execute_procedure():
 
 
     if False:
-        candidacy.execute_procedure(
-            compartmentalization=arguments.compartmentalization,
-            directory=arguments.directory
-        )
-        network.execute_procedure(directory=arguments.directory)
-        conversion.execute_procedure(directory=arguments.directory)
         # TODO: maybe include a separate module for measurements...
         if arguments.clean:
             # Report status.
