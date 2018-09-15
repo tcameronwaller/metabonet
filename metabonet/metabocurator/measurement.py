@@ -258,6 +258,84 @@ def match_measurements_to_metabolites(
     return measurements_novel
 
 
+def filter_measurements_metabolites(
+    measurements_original=None
+):
+    """
+    Filter measurements by those that map to metabolites.
+
+    arguments:
+        measurements_original (list<dict>): information about measurements
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    measurements_novel = []
+    for measurement in measurements_original:
+        metabolites = measurement["metabolites"]
+        if len(metabolites) > 0:
+            measurements_novel.append(measurement)
+    return measurements_novel
+
+
+def filter_measurements_significance(
+    p_value_threshold=None,
+    measurements_original=None
+):
+    """
+    Filter measurements by a threshold for significance.
+
+    arguments:
+        p_value_threshold (float): p value threshold for significance
+        measurements_original (list<dict>): information about measurements
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    measurements_novel = []
+    for measurement in measurements_original:
+        p_value = measurement["p_value"]
+        if p_value < p_value_threshold:
+            measurements_novel.append(measurement)
+    return measurements_novel
+
+
+def convert_measurements_text(measurements=None):
+    """
+    Converts information about measurements to text format.
+
+    arguments:
+        measurements_original (list<dict>): information about measurements
+
+    returns:
+        (list<dict>): information about measurements
+
+    raises:
+
+    """
+
+    records = []
+    for measurement in measurements:
+        record = {
+            "name": measurement["name"],
+            "fold": measurement["fold"],
+            "log_fold": measurement["log_fold"],
+            "p_value": measurement["p_value"],
+            "hmdb": ";".join(measurement["hmdb"]),
+            "metabolites": ";".join(measurement["metabolites"])
+        }
+        records.append(record)
+    return records
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -275,22 +353,15 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
-    path_pickle = os.path.join(path, "hmdb_summary.pickle")
-    path_text = os.path.join(path, "hmdb_summary.tsv")
-    path_midas = os.path.join(path, "midas_novel.tsv")
+    path_pickle = os.path.join(path, "measurements.pickle")
+    path_text = os.path.join(path, "measurements.tsv")
     # Write information to file.
     with open(path_pickle, "wb") as file_product:
-        pickle.dump(information["summary_object"], file_product)
+        pickle.dump(information["measurements"], file_product)
     utility.write_file_table(
-        information=information["summary_list"],
+        information=information["measurements_text"],
         path_file=path_text,
-        names=information["summary_list"][0].keys(),
-        delimiter="\t"
-    )
-    utility.write_file_table(
-        information=information["midas_novel"],
-        path_file=path_midas,
-        names=information["midas_novel"][0].keys(),
+        names=information["measurements_text"][0].keys(),
         delimiter="\t"
     )
 
@@ -319,14 +390,10 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Extract relevant information about measurements.
     measurements = extract_measurements(records=source["measurements"])
-    # Calculate base-2 logarithm of fold change.
-    measurements_log = calculate_measurements_log(
-        measurements_original=measurements
-    )
     # Match analytes to identifiers for Human Metabolome Database (HMDB) and
     # metabolites.
     measurements_hmdb = enhance_measurements_hmdb_references(
-        measurements_original=measurements_log,
+        measurements_original=measurements,
         summary_hmdb=source["summary_hmdb"]
     )
     measurements_metabolites = match_measurements_to_metabolites(
@@ -334,14 +401,31 @@ def execute_procedure(directory=None):
         measurements_original=measurements_hmdb,
         metabolites=source["metabolites"]
     )
+    # Filter analytes for those which map to metabolites.
+    measurements_metabolites_only = filter_measurements_metabolites(
+        measurements_original=measurements_metabolites
+    )
+    # Calculate base-2 logarithm of fold change.
+    measurements_log = calculate_measurements_log(
+        measurements_original=measurements_metabolites_only
+    )
     # Filter analytes for those whose differences have p-values < 0.05.
-
+    measurements_significance = filter_measurements_significance(
+        p_value_threshold=0.05,
+        measurements_original=measurements_log
+    )
+    count = 1
+    for measurement in measurements_significance:
+        print(str(count) + "..." + measurement["name"] + "..." + str(measurement["metabolites"]) + "..." + str(measurement["p_value"]))
+        count = count + 1
     # Convert measurement information to table in text format.
-
-    if False:
-        # Compile information.
-        information = {
-            "midas_novel": midas_novel
-        }
-        #Write product information to file
-        write_product(directory=directory, information=information)
+    measurements_text = convert_measurements_text(
+        measurements=measurements_significance
+    )
+    # Compile information.
+    information = {
+        "measurements": measurements_significance,
+        "measurements_text": measurements_text
+    }
+    #Write product information to file
+    write_product(directory=directory, information=information)
