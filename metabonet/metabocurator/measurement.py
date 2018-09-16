@@ -262,7 +262,7 @@ def filter_measurements_metabolites(
     measurements_original=None
 ):
     """
-    Filter measurements by those that map to metabolites.
+    Filter measurements for those that map to metabolites.
 
     arguments:
         measurements_original (list<dict>): information about measurements
@@ -390,24 +390,24 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Extract relevant information about measurements.
     measurements = extract_measurements(records=source["measurements"])
-    # Match analytes to identifiers for Human Metabolome Database (HMDB).
+    # Match measurements to identifiers for Human Metabolome Database (HMDB).
     measurements_hmdb = enhance_measurements_hmdb_references(
         measurements_original=measurements,
         summary_hmdb=source["summary_hmdb"]
     )
-    # Match analytes to metabolites.
+    # Match measurements to metabolites.
     measurements_metabolites = match_measurements_to_metabolites(
         reference="hmdb",
         measurements_original=measurements_hmdb,
         metabolites=source["metabolites"]
     )
-    # Filter analytes for those which map to metabolites.
-    measurements_metabolites_only = filter_measurements_metabolites(
+    # Filter measurements for those that map to metabolites.
+    measurements_match = filter_measurements_metabolites(
         measurements_original=measurements_metabolites
     )
     # Calculate base-2 logarithm of fold change.
     measurements_log = calculate_measurements_log(
-        measurements_original=measurements_metabolites_only
+        measurements_original=measurements_match
     )
     # Filter analytes for those whose differences have p-values < 0.05.
     measurements_significance = filter_measurements_significance(

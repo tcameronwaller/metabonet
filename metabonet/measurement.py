@@ -159,6 +159,30 @@ def match_measurements_to_candidate_metabolites(
     return measurements_novel
 
 
+def filter_measurements_candidates(
+    measurements_original=None
+):
+    """
+    Filter measurements for those that map to candidate metabolites.
+
+    arguments:
+        measurements_original (list<dict>): information about measurements
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    measurements_novel = []
+    for measurement in measurements_original:
+        candidates = measurement["candidates"]
+        if len(candidates) > 0:
+            measurements_novel.append(measurement)
+    return measurements_novel
+
+
 def convert_measurements_text(measurements=None):
     """
     Converts information about measurements to text format.
@@ -245,9 +269,13 @@ def execute_procedure(directory=None):
         measurements_original=source["measurements"],
         metabolites_candidacy=source["metabolites_candidacy"]
     )
+    # Filter measurements for those that map to candidate metabolites.
+    measurements_match = filter_measurements_candidates(
+        measurements_original=measurements_candidacy
+    )
     # Convert measurement information to table in text format.
     measurements_candidacy_text = convert_measurements_text(
-        measurements=measurements_candidacy
+        measurements=measurements_match
     )
     # Compile information.
     information = {
