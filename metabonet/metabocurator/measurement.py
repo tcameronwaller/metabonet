@@ -390,12 +390,12 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Extract relevant information about measurements.
     measurements = extract_measurements(records=source["measurements"])
-    # Match analytes to identifiers for Human Metabolome Database (HMDB) and
-    # metabolites.
+    # Match analytes to identifiers for Human Metabolome Database (HMDB).
     measurements_hmdb = enhance_measurements_hmdb_references(
         measurements_original=measurements,
         summary_hmdb=source["summary_hmdb"]
     )
+    # Match analytes to metabolites.
     measurements_metabolites = match_measurements_to_metabolites(
         reference="hmdb",
         measurements_original=measurements_hmdb,
@@ -414,10 +414,6 @@ def execute_procedure(directory=None):
         p_value_threshold=0.05,
         measurements_original=measurements_log
     )
-    count = 1
-    for measurement in measurements_significance:
-        print(str(count) + "..." + measurement["name"] + "..." + str(measurement["metabolites"]) + "..." + str(measurement["p_value"]))
-        count = count + 1
     # Convert measurement information to table in text format.
     measurements_text = convert_measurements_text(
         measurements=measurements_significance
