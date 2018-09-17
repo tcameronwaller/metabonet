@@ -116,36 +116,50 @@ def read_source(directory=None):
 
     # Specify directories and files.
     path_conversion = os.path.join(directory, "conversion")
-    path_compartments = os.path.join(path_conversion, "compartments.pickle")
-    path_processes = os.path.join(path_conversion, "processes.pickle")
-    path_reactions = os.path.join(path_conversion, "reactions.pickle")
-    path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
-    path_candidacy = os.path.join(directory, "candidacy")
-    path_reactions_candidacy = os.path.join(path_candidacy, "reactions.pickle")
-    path_metabolites_candidacy = os.path.join(path_candidacy, "metabolites.pickle")
+    path_networkx = os.path.join(path, "network_elements_networkx.pickle")
     # Read information from file.
-    with open(path_compartments, "rb") as file_source:
-        compartments = pickle.load(file_source)
-    with open(path_processes, "rb") as file_source:
-        processes = pickle.load(file_source)
-    with open(path_reactions, "rb") as file_source:
-        reactions = pickle.load(file_source)
-    with open(path_metabolites, "rb") as file_source:
-        metabolites = pickle.load(file_source)
-    with open(path_reactions_candidacy, "rb") as file_source:
-        reactions_candidacy = pickle.load(file_source)
-    with open(path_metabolites_candidacy, "rb") as file_source:
-        metabolites_candidacy = pickle.load(file_source)
+    with open(path_networkx, "rb") as file_source:
+        network_elements = pickle.load(file_source)
     # Compile and return information.
     return {
-        "compartments": compartments,
-        "processes": processes,
-        "reactions": reactions,
-        "metabolites": metabolites,
-        "reactions_candidacy": reactions_candidacy,
-        "metabolites_candidacy": metabolites_candidacy,
+        "network_elements": network_elements
     }
 
+
+def instantiate_networkx(nodes=None, links=None):
+    """
+    Converts information about network's nodes and links to format for
+    NetworkX.
+
+    arguments:
+        nodes (list<tuple<str,dict>>): information about network's nodes
+        links (list<tuple<str,str,dict>>): information about network's links
+
+    raises:
+
+    returns:
+        (object): instance of network in NetworkX
+
+    """
+
+    network = ntx.DiGraph()
+    # Method add_nodes_from accepts a list of tuples of node identifier (str),
+    # node attributes (dict).
+    network.add_nodes_from(nodes_records)
+    # Method add_edges_from accepts a list of tuples of source node identifier
+    # (str), target node identifier (str), link attributes (dict).
+    network.add_edges_from(links_records)
+
+    # list(network.nodes)
+    # list(network.edges)
+    # list(network.neighbors([node_1, node_2]))
+    # list(network.degree([node_1, node_2]))
+    # network.nodes.data()
+    # list(ntx.connected_components(network))
+    # ntx.clustering(network)
+
+
+    pass
 
 def write_product(directory=None, information=None):
     """
@@ -176,6 +190,7 @@ def write_product(directory=None, information=None):
         pickle.dump(information["links"], file_product)
 
 
+
 ###############################################################################
 # Procedure
 
@@ -198,22 +213,17 @@ def execute_procedure(directory=None):
     # Read source information from file.
     source = read_source(directory=directory)
 
+    # TODO: read in nodes and links for NetworkX.
+    # TODO: instantiate network in NetworkX
+    # TODO: run multiple descriptors of the entire network
+    # TODO: ... modularity?
+    # TODO: describe individual nodes by degrees, centralities, etc...
 
-    network = ntx.DiGraph()
-    # Method add_nodes_from accepts a list of tuples of node identifier (str),
-    # node attributes (dict).
-    network.add_nodes_from(nodes_records)
-    # Method add_edges_from accepts a list of tuples of source node identifier
-    # (str), target node identifier (str), link attributes (dict).
-    network.add_edges_from(links_records)
-
-    # list(network.nodes)
-    # list(network.edges)
-    # list(network.neighbors([node_1, node_2]))
-    # list(network.degree([node_1, node_2]))
-    # network.nodes.data()
-    # list(ntx.connected_components(network))
-    # ntx.clustering(network)
+    # Instantiate network in NetworkX.
+    network = instantiate_networkx(
+        nodes=source["network_elements"]["nodes"],
+        links=source["network_elements"]["links"]
+    )
 
 
     if False:

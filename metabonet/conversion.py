@@ -182,7 +182,7 @@ def convert_nodes_networkx(
     raises:
 
     returns:
-        (list<tuple>): information about network's nodes
+        (list<tuple<str,dict>>): information about network's nodes
 
     """
 
@@ -207,7 +207,7 @@ def convert_links_networkx(links=None):
     raises:
 
     returns:
-        (list<tuple>): information about network's links
+        (list<tuple<str,str,dict>>): information about network's links
 
     """
 
@@ -330,8 +330,8 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "conversion")
     utility.confirm_path_directory(path)
-    path_networkx = os.path.join(path, "networkx.pickle")
-    path_cytoscape = os.path.join(path, "cytoscape.json")
+    path_networkx = os.path.join(path, "network_elements_networkx.pickle")
+    path_cytoscape = os.path.join(path, "network_elements_cytoscape.json")
     # Write information to file.
     with open(path_networkx, "wb") as file_product:
         pickle.dump(information["networkx"], file_product)
