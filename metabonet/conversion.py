@@ -143,6 +143,10 @@ def convert_networkx(
     Converts information about network's nodes and links to format for
     NetworkX.
 
+    Network is bipartite.
+    Store information about separate groups of nodes for reactions and
+    metabolites.
+
     arguments:
         nodes_reactions (dict<dict>): information about reactions' nodes
         nodes_metabolites (dict<dict>): information about metabolites' nodes
@@ -160,10 +164,20 @@ def convert_networkx(
         nodes_reactions=nodes_reactions,
         nodes_metabolites=nodes_metabolites
     )
+    nodes_reactions_identifiers = utility.collect_value_from_records(
+        key="identifier",
+        records=nodes_reactions.values()
+    )
+    nodes_metabolites_identifiers = utility.collect_value_from_records(
+        key="identifier",
+        records=nodes_metabolites.values()
+    )
     links_networkx = convert_links_networkx(links=links)
     # Compile and return information.
     return {
         "nodes": nodes_networkx,
+        "nodes_reactions": nodes_reactions_identifiers,
+        "nodes_metabolites": nodes_metabolites_identifiers,
         "links": links_networkx
     }
 
@@ -176,8 +190,10 @@ def convert_nodes_networkx(
     Converts information about network's nodes to format for NetworkX.
 
     arguments:
-        nodes_reactions (dict<dict>): information about reactions' nodes
-        nodes_metabolites (dict<dict>): information about metabolites' nodes
+        nodes_reactions (dict<dict>): information about network's nodes for
+            reactions
+        nodes_metabolites (dict<dict>): information about network's nodes for
+            metabolites
 
     raises:
 
