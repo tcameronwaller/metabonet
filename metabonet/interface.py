@@ -90,6 +90,7 @@ import utility
 ###############################################################################
 # Functionality
 
+
 def define_interface_parsers():
     """
     Defines and parses arguments from terminal's interface.
@@ -388,6 +389,11 @@ def define_network_subparser(subparsers=None):
         )
     )
     parser_network.add_argument(
+        "-s", "--component", dest="component", action="store_true",
+        required=False,
+        help="Select network's main component."
+    )
+    parser_network.add_argument(
         "-v", "--conversion", dest="conversion", action="store_true",
         help="Convert information to formats for export."
     )
@@ -614,7 +620,10 @@ def evaluate_network_parameters(arguments):
         # Report status.
         print("... executing network procedure ...")
         # Execute procedure.
-        network.execute_procedure(directory=arguments.directory)
+        network.execute_procedure(
+            component=arguments.component,
+            directory=arguments.directory
+        )
     if arguments.conversion:
         # Report status.
         print("... executing conversion procedure ...")

@@ -482,6 +482,31 @@ def filter_nonempty_elements(elements_original=None):
     return elements_novel
 
 
+def filter_entries_identifiers(
+    identifiers=None,
+    entries_original=None
+):
+    """
+    Filters nodes and links by identifiers.
+
+    arguments:
+        identifiers (list<str>): identifiers of elements to keep
+        entries_original (dict<dict>): entries
+
+    raises:
+
+    returns:
+        (dict<dict>): entries
+
+    """
+
+    entries_novel = {}
+    for entry in entries_original.values():
+        if entry["identifier"] in identifiers:
+            entries_novel[entry["identifier"]] = entry
+    return entries_novel
+
+
 # Human Metabolome Database (HMDB).
 
 

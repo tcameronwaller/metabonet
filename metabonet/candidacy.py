@@ -174,6 +174,9 @@ def read_source(directory=None):
     }
 
 
+# Candidate reactions.
+
+
 def collect_candidate_reactions(
     reactions=None,
     compartmentalization=None,
@@ -1096,6 +1099,9 @@ def determine_redundant_reaction_priority(
     else:
         priority = True
     return priority
+
+
+# Candidate metabolites.
 
 
 def collect_candidate_reactions_metabolites(

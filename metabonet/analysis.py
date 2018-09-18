@@ -222,12 +222,26 @@ def read_source(directory=None):
     path_networkx = os.path.join(
         path_conversion, "network_elements_networkx.pickle"
     )
+    #path_network = os.path.join(directory, "network")
+    #path_nodes_reactions = os.path.join(path_network, "nodes_reactions.pickle")
+    #path_nodes_metabolites = os.path.join(
+    #    path_network, "nodes_metabolites.pickle"
+    #)
     # Read information from file.
     with open(path_networkx, "rb") as file_source:
-        network_elements = pickle.load(file_source)
+        information = pickle.load(file_source)
     # Compile and return information.
     return {
-        "network_elements": network_elements
+        "nodes": information["nodes"],
+        "links": information["links"],
+        "nodes_reactions_identifiers": (
+            information["nodes_reactions_identifiers"]
+        ),
+        "nodes_reactions": information["nodes_reactions"],
+        "nodes_metabolites_identifiers": (
+            information["nodes_metabolites_identifiers"]
+        ),
+        "nodes_metabolites": information["nodes_metabolites"],
     }
 
 
@@ -260,7 +274,9 @@ def instantiate_networkx(nodes=None, links=None):
 
 def analyze_bipartite_network_nodes(
     network=None,
+    nodes_reactions_identifiers=None,
     nodes_reactions=None,
+    nodes_metabolites_identifiers=None,
     nodes_metabolites=None
 ):
     """
@@ -269,8 +285,14 @@ def analyze_bipartite_network_nodes(
 
     arguments:
         network (object): instance of network in NetworkX
-        nodes_reactions (list<str>): identifiers of reactions' nodes
-        nodes_metabolites (list<str>): identifiers of metabolites' nodes
+        nodes_reactions_identifiers (list<str>): identifiers of reactions'
+            nodes
+        nodes_reactions (dict<dict>): information about network's nodes for
+            reactions
+        nodes_metabolites_identifiers (list<str>): identifiers of metabolites'
+            nodes
+        nodes_metabolites (dict<dict>): information about network's nodes for
+            metabolites
 
     raises:
 
@@ -282,11 +304,13 @@ def analyze_bipartite_network_nodes(
     # Reactions.
     reactions = analyze_network_nodes_group(
         network=network,
+        nodes_identifiers=nodes_reactions_identifiers,
         nodes=nodes_reactions
     )
     # Metabolites.
     metabolites = analyze_network_nodes_group(
         network=network,
+        nodes_identifiers=nodes_metabolites_identifiers,
         nodes=nodes_metabolites
     )
     # Compile information.
@@ -298,6 +322,7 @@ def analyze_bipartite_network_nodes(
 
 def analyze_network_nodes_group(
     network=None,
+    nodes_identifiers=None,
     nodes=None
 ):
     """
@@ -311,11 +336,14 @@ def analyze_network_nodes_group(
     betweenness centrality
     eigenvector centrality
     eccentricity centrality
+    eccentricity
     clustering coefficient
 
     arguments:
         network (object): instance of network in NetworkX
-        nodes (list<str>): identifiers of nodes in a bipartite set
+        nodes_identifiers (list<str>): identifiers of nodes in a bipartite set
+        nodes (dict<dict>): information about network's nodes in a bipartite
+            set
 
     raises:
 
@@ -325,28 +353,39 @@ def analyze_network_nodes_group(
     """
 
     # Degree.
-    degrees = determine_network_nodes_degrees(network=network, nodes=nodes)
+    degrees = determine_network_nodes_degrees(
+        network=network, nodes=nodes_identifiers
+    )
     # Centrality.
     centralities = determine_network_nodes_centralities(
         network=network,
-        nodes=nodes
+        nodes=nodes_identifiers
     )
+    # Distance.
+    # Measurements of distance including diameter and radius are undefined for
+    # non-connected or even less-connected networks.
+    #distances = determine_network_nodes_distances(network=network, nodes=nodes)
     # Cluster.
     clusters = determine_network_nodes_clusters(
         network=network,
-        nodes=nodes
+        nodes=nodes_identifiers
     )
+    # Rank.
     # Compile information.
     collection = {}
-    for node in nodes:
+    for node_identifier in nodes_identifiers:
         entry = {
-            "identifier": node,
+            "identifier": node_identifier,
+            "type": nodes[node_identifier]["type"],
+            "entity": nodes[node_identifier]["entity"],
+            "name": nodes[node_identifier]["name"],
             "degree_in": degrees[node]["degree_in"],
             "degree_out": degrees[node]["degree_out"],
             "degree": degrees[node]["degree"],
             "centrality_degree": centralities[node]["degree"],
             "centrality_closeness": centralities[node]["closeness"],
             "centrality_betweenness": centralities[node]["betweenness"],
+            #"eccentricity": distances[node]["eccentricity"],
             "cluster_coefficient": clusters[node]["coefficient"]
         }
         collection[node] = entry
@@ -439,6 +478,39 @@ def determine_network_nodes_centralities(
     return collection
 
 
+def determine_network_nodes_distances(
+    network=None,
+    nodes=None
+):
+    """
+    Determine distances of nodes in a network.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes (list<str>): identifiers of nodes in a bipartite set
+
+    raises:
+
+    returns:
+        (dict<dict>): information about distances of network's nodes
+
+    """
+
+    # Determine distances.
+    eccentricities = ntx.algorithms.distance_measures.eccentricity(
+        network, nodes
+    )
+    # Compile information.
+    collection = {}
+    for node in nodes:
+        entry = {
+            "identifier": node,
+            "eccentricity": eccentricities[node]
+        }
+        collection[node] = entry
+    return collection
+
+
 def determine_network_nodes_clusters(
     network=None,
     nodes=None
@@ -497,12 +569,14 @@ def analyze_bipartite_network(
     # Reactions.
     reactions = analyze_bipartite_network_group(
         network=network,
-        nodes=nodes_reactions
+        nodes_cis=nodes_reactions,
+        nodes_trans=nodes_metabolites
     )
     # Metabolites.
     metabolites = analyze_bipartite_network_group(
         network=network,
-        nodes=nodes_metabolites
+        nodes_cis=nodes_metabolites,
+        nodes_trans=nodes_reactions
     )
     # Compile information.
     return {
@@ -513,14 +587,19 @@ def analyze_bipartite_network(
 
 def analyze_bipartite_network_group(
     network=None,
-    nodes=None
+    nodes_cis=None,
+    nodes_trans=None
 ):
     """
-    Analyze a bipartite group in a network.
+    Analyze a bipartite network with primary relevance to a single bipartite
+    set of nodes.
 
     arguments:
         network (object): instance of network in NetworkX
-        nodes (list<str>): identifiers of nodes in a bipartite set
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
 
     raises:
 
@@ -530,129 +609,380 @@ def analyze_bipartite_network_group(
     """
 
     # Scale.
-
-    #ntx.algorithms.bipartite.basic.density(network, nodes)
-    #print(len(source["network_elements"]["nodes"]))
-    #print(len(source["network_elements"]["nodes_reactions"]))
-    #print(len(source["network_elements"]["nodes_metabolites"]))
-    #print(network.number_of_nodes()) #network.order() = count of nodes
-    #print(network.number_of_edges()) #network.size() = count of links
-    # graph diameter (longest shortest path between any node pairs)
-
+    scale = determine_network_scale(network=network, nodes=nodes_cis)
     # Connectivity.
-    #list(ntx.connected_components(network))
-    #degree_assortativity_coefficient()
-    #ntx.algorithms.components.is_connected(network)
-    #ntx.algorithms.components.is_strongly_connected(network)
-    #ntx.algorithms.components.is_weakly_connected(network)
-    #ntx.algorithms.components.connected_components(network)
-    #ntx.algorithms.components.number_connected_components(network)
-    # TODO: average node connectivity might not be accurate for bipartite
-    #ntx.algorithms.connectivity.connectivity.average_node_connectivity(network)
-    # TODO: I think all pairs node connectivity will work if I specify a single bipartite group
-    # TODO: calculate average from these calculations... average for each bipartite group
-    #ntx.algorithms.connectivity.connectivity.all_pairs_node_connectivity(network, nodes)
-
+    connectivity = determine_network_connectivity(
+        network=network, nodes=nodes_cis
+    )
+    # Distance.
+    # Measurements of distance including diameter and radius are undefined for
+    # non-connected or even less-connected networks.
+    #distance = determine_network_distance(network=network, nodes=nodes_cis)
     # Centralization.
-    # centralization (https://stackoverflow.com/questions/35243795/calculate-indegree-centralization-of-graph-with-python-networkx)
-    # https://www.rdocumentation.org/packages/igraph/versions/0.7.1/topics/centralization
-    # https://www.stat.washington.edu/~pdhoff/courses/567/Notes/l6_centrality.pdf
-
+    centralization = determine_bipartite_network_centralization(
+        network=network,
+        nodes_cis=nodes_cis,
+        nodes_trans=nodes_trans,
+        method="separate"
+    )
     # Cluster.
-    # average clustering coefficient
-    #ntx.clustering(network)
-    #bipartite.average_clustering(network)
-    #ntx.clustering(network, network.nodes())
-    #ntx.average_clustering(network, network.nodes())
+    cluster_coefficient = ntx.algorithms.bipartite.cluster.average_clustering(
+        network, nodes=nodes_cis, mode="dot"
+    )
+    # Modularity.
+    # NetworkX might lack this functionality.
     if False:
-        clusters = determine_network_nodes_clusters(
-            network=network,
-            nodes=nodes
-        )
-        network_indirect = network.to_undirected()
-        # Need to use bipartite cluster algorithm.
-        print("cluster bipartite for metabolites")
-        cluster_metabolites = ntx.algorithms.bipartite.cluster.average_clustering(
-            network, source["network_elements"]["nodes_metabolites"]
-        )
-        print(cluster_metabolites)
-        print("cluster for metabolites")
-        cluster = ntx.algorithms.cluster.average_clustering(
-            network_indirect#, source["network_elements"]["nodes_metabolites"]
-        )
-        print(cluster)
-
-
-
+        modules = (
+            ntx.algorithms.community.modularity_max.greedy_modularity_communities(
+                network
+        ))
+        modules_orders = []
+        for module in sorted(modules, key=len, reverse=True):
+            modules_orders.append(len(module))
     # Compile information.
-    return {
-        "reactions": reactions,
-        "metabolites": metabolites
+    collection = {
+        "order_total": scale["order_total"],
+        "order_set": scale["order_set"],
+        "size": scale["size"],
+        "density": scale["density"],
+        "connection": connectivity["connection"],
+        "connection_strong": connectivity["connection_strong"],
+        "connection_weak": connectivity["connection_weak"],
+        "components_count": connectivity["components_count"],
+        "components_orders": connectivity["components_orders"],
+        "bipartite": connectivity["bipartite"],
+        #"diameter": distance["diameter"],
+        #"radius": distance["radius"],
+        "centralization_degree": centralization["degree"],
+        "centralization_closeness": centralization["closeness"],
+        "centralization_betweenness": centralization["betweenness"],
+        "cluster_coefficient": cluster_coefficient,
+        #"modules_orders": modules_orders
     }
-
-
-    #average_degree_connectivity()
-
-    # assortativity
-    #print(ntx.node_connectivity(network))
-    network_indirect = network.to_undirected()
-    print(ntx.algorithms.bipartite.is_bipartite(network_indirect))
-    print(ntx.algorithms.bipartite.is_bipartite_node_set(
-        network_indirect, source["network_elements"]["nodes_reactions"]
-    ))
-    #print(ntx.all_pairs_node_connectivity(network))
-    #print(ntx.is_connected(network)) # not implemented for directed graph
-    #print(ntx.number_connected_components(network)) # not implemented for directed graph
-
-
-    # Compile information.
-    collection = {}
-    for node in nodes:
-        entry = {
-            "identifier": node,
-            "degree_in": degrees[node]["degree_in"],
-            "degree_out": degrees[node]["degree_out"],
-            "degree": degrees[node]["degree"],
-            "centrality_degree": centralities[node]["degree"],
-            "centrality_closeness": centralities[node]["closeness"],
-            "centrality_betweenness": centralities[node]["betweenness"],
-            "cluster_coefficient": clusters[node]["coefficient"]
-        }
-        collection[node] = entry
     return collection
 
 
-
-
-# TODO: implement this function for centralization...
-
-def calculate_network_centralization(
-    type=None,
-    bipartite=None,
-    count_nodes=None,
-    count_metabolites=None,
-    count_reactions=None,
-    centralities=None
+def determine_network_scale(
+    network=None,
+    nodes=None
 ):
     """
-    Calculates the centralization of the entire network.
-
-    Centralities need to be raw centralities, not standard centralities that
-    are normalized to maxima.
-
-    Normalization to the maximal centrality for the star graph depends on
-    whether the graph is bipartite.
-    The relevant star graph in a bipartite scenario would have n-1 nodes of the
-    type opposite that of the central node.
-    Same formulas will apply as a non-bipartite star graph, but must adjust the
-    value of n to match the correct type.
+    Determine metrics of a network's scale.
 
     arguments:
-        type (str): type of centrality, degree, closeness, betweenness,
-            eigenvector
-        count (int): count of nodes in network
-        centralities (list<tuple<str,str,dict>>): centralities of all nodes in
+        network (object): instance of network in NetworkX
+        nodes (list<str>): identifiers of nodes in a bipartite set
+
+    raises:
+
+    returns:
+        (dict): information about a network
+
+    """
+
+    # Determine scale.
+    #network.number_of_nodes()
+    #network.number_of_edges()
+    order_total = network.order()
+    order_set = len(nodes)
+    size = network.size()
+    density = ntx.algorithms.bipartite.basic.density(network, nodes)
+    # Compile information.
+    collection = {
+        "order_total": order_total,
+        "order_set": order_set,
+        "size": size,
+        "density": density
+    }
+    return collection
+
+
+def determine_network_connectivity(
+    network=None,
+    nodes=None
+):
+    """
+    Determine metrics of a network's connectivity.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes (list<str>): identifiers of nodes in a bipartite set
+
+    raises:
+
+    returns:
+        (dict): information about a network
+
+    """
+
+    # Determine connectivity.
+    # Assortativity requires specific algorithm for bipartite network.
+    #ntx.algorithms.assortativity.degree_assortativity_coefficient()
+    #ntx.algorithms.assortativity.average_degree_connectivity()
+    # Average node connectivity requires specific algorithm for bipartite
+    # network.
+    #ntx.algorithms.connectivity.connectivity.average_node_connectivity(network)
+    # Calculate all pairs node connectivity for each bipartite group, and
+    # then determine average.
+    # This algorithm is computationally expensive.
+    #connectivities = (
+    #    ntx.algorithms.connectivity.connectivity.all_pairs_node_connectivity(
+    #        network, nodes
+    #    )
+    #)
+    connection = (
+        ntx.algorithms.components.is_connected(network.to_undirected())
+    )
+    connection_strong = (
+        ntx.algorithms.components.is_strongly_connected(network)
+    )
+    connection_weak = ntx.algorithms.components.is_weakly_connected(network)
+    components_count = (
+        ntx.algorithms.components.number_connected_components(
+            network.to_undirected()
+        )
+    )
+    components = ntx.algorithms.components.connected_components(
+        network.to_undirected()
+    )
+    components_orders = []
+    for component in sorted(components, key=len, reverse=True):
+        components_orders.append(len(component))
+    bipartite = ntx.algorithms.bipartite.is_bipartite(network.to_undirected())
+    # Compile information.
+    collection = {
+        "connection": connection,
+        "connection_strong": connection_strong,
+        "connection_weak": connection_weak,
+        "components_count": components_count,
+        "components_orders": components_orders,
+        "bipartite": bipartite,
+    }
+    return collection
+
+
+def determine_network_distance(
+    network=None,
+    nodes=None
+):
+    """
+    Determine metrics of a network's distance.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes (list<str>): identifiers of nodes in a bipartite set
+
+    raises:
+
+    returns:
+        (dict): information about a network
+
+    """
+
+    # Determine distance.
+    #networkx.algorithms.distance_measures.radius
+
+    diameter = ntx.algorithms.distance_measures.diameter(network)
+    radius = ntx.algorithms.distance_measures.radius(network)
+    # Compile information.
+    collection = {
+        "diameter": diameter,
+        "radius": radius
+    }
+    return collection
+
+
+def determine_bipartite_network_centralization(
+    network=None,
+    nodes_cis=None,
+    nodes_trans=None,
+    method=None
+):
+    """
+    Calculates the centralization of a bipartite network.
+
+    It is reasonable to calculate centralization of a bipartite network in
+    multiple ways.
+    1. Consider both bipartite sets of nodes together to create a single
+    measurement of the network's centralization.
+    2. Consider each bipartite set of nodes separately to create two
+    measurements of the network's centralization relative to each set of nodes.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
+        method (str): method to calcuate centralization of bipartite network,
+            relevant to both bipartite sets of nodes together or separate
+
+    raises:
+
+    returns:
+        (dict): information about a network
+
+    """
+
+    # Determine non-normal centralities.
+    # Non-normal bipartite degree centrality is node degree.
+    #degree = dict(network.degree(nodes_cis))
+    # Non-normal bipartite closeness centrality is undefined.
+    # Non-normal bipartite betweenness centrality omits final normalization.
+    #betweenness = ntx.algorithms.centrality.betweenness_centrality(
+    #    network, normalized=False
+    #)
+
+    # Determine normal centralities.
+    # Formulas for centralization will be relevant to these normal
+    # centralities.
+    # Degree centrality.
+    degree = ntx.algorithms.bipartite.centrality.degree_centrality(
+        network, nodes_cis
+    )
+    # Closeness centrality.
+    # Do not apply supplemental normalization to the order of node's component.
+    closeness = bipartite_closeness_centrality(
+        network, nodes_cis, normalized=True
+    )
+    # Betweenness centrality.
+    betweenness = ntx.algorithms.bipartite.centrality.betweenness_centrality(
+        network, nodes_cis
+    )
+    # Calculate centralization.
+    centralization = calculate_bipartite_network_centralization(
+        centralities_degree=degree,
+        centralities_closeness=closeness,
+        centralities_betweenness=betweenness,
+        nodes_cis=nodes_cis,
+        nodes_trans=nodes_trans,
+        method=method
+    )
+    # Compile information.
+    collection = {
+        "degree": centralization["degree"],
+        "closeness": centralization["closeness"],
+        "betweenness": centralization["betweenness"]
+    }
+    return collection
+
+
+def calculate_bipartite_network_centralization(
+    centralities_degree=None,
+    centralities_closeness=None,
+    centralities_betweenness=None,
+    nodes_cis=None,
+    nodes_trans=None,
+    method=None
+):
+    """
+    Calculates the centralization of a bipartite network relevant to both
+    bipartite sets of nodes either together or separate.
+
+    arguments:
+        centralities_degree (dict<float>): degree centralities of nodes in
             network
+        centralities_closeness (dict<float>): closeness centralities of nodes
+            in network
+        centralities_betweenness (dict<float>): betweenness centralities of
+            nodes in network
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
+        method (str): method to calcuate centralization of bipartite network,
+            relevant to both bipartite sets of nodes together or separate
+
+    raises:
+
+    returns:
+        (dict<float>): measurements of a network's centralization
+
+    """
+
+    # Determine whether to measure centrality relative to bipartite sets of
+    # nodes together or separate.
+    if method == "together":
+        centralization_degree = (
+            calculate_bipartite_network_centralization_together(
+                centralities=centralities_degree,
+                method="degree",
+                nodes_cis=nodes_cis,
+                nodes_trans=nodes_trans
+            )
+        )
+        centralization_closeness = (
+            calculate_bipartite_network_centralization_together(
+                centralities=centralities_closeness,
+                method="closeness",
+                nodes_cis=nodes_cis,
+                nodes_trans=nodes_trans
+            )
+        )
+        centralization_betweenness = (
+            calculate_bipartite_network_centralization_together(
+                centralities=centralities_betweenness,
+                method="betweenness",
+                nodes_cis=nodes_cis,
+                nodes_trans=nodes_trans
+            )
+        )
+    elif method == "separate":
+        centralization_degree = (
+            calculate_bipartite_network_centralization_separate(
+                centralities=centralities_degree,
+                method="degree",
+                nodes_cis=nodes_cis,
+                nodes_trans=nodes_trans
+            )
+        )
+        centralization_closeness = (
+            calculate_bipartite_network_centralization_separate(
+                centralities=centralities_closeness,
+                method="closeness",
+                nodes_cis=nodes_cis,
+                nodes_trans=nodes_trans
+            )
+        )
+        centralization_betweenness = (
+            calculate_bipartite_network_centralization_separate(
+                centralities=centralities_betweenness,
+                method="betweenness",
+                nodes_cis=nodes_cis,
+                nodes_trans=nodes_trans
+            )
+        )
+    # Compile information.
+    collection = {
+        "degree": centralization_degree,
+        "closeness": centralization_closeness,
+        "betweenness": centralization_betweenness
+    }
+    return collection
+
+
+def calculate_bipartite_network_centralization_together(
+    centralities=None,
+    method=None,
+    nodes_cis=None,
+    nodes_trans=None
+):
+    """
+    Calculates the centralization of a bipartite network relevant to both
+    bipartite sets of nodes together.
+
+    This procedure calculates the double mode centralization for both bipartite
+    sets of nodes within a bipartite network.
+    Formulas use normal centralities for these nodes.
+
+    arguments:
+        centralities (dict<float>): centralities of nodes in network
+        method (str): method to measure centralities, degree, closeness, or
+            betweenness
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
 
     raises:
 
@@ -661,12 +991,183 @@ def calculate_network_centralization(
 
     """
 
-    # TODO: re-calculate centralities of all nodes without normalization
-    # TODO: non-normalized degree centrality is just the node degree...
-    # TODO: non-normalized betweenness centrality is just
-    # TODO: ntx.betweenness_centrality(G, normalized=False)
+    # Define formulas to calculate and normalize centralizations relevant to
+    # both bipartite sets of nodes together.
+    # Centralities have normalization for bipartite networks.
+    def calculate_centralization(
+        centralities=None, nodes_cis=None, nodes_trans=None
+    ):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        maximum = max(list(centralities.values()))
+        n = no + ni
+        return (n * maximum) - sum(list(centralities.values()))
+    def maximize_degree(nodes_cis=None, nodes_trans=None):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        return (
+            (no+ni-1)-
+            ((no-1)/ni)-
+            ((ni+no-1)/no)
+        )
+    def maximize_closeness(nodes_cis=None, nodes_trans=None):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        if no > ni:
+            return (
+                (2*(ni-1)*((ni+no-2)/((3*ni)+(4*no)-8)))+
+                (2*(no-ni)*(((2*ni)-1)/((5*ni)+(2*no)-6)))+
+                (2*(ni-1)*((no-2)/((2*ni)+(3*no)-6)))+
+                (2*((ni-1)/(no+(4*ni)-4)))
+            )
+        else:
+            return (
+                (2*(no-1)*((ni+no-4)/((3*ni)+(4*no)-8)))+
+                (2*(no-1)*((no-2)/((2*ni)+(3*no)-6)))+
+                (2*(no-1)*((ni-no+1)/((2*ni)+(3*no)-4)))
+            )
+    def maximize_betweenness(nodes_cis=None, nodes_trans=None):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        if no > ni:
+            return (
+                (no+ni-1)-
+                (((ni-1)*(no+ni-2)+(0.5*(no-ni)*(no+(3*ni)-3)))/
+                ((0.5*no*(no-1))+(0.5*(ni-1)*(ni-2))+((no-1)*(ni-1))))
+            )
+        else:
+            return (
+                (no+ni-1)-
+                (((no-1)*(no+ni-2))/(2*(no-1)*ni-1))
+            )
+    # Calculate and normalize centralizations.
+    numerator = calculate_centralization(
+        centralities=centralities,
+        nodes_cis=nodes_cis,
+        nodes_trans=nodes_trans
+    )
+    if method == "degree":
+        denominator = maximize_degree(
+            nodes_cis=nodes_cis,
+            nodes_trans=nodes_trans
+        )
+    elif method == "closeness":
+        denominator = maximize_closeness(
+            nodes_cis=nodes_cis,
+            nodes_trans=nodes_trans
+        )
+    elif method == "betweenness":
+        denominator = maximize_betweenness(
+            nodes_cis=nodes_cis,
+            nodes_trans=nodes_trans
+        )
+    centralization = numerator / denominator
+    # Return information.
+    return centralization
 
-    pass
+
+def calculate_bipartite_network_centralization_separate(
+    centralities=None,
+    method=None,
+    nodes_cis=None,
+    nodes_trans=None
+):
+    """
+    Calculates the centralization of a bipartite network relevant to both
+    bipartite sets of nodes separate.
+
+    This procedure calculates the single mode centralization for a single
+    bipartite set of nodes within a bipartite network.
+    Formulas use normal centralities for these nodes.
+
+    arguments:
+        centralities (dict<float>): centralities of nodes in network
+        method (str): method to measure centralities, degree, closeness, or
+            betweenness
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
+
+    raises:
+
+    returns:
+        (float): centralization of network
+
+    """
+
+    # Define formulas to calculate and normalize centralizations relevant to
+    # both bipartite sets of nodes separate.
+    # Centralities have normalization for bipartite networks.
+    def calculate_centralization(
+        centralities=None, nodes_cis=None, nodes_trans=None
+    ):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        # Filter centralities to consider only nodes in cis bipartite set.
+        centralities_cis = {}
+        for node in centralities.keys():
+            if node in nodes_cis:
+                centralities_cis[node] = centralities[node]
+        maximum = max(list(centralities_cis.values()))
+        centralization = (no * maximum) - sum(list(centralities_cis.values()))
+        return centralization
+    def maximize_degree(nodes_cis=None, nodes_trans=None):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        return ((ni-1)*(no-1))
+    def maximize_closeness(nodes_cis=None, nodes_trans=None):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        if no > ni:
+            return (
+                (((ni-1)*(no-2))/((2*no)-3))+
+                (((ni-1)*(no-ni))/(no+ni-2))
+            )
+        else:
+            return (
+                ((no-2)*(no-1))/((2*no)-3)
+            )
+    def maximize_betweenness(nodes_cis=None, nodes_trans=None):
+        no = len(nodes_cis)
+        ni = len(nodes_trans)
+        if no > ni:
+            return (
+                (2*((no-1)^2)*(ni-1))
+            )
+        else:
+            return (
+                (no-1)*
+                (
+                    (0.5*ni*(ni-1))+
+                    (0.5*(no-1)*(no-2))+
+                    ((no-1)*(ni-1))
+                )
+            )
+    # Calculate and normalize centralizations.
+    numerator = calculate_centralization(
+        centralities=centralities,
+        nodes_cis=nodes_cis,
+        nodes_trans=nodes_trans
+    )
+    if method == "degree":
+        denominator = maximize_degree(
+            nodes_cis=nodes_cis,
+            nodes_trans=nodes_trans
+        )
+    elif method == "closeness":
+        denominator = maximize_closeness(
+            nodes_cis=nodes_cis,
+            nodes_trans=nodes_trans
+        )
+    elif method == "betweenness":
+        denominator = maximize_betweenness(
+            nodes_cis=nodes_cis,
+            nodes_trans=nodes_trans
+        )
+    centralization = numerator / denominator
+    # Return information.
+    return centralization
 
 
 def write_product(directory=None, information=None):
@@ -684,18 +1185,37 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "network")
+    path = os.path.join(directory, "analysis")
     utility.confirm_path_directory(path)
-    path_nodes_reactions = os.path.join(path, "nodes_reactions.pickle")
-    path_nodes_metabolites = os.path.join(path, "nodes_metabolites.pickle")
-    path_links = os.path.join(path, "links.pickle")
+    path_nodes_reactions = os.path.join(path, "nodes_reactions.tsv")
+    path_nodes_metabolites = os.path.join(path, "nodes_metabolites.tsv")
+    path_network_reactions = os.path.join(path, "network_reactions.tsv")
+    path_network_metabolites = os.path.join(path, "network_metabolites.tsv")
     # Write information to file.
-    with open(path_nodes_reactions, "wb") as file_product:
-        pickle.dump(information["nodes_reactions"], file_product)
-    with open(path_nodes_metabolites, "wb") as file_product:
-        pickle.dump(information["nodes_metabolites"], file_product)
-    with open(path_links, "wb") as file_product:
-        pickle.dump(information["links"], file_product)
+    utility.write_file_table(
+        information=information["report_nodes_reactions"],
+        path_file=path_nodes_reactions,
+        names=information["report_nodes_reactions"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["report_nodes_metabolites"],
+        path_file=path_nodes_metabolites,
+        names=information["report_nodes_metabolites"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["report_network_reactions"],
+        path_file=path_network_reactions,
+        names=information["report_network_reactions"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["report_network_metabolites"],
+        path_file=path_network_metabolites,
+        names=information["report_network_metabolites"][0].keys(),
+        delimiter="\t"
+    )
 
 
 ###############################################################################
@@ -721,41 +1241,38 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Instantiate network in NetworkX.
     network = instantiate_networkx(
-        nodes=source["network_elements"]["nodes"],
-        links=source["network_elements"]["links"]
+        nodes=source["nodes"],
+        links=source["links"]
     )
     # Network is bipartite.
     # Store references to separate groups of nodes for reactions and
     # metabolites.
     # Analyze network's individual nodes.
-    report_network_nodes = analyze_network_nodes(
+    report_nodes = analyze_bipartite_network_nodes(
         network=network,
-        nodes_reactions=source["network_elements"]["nodes_reactions"],
-        nodes_metabolites=source["network_elements"]["nodes_metabolites"]
+        nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
+        nodes_reactions=source["nodes_reactions"],
+        nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
+        nodes_metabolites=source["nodes_metabolites"]
     )
-    print(list(report_network_nodes["metabolites"].values())[10])
+    #print(list(report_nodes["metabolites"].values())[10])
     # Analyze entire network.
-    if False:
-        report_network = analyze_network(
-            network=network,
-            nodes_reactions=source["network_elements"]["nodes_reactions"],
-            nodes_metabolites=source["network_elements"]["nodes_metabolites"]
-        )
-
-    # Network analysis.
-
-
-
+    report_network = analyze_bipartite_network(
+        network=network,
+        nodes_reactions=source["nodes_reactions_identifiers"],
+        nodes_metabolites=source["nodes_metabolites_identifiers"]
+    )
+    #print(report_network)
     # Prepare reports.
     # TODO: Sort records within reports...
-
-
-    if False:
-        # Compile information.
-        information = {
-            "nodes_reactions": nodes_reactions,
-            "nodes_metabolites": nodes_metabolites,
-            "links": links
-        }
-        #Write product information to file.
-        write_product(directory=directory, information=information)
+    # Compile information.
+    information = {
+        "report_nodes_reactions": list(report_nodes["reactions"].values()),
+        "report_nodes_metabolites": list(
+            report_nodes["metabolites"].values()
+        ),
+        "report_network_reactions": [report_network["reactions"]],
+        "report_network_metabolites": [report_network["metabolites"]]
+    }
+    #Write product information to file.
+    write_product(directory=directory, information=information)

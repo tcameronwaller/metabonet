@@ -88,9 +88,12 @@ import pickle
 import copy
 
 # Relevant
+import networkx as ntx
 
 # Custom
 import utility
+import conversion
+import analysis
 
 #dir()
 #importlib.reload()
@@ -223,7 +226,7 @@ def define_reaction_node(
     # Compile information.
     reaction_node = {
         "identifier": reaction_candidacy["identifier"],
-        "reaction": reaction["identifier"],
+        "entity": reaction["identifier"],
         "name": reaction_candidacy["name"],
         "reversibility": reaction_candidacy["reversibility"],
         "replicates": reaction_candidacy["replicates"],
@@ -314,7 +317,7 @@ def define_metabolite_node(
     # Compile information.
     metabolite_node = {
         "identifier": metabolite_candidacy["identifier"],
-        "metabolite": metabolite["identifier"],
+        "entity": metabolite["identifier"],
         "name": metabolite_candidacy["name"],
         "compartment": compartment_name,
         "formula": metabolite["formula"],
@@ -540,6 +543,84 @@ def determine_link_candidacy(
     return candidacy
 
 
+def select_network_component_elements(
+    component=None,
+    nodes_reactions=None,
+    nodes_metabolites=None,
+    links=None,
+):
+    """
+    Determines whether to select the main component of a network.
+
+    arguments:
+        component (bool): whether to select network's main component
+        nodes_reactions (dict<dict>): information about reactions' nodes
+        nodes_metabolites (dict<dict>): information about metabolites' nodes
+        links (dict<dict>): information about links between nodes for reactions
+            and metabolites
+
+    raises:
+
+    returns:
+        (dict<dict<dict>>): information about network's nodes and links
+
+    """
+
+    if component:
+        # Convert information format for export to NetworkX.
+        networkx = conversion.convert_networkx(
+            nodes_reactions=nodes_reactions,
+            nodes_metabolites=nodes_metabolites,
+            links=links
+        )
+        # Instantiate network in NetworkX.
+        network = analysis.instantiate_networkx(
+            nodes=networkx["nodes"],
+            links=networkx["links"]
+        )
+        # Select network's main component.
+        components = ntx.algorithms.components.connected_components(
+            network.to_undirected()
+        )
+        components_sort = sorted(components, key=len, reverse=True)
+        component_main = components_sort[0]
+        # Induce subnetwork for component.
+        subnetwork = ntx.DiGraph.subgraph(network, list(component_main))
+        # Extract identifiers of nodes and links from subnetwork.
+        nodes_identifiers = []
+        for node, data in subnetwork.nodes.items():
+            nodes_identifiers.append(data["identifier"])
+        links_identifiers = []
+        for link, data in subnetwork.edges.items():
+            links_identifiers.append(data["identifier"])
+        # Filter nodes and links by identifiers.
+        nodes_reactions_component = utility.filter_entries_identifiers(
+            identifiers=nodes_identifiers,
+            entries_original=nodes_reactions
+        )
+        nodes_metabolites_component = utility.filter_entries_identifiers(
+            identifiers=nodes_identifiers,
+            entries_original=nodes_metabolites
+        )
+        links_component = utility.filter_entries_identifiers(
+            identifiers=links_identifiers,
+            entries_original=links
+        )
+        # Compile and return information.
+        return {
+            "nodes_reactions": nodes_reactions_component,
+            "nodes_metabolites": nodes_metabolites_component,
+            "links": links_component
+        }
+    else:
+        # Compile and return information.
+        return {
+            "nodes_reactions": nodes_reactions,
+            "nodes_metabolites": nodes_metabolites,
+            "links": links
+        }
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -573,13 +654,17 @@ def write_product(directory=None, information=None):
 # Procedure
 
 
-def execute_procedure(directory=None):
+def execute_procedure(
+    component=None,
+    directory=None
+):
     """
     Function to execute module's main behavior.
 
     The purpose of this procedure is to define network's elements.
 
     arguments:
+        component (bool): whether to select network's main component
         directory (str): path to directory for source and product files
 
     raises:
@@ -611,11 +696,18 @@ def execute_procedure(directory=None):
         reactions_candidacy=source["reactions_candidacy"],
         metabolites_candidacy=source["metabolites_candidacy"]
     )
+    # Determine whether to select network's main component.
+    component_elements = select_network_component_elements(
+        component=component,
+        nodes_reactions=nodes_reactions,
+        nodes_metabolites=nodes_metabolites,
+        links=links,
+    )
     # Compile information.
     information = {
-        "nodes_reactions": nodes_reactions,
-        "nodes_metabolites": nodes_metabolites,
-        "links": links
+        "nodes_reactions": component_elements["nodes_reactions"],
+        "nodes_metabolites": component_elements["nodes_metabolites"],
+        "links": component_elements["links"]
     }
     #Write product information to file.
     write_product(directory=directory, information=information)

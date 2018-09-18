@@ -176,8 +176,10 @@ def convert_networkx(
     # Compile and return information.
     return {
         "nodes": nodes_networkx,
-        "nodes_reactions": nodes_reactions_identifiers,
-        "nodes_metabolites": nodes_metabolites_identifiers,
+        "nodes_reactions_identifiers": nodes_reactions_identifiers,
+        "nodes_reactions": nodes_reactions,
+        "nodes_metabolites_identifiers": nodes_metabolites_identifiers,
+        "nodes_metabolites": nodes_metabolites,
         "links": links_networkx
     }
 

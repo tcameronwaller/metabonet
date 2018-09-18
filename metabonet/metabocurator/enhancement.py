@@ -860,10 +860,11 @@ def filter_reaction(reaction=None):
     """
 
     # Name.
-    # Biomass and protein degradation are irrelevant.
+    # Biomass, protein assembly, and protein degradation are irrelevant.
     name = (
-        reaction["name"] == "Generic human biomass reaction" or
-        reaction["name"] == "Protein degradation"
+        (reaction["name"] == "Generic human biomass reaction") or
+        (reaction["name"] == "Protein degradation") or
+        ("Protein assembly" in reaction["name"])
     )
     # Compartment.
     # Boundary is irrelevant.
