@@ -74,6 +74,7 @@ License:
 import os
 import csv
 import copy
+import textwrap
 
 # Relevant
 
@@ -639,6 +640,129 @@ def filter_hmdb_entries_by_synonyms(
 # Metabolic information.
 
 
+def prepare_curation_report(
+    compartments=None,
+    processes=None,
+    reactions=None,
+    metabolites=None
+):
+    """
+    Prepares a summary report on curation of metabolic sets and entities.
+
+    arguments:
+        compartments (dict<dict>): information about compartments
+        processes (dict<dict>): information about processes
+        reactions (dict<dict>): information about reactions
+        metabolites (dict<dict>): information about metabolites
+
+    returns:
+        (str): report of summary information
+
+    raises:
+
+    """
+
+    # Count compartments.
+    count_compartments = len(compartments)
+    # Count processes.
+    count_processes = len(processes)
+    # Count reactions.
+    count_reactions = len(reactions)
+    # Count reactions with references to MetaNetX.
+    count_reactions_metanetx = count_entities_with_references(
+        references=["metanetx"],
+        entities=reactions
+    )
+    proportion_reactions_metanetx = count_reactions_metanetx / count_reactions
+    percentage_reactions_metanetx = (
+        round((proportion_reactions_metanetx * 100), 2)
+    )
+    # Count reactions with references either to genes or enzyme commission.
+    count_gene_enzyme = count_entities_with_references(
+        references=["gene", "enzyme"],
+        entities=reactions
+    )
+    proportion_gene_enzyme = count_gene_enzyme / count_reactions
+    percentage_gene_enzyme = round((proportion_gene_enzyme * 100), 2)
+    # Count metabolites.
+    count_metabolites = len(metabolites)
+    # Count metabolites with references to MetaNetX.
+    count_metabolites_metanetx = count_entities_with_references(
+        references=["metanetx"],
+        entities=metabolites
+    )
+    proportion_metabolites_metanetx = (
+        count_metabolites_metanetx / count_metabolites
+    )
+    percentage_metabolites_metanetx = (
+        round((proportion_metabolites_metanetx * 100), 2)
+    )
+    # Count metabolites with references to Human Metabolome Database (HMDB) and
+    # PubChem.
+    count_hmdb_pubchem = count_entities_with_references(
+        references=["hmdb", "pubchem"],
+        entities=metabolites
+    )
+    proportion_hmdb_pubchem = count_hmdb_pubchem / count_metabolites
+    percentage_hmdb_pubchem = round((proportion_hmdb_pubchem * 100), 2)
+    # Compile information.
+    report = textwrap.dedent("""\
+
+        --------------------------------------------------
+        curation report
+
+        compartments: {count_compartments}
+        processes: {count_processes}
+        reactions: {count_reactions}
+        metabolites: {count_metabolites}
+
+        reactions in MetaNetX: {percentage_reactions_metanetx} %
+        reactions with gene or enzyme: {percentage_gene_enzyme} %
+        metabolites in MetaNetX: {percentage_metabolites_metanetx} %
+        metabolites with HMDB or PubChem: {percentage_hmdb_pubchem} %
+
+        --------------------------------------------------
+    """).format(
+        count_compartments=count_compartments,
+        count_processes=count_processes,
+        count_reactions=count_reactions,
+        count_metabolites=count_metabolites,
+        percentage_reactions_metanetx=percentage_reactions_metanetx,
+        percentage_gene_enzyme=percentage_gene_enzyme,
+        percentage_metabolites_metanetx=percentage_metabolites_metanetx,
+        percentage_hmdb_pubchem=percentage_hmdb_pubchem
+    )
+    # Return information.
+    return report
+
+
+def count_entities_with_references(references=None, entities=None):
+    """
+    Counts entities with any of specific references.
+
+    arguments:
+        references (list<str>): identifiers of references
+        entities (dict<dict>): information about entities
+
+    returns:
+        (int): count of entities with specific reference
+
+    raises:
+
+    """
+
+    count = 0
+    for entity in entities.values():
+        matches = []
+        for reference in references:
+            if reference in entity["references"].keys():
+                if len(entity["references"][reference]) > 0:
+                    matches.append(True)
+        if any(matches):
+            count += 1
+    return count
+
+
 def collect_reaction_participants_value(
     key=None, criteria=None, participants=None
 ):
@@ -697,6 +821,10 @@ def filter_reaction_participants(criteria=None, participants=None):
             match_role = True
         return match_metabolite and match_compartment and match_role
     return list(filter(match, participants))
+
+
+
+
 
 
 ###############################################################################

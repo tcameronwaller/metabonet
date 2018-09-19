@@ -87,7 +87,7 @@ import copy
 
 # Packages and modules from local source
 import utility
-import metabocurator.extraction
+import metabocurator.collection
 
 ###############################################################################
 # Functionality
@@ -136,6 +136,51 @@ def read_source(directory=None):
     }
 
 
+def count_model_sets_entities(content=None):
+    """
+    Counts compartments, reactions, and metabolites in model.
+
+    arguments:
+        content (object): content from file in Systems Biology Markup Language
+            (XML)
+
+    raises:
+
+    returns:
+        (dict<int>): summary
+
+    """
+
+    # Copy and interpret content.
+    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+        content=content
+    )
+    # Count compartments.
+    compartments = 0
+    for compartment in reference["compartments"].findall(
+        "version:compartment", reference["space"]
+    ):
+        compartments = compartments + 1
+    # Count reactions.
+    reactions = 0
+    for reaction in reference["reactions"].findall(
+        "version:reaction", reference["space"]
+    ):
+        reactions = reactions + 1
+    # Count metabolites.
+    metabolites = 0
+    for metabolite in reference["metabolites"].findall(
+    "version:species", reference["space"]
+    ):
+        metabolites = metabolites + 1
+    # Compile and return inforation.
+    return {
+        "compartments": compartments,
+        "reactions": reactions,
+        "metabolites": metabolites
+    }
+
+
 def change_model_boundary(content=None):
     """
     Changes annotations for a model's boundary
@@ -155,7 +200,9 @@ def change_model_boundary(content=None):
     """
 
     # Copy and interpret content.
-    reference = extraction.copy_interpret_content_recon2m2(content=content)
+    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+        content=content
+    )
     # Correct designation of model's boundary in metabolites.
     for metabolite in reference["metabolites"].findall(
         "version:species", reference["space"]
@@ -207,7 +254,9 @@ def change_model_compartments(curation_compartments=None, content=None):
     """
 
     # Copy and interpret content.
-    reference = extraction.copy_interpret_content_recon2m2(content=content)
+    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+        content=content
+    )
     # Change content for each combination of original and novel information.
     for row in curation_compartments:
         # Detmerine whether to change compartment's name.
@@ -276,7 +325,9 @@ def remove_model_metabolite_prefix(content=None):
     """
 
     # Copy and interpret content.
-    reference = extraction.copy_interpret_content_recon2m2(content=content)
+    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+        content=content
+    )
     # Remove prefixes from identifiers for metabolites.
     for metabolite in reference["metabolites"].findall(
     "version:species", reference["space"]
@@ -335,7 +386,9 @@ def change_model_metabolites(curation_metabolites=None, content=None):
     """
 
     # Copy and interpret content.
-    reference = extraction.copy_interpret_content_recon2m2(content=content)
+    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+        content=content
+    )
     # Change content for each combination of original and novel identifiers.
     for row in curation_metabolites:
         # Construct targets to recognize original and novel identifiers.
@@ -434,3 +487,9 @@ def execute_procedure(directory=None):
     )
     #Write product information to file.
     write_product(directory=directory, information=content_metabolites)
+    # Summary.
+    summary = count_model_sets_entities(content=content_metabolites)
+    # Report.
+    print("compartments: " + str(summary["compartments"]))
+    print("reactions: " + str(summary["reactions"]))
+    print("metabolites: " + str(summary["metabolites"]))

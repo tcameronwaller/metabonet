@@ -236,7 +236,7 @@ def enhance_metabolite_references(
         hmdb_references["hmdb"]
     )
     references_novel["pubchem"] = utility.collect_unique_elements(
-        hmdb_references["pubchem"]
+        references_original["pubchem"] + hmdb_references["pubchem"]
     )
     references_novel["chebi"] = utility.collect_unique_elements(
         references_original["chebi"] + hmdb_references["chebi"]
@@ -880,7 +880,7 @@ def filter_reaction(reaction=None):
     metabolite = ("BIOMASS" in metabolites)
     # Reference.
     # MetaNetX reaction MNXR01 is for a meaningless proton exchange.
-    reference = reaction["references"]["metanetx"][0] == "MNXR01"
+    reference = "MNXR01" in reaction["references"]["metanetx"]
     # Determine whether reaction passes filters.
     filter = name or compartment or metabolite or reference
     # Prepare report.
@@ -1014,3 +1014,11 @@ def execute_procedure(directory=None):
     }
     #Write product information to file.
     write_product(directory=directory, information=information)
+    # Report.
+    report = utility.prepare_curation_report(
+        compartments=source["compartments"],
+        processes=source["processes"],
+        reactions=reactions_replication,
+        metabolites=metabolites
+    )
+    print(report)

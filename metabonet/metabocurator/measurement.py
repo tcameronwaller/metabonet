@@ -79,6 +79,7 @@ import csv
 import copy
 import pickle
 import math
+import textwrap
 
 # Packages and modules from third parties
 
@@ -117,10 +118,7 @@ def read_source(directory=None):
     # Read information from file.
     measurements = utility.read_file_table(
         path_file=path_measurement,
-        names=[
-            "set", "subset", "name", "reference_hmdb", "fold", "p_value",
-            "q_value"
-        ],
+        names=["set", "subset", "name", "hmdb", "fold", "p_value", "q_value"],
         delimiter="\t"
     )
     with open(path_hmdb, "rb") as file_source:
@@ -155,7 +153,7 @@ def extract_measurements(records=None):
         name_novel = name_original.replace("*", "")
         measurement = {
             "name": name_novel,
-            "reference_hmdb": record["reference_hmdb"],
+            "hmdb": record["hmdb"],
             "fold": float(record["fold"]),
             "p_value": float(record["p_value"])
         }
@@ -205,14 +203,14 @@ def enhance_measurements_hmdb_references(
 
     measurements_novel = []
     for measurement in measurements_original:
-        reference_hmdb = measurement["reference_hmdb"]
+        reference_hmdb = measurement["hmdb"]
         name = measurement["name"]
         hmdb_keys = utility.match_hmdb_entries_by_identifiers_names(
             identifiers=[reference_hmdb],
             names=[name],
             summary_hmdb=summary_hmdb
         )
-        del measurement["reference_hmdb"]
+        del measurement["hmdb"]
         measurement["hmdb"] = hmdb_keys
         measurements_novel.append(measurement)
     return measurements_novel
@@ -336,6 +334,88 @@ def convert_measurements_text(measurements=None):
     return records
 
 
+def prepare_curation_report(
+    measurements=None
+):
+    """
+    Prepares a summary report on curation of metabolic sets and entities.
+
+    arguments:
+        measurements (list<dict>): information about measurements
+
+    returns:
+        (str): report of summary information
+
+    raises:
+
+    """
+
+    # Count measurements.
+    count_measurements = len(measurements)
+    # Count measurements with references to Human Metabolome Database (HMDB).
+    count_hmdb = count_records_with_references(
+        references=["hmdb"],
+        records=measurements
+    )
+    proportion_hmdb = count_hmdb / count_measurements
+    percentage_hmdb = round((proportion_hmdb * 100), 2)
+    # Count measurements with references to Human Metabolome Database (HMDB).
+    count_metab = count_records_with_references(
+        references=["metabolites"],
+        records=measurements
+    )
+    proportion_metabolite = count_metab / count_measurements
+    percent_metabolite = round((proportion_metabolite * 100), 2)
+    # Compile information.
+    report = textwrap.dedent("""\
+
+        --------------------------------------------------
+        curation report
+
+        measurements: {count_measurements}
+
+        measurements with HMDB: {count_hmdb} ({percentage_hmdb} %)
+        measurements with metabolite: {count_metab} ({percent_metabolite} %)
+
+        --------------------------------------------------
+    """).format(
+        count_measurements=count_measurements,
+        count_hmdb=count_hmdb,
+        percentage_hmdb=percentage_hmdb,
+        count_metab=count_metab,
+        percent_metabolite=percent_metabolite
+    )
+    # Return information.
+    return report
+
+
+def count_records_with_references(references=None, records=None):
+    """
+    Counts entities with any of specific references.
+
+    arguments:
+        references (list<str>): identifiers of references
+        records (list<dict>): information in records
+
+    returns:
+        (int): count of records with specific reference
+
+    raises:
+
+    """
+
+    count = 0
+    for record in records:
+        matches = []
+        for reference in references:
+            if reference in record.keys():
+                if len(record[reference]) > 0:
+                    matches.append(True)
+        if any(matches):
+            count += 1
+    return count
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -392,18 +472,18 @@ def execute_procedure(directory=None):
     measurements = extract_measurements(records=source["measurements"])
     # Match measurements to identifiers for Human Metabolome Database (HMDB).
     measurements_hmdb = enhance_measurements_hmdb_references(
-        measurements_original=measurements,
+        measurements_original=copy.deepcopy(measurements),
         summary_hmdb=source["summary_hmdb"]
     )
     # Match measurements to metabolites.
     measurements_metabolites = match_measurements_to_metabolites(
         reference="hmdb",
-        measurements_original=measurements_hmdb,
+        measurements_original=copy.deepcopy(measurements_hmdb),
         metabolites=source["metabolites"]
     )
     # Filter measurements for those that map to metabolites.
     measurements_match = filter_measurements_metabolites(
-        measurements_original=measurements_metabolites
+        measurements_original=copy.deepcopy(measurements_metabolites)
     )
     # Calculate base-2 logarithm of fold change.
     measurements_log = calculate_measurements_log(
@@ -425,3 +505,19 @@ def execute_procedure(directory=None):
     }
     #Write product information to file
     write_product(directory=directory, information=information)
+    # Report.
+    print("measurements before curation...")
+    report = prepare_curation_report(
+        measurements=measurements
+    )
+    print(report)
+    print("measurements after enhancement of HMDB and metabolites")
+    report = prepare_curation_report(
+        measurements=measurements_metabolites
+    )
+    print(report)
+    print("measurements after curation and filters...")
+    report = prepare_curation_report(
+        measurements=measurements_significance
+    )
+    print(report)

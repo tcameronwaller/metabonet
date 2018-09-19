@@ -255,7 +255,6 @@ def convert_reactions_text(reactions=None):
             "metabolites": ";".join(metabolites_unique),
             "compartments": ";".join(compartments_unique),
             "processes": ";".join(reaction["processes"]),
-            "genes": ";".join(reaction["genes"]),
             "reversibility": reaction["reversibility"],
             "conversion": reaction["conversion"],
             "dispersal": reaction["dispersal"],
@@ -266,15 +265,15 @@ def convert_reactions_text(reactions=None):
             "replicates": ";".join(reaction["replicates"]),
             "reference_metanetx": ";".join(reaction["references"]["metanetx"]),
             "reference_recon2m2": ";".join(reaction["references"]["recon2m2"]),
+            "reference_gene": ";".join(reaction["references"]["gene"]),
+            "reference_enzyme": ";".join(reaction["references"]["enzyme"]),
             "reference_kegg": ";".join(reaction["references"]["kegg"]),
             "reference_reactome": ";".join(reaction["references"]["reactome"]),
             "reference_metacyc": ";".join(reaction["references"]["metacyc"]),
             "reference_bigg": ";".join(reaction["references"]["bigg"]),
             "reference_rhea": ";".join(reaction["references"]["rhea"]),
             "reference_sabiork": ";".join(reaction["references"]["sabiork"]),
-            "reference_seed": ";".join(reaction["references"]["seed"]),
-            "reference_enzyme_commission":
-                ";".join(reaction["references"]["enzyme_commission"]),
+            "reference_seed": ";".join(reaction["references"]["seed"])
         }
         records.append(record)
     return records

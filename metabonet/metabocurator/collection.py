@@ -427,13 +427,12 @@ def extract_reaction(
         processes=processes
     )
     references = extract_reaction_references(
+        identifier=identifier,
         recon2m2=reaction_source["recon2m2"],
         metanetx=reaction_source["metanetx"],
         enzyme_commission=reaction_source["enzyme_commission"],
+        genes=genes_source,
         references_source=reaction_source["references"]
-    )
-    genes = extract_reaction_genes(
-        identifier=identifier, genes_source=genes_source
     )
     # Compile and return information
     return {
@@ -443,7 +442,6 @@ def extract_reaction(
         "reversibility": reversibility,
         "participants": participants,
         "processes": processes,
-        "genes": genes,
         "references": references
     }
 
@@ -661,7 +659,8 @@ def extract_reaction_genes(identifier=None, genes_source=None):
     genes = []
     for gene_pair in genes_split_two:
         identifier = gene_pair.replace("gene:", "")
-        genes.append(identifier)
+        if len(identifier) > 0:
+            genes.append(identifier)
     return genes
 
 
@@ -697,17 +696,23 @@ def extract_reaction_processes(reaction_source=None, processes=None):
 
 
 def extract_reaction_references(
-    recon2m2=None, metanetx=None, enzyme_commission=None,
+    identifier=None,
+    recon2m2=None,
+    metanetx=None,
+    enzyme_commission=None,
+    genes=None,
     references_source=None
 ):
     """
     Extracts references from source about a reaction
 
     arguments:
+        identifier (str): identifier of a reaction
         recon2m2 (str): identifier of reaction in original version of model,
             Recon 2M.2
         metanetx (str): identifier of reaction in MetaNetX
         enzyme_commission (str): identifier of reaction in Enzyme Commission
+        genes (list<dict>): source information about genes
         references_source (str): source information about a reaction's
             references
 
@@ -718,7 +723,14 @@ def extract_reaction_references(
 
     """
 
-    # Collect identifiers for each reference
+    # Collect identifiers for each reference.
+    gene = extract_reaction_genes(
+        identifier=identifier, genes_source=genes
+    )
+    if ";" in enzyme_commission:
+        enzyme = enzyme_commission.split(";")
+    else:
+        enzyme = []
     rhea = extract_reference_information(
         references_source=references_source, key="rhea:"
     )
@@ -728,7 +740,10 @@ def extract_reaction_references(
     metanetx_prior = extract_reference_information(
         references_source=references_source, key="deprecated:"
     )
-    metanetx_current = [metanetx] + metanetx_prior
+    if len(metanetx) > 0:
+        metanetx_current = [metanetx] + metanetx_prior
+    else:
+        metanetx_current = metanetx_prior
     kegg = extract_reference_information(
         references_source=references_source, key="kegg:"
     )
@@ -747,10 +762,11 @@ def extract_reaction_references(
     # Compile and return information
     return {
         "recon2m2": [recon2m2],
+        "metanetx": metanetx_current,
+        "gene": gene,
+        "enzyme": enzyme,
         "rhea": rhea,
         "bigg": bigg,
-        "metanetx": metanetx_current,
-        "enzyme_commission": enzyme_commission.split(";"),
         "kegg": kegg,
         "metacyc": metacyc,
         "reactome": reactome,
@@ -831,25 +847,31 @@ def extract_metabolite_references(identifier=None, references_source=None):
 
     """
 
-    # Collect identifiers for each reference
+    # Collect identifiers for each reference.
+    metanetx_prior = extract_reference_information(
+        references_source=references_source, key="deprecated:"
+    )
+    if not ("MNXMK" in identifier):
+        metanetx = [identifier] + metanetx_prior
+    else:
+        metanetx = metanetx_prior
+    hmdb = extract_reference_information(
+        references_source=references_source, key="hmdb:"
+    )
+    pubchem = extract_reference_information(
+        references_source=references_source, key="pubchem:"
+    )
+    kegg = extract_reference_information(
+        references_source=references_source, key="kegg:"
+    )
     chebi = extract_reference_information(
         references_source=references_source, key="chebi:"
     )
     bigg = extract_reference_information(
         references_source=references_source, key="bigg:"
     )
-    metanetx_prior = extract_reference_information(
-        references_source=references_source, key="deprecated:"
-    )
-    metanetx = [identifier] + metanetx_prior
     envipath = extract_reference_information(
         references_source=references_source, key="envipath:"
-    )
-    hmdb = extract_reference_information(
-        references_source=references_source, key="hmdb:"
-    )
-    kegg = extract_reference_information(
-        references_source=references_source, key="kegg:"
     )
     lipidmaps = extract_reference_information(
         references_source=references_source, key="lipidmaps:"
@@ -871,12 +893,14 @@ def extract_metabolite_references(identifier=None, references_source=None):
     )
     # Compile and return information
     return {
+        "metanetx": metanetx,
+        "hmdb": hmdb,
+        "pubchem": pubchem,
+        "kegg": kegg,
         "chebi": chebi,
         "bigg": bigg,
         "metanetx": metanetx,
         "envipath": envipath,
-        "hmdb": hmdb,
-        "kegg": kegg,
         "lipidmaps": lipidmaps,
         "metacyc": metacyc,
         "reactome": reactome,
@@ -954,7 +978,7 @@ def prepare_report_reactions(reactions=None):
             "metabolites": metabolites,
             "compartments": compartments,
             "processes": reaction["processes"],
-            "genes": reaction["genes"],
+            "reference_gene": reaction["references"]["gene"],
             "reference_metanetx": reaction["references"]["metanetx"]
         }
         records.append(record)
@@ -1072,3 +1096,11 @@ def execute_procedure(directory=None):
     }
     #Write product information to file
     write_product(directory=directory, information=information)
+    # Report.
+    report = utility.prepare_curation_report(
+        compartments=compartments,
+        processes=processes,
+        reactions=reactions,
+        metabolites=metabolites
+    )
+    print(report)

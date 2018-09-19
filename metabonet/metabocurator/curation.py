@@ -320,6 +320,8 @@ def curate_processes(
     }
 
 
+# TODO: Implement more curation... enhancement of HMDB references for example
+
 def curate_metabolites(
     metabolites_curation=None,
     metabolites_original=None,
@@ -351,21 +353,22 @@ def curate_metabolites(
         name_original = record["name_original"]
         name_novel = record["name_novel"]
         # Determine method to change information.
-        match_identifiers = identifier_original == identifier_novel
-        match_names = name_original == name_novel
         if identifier_novel == "null":
             if identifier_original in metabolites_novel:
                 # Remove metabolite.
                 del metabolites_novel[identifier_original]
                 # Remove metabolite from relevant reactions.
-                for reaction in reactions_novel.values():
-                    participants = reaction["participants"]
-                    for index, party in enumerate(participants):
-                        if party["metabolite"] == identifier_original:
-                            del participants[index]
+                reactions_novel = change_reactions_participants_metabolite(
+                    reactions_original=reactions_novel,
+                    metabolite_original=identifier_original,
+                    metabolite_novel="null",
+                    remove=True,
+                    replace=False
+                )
         else:
-            if not match_identifiers:
+            if not (identifier_original == identifier_novel):
                 # Change identifier.
+                # Change identifier in reactions' participants.
                 if (
                     (identifier_original in metabolites_novel) and
                     (identifier_novel not in metabolites_novel)
@@ -386,12 +389,14 @@ def curate_metabolites(
                     # Remove original record.
                     del metabolites_novel[identifier_original]
                 # Replace metabolite in relevant reactions.
-                for reaction in reactions_novel.values():
-                    participants = reaction["participants"]
-                    for party in participants:
-                        if party["metabolite"] == identifier_original:
-                            party["metabolite"] = identifier_novel
-            if not match_names:
+                reactions_novel = change_reactions_participants_metabolite(
+                    reactions_original=reactions_novel,
+                    metabolite_original=identifier_original,
+                    metabolite_novel=identifier_novel,
+                    remove=False,
+                    replace=True
+                )
+            if not (name_original == name_novel):
                 # Change name.
                 if identifier_novel in metabolites_novel:
                     metabolites_novel[identifier_novel]["name"] = name_novel
@@ -400,6 +405,50 @@ def curate_metabolites(
         "metabolites": metabolites_novel,
         "reactions": reactions_novel
     }
+
+
+def change_reactions_participants_metabolite(
+    reactions_original=None,
+    metabolite_original=None,
+    metabolite_novel=None,
+    remove=None,
+    replace=None
+):
+    """
+    Changes metabolite in reactions' participants.
+
+    arguments:
+        reactions_original (dict<dict>): information about reactions
+        metabolite_original (str): identifier of a metabolite
+        metabolite_novel (str): identifier of a metabolite
+        remove (bool): whether to remove the metabolite from participants
+        replace (bool): whether to replace the metabolite in participants
+
+    returns:
+        (dict<dict>): information about reactions
+
+    raises:
+
+    """
+
+
+    reactions_novel = {}
+    for reaction in reactions_original.values():
+        participants_original = reaction["participants"]
+        participants_novel = []
+        for party in participants_original:
+            if party["metabolite"] != metabolite_original:
+                participants_novel.append(party)
+            else:
+                if remove:
+                    # Omit participant.
+                    pass
+                elif replace:
+                    party["metabolite"] = metabolite_novel
+                    participants_novel.append(party)
+        reaction["participants"] = participants_novel
+        reactions_novel[reaction["identifier"]] = reaction
+    return reactions_novel
 
 
 def curate_reactions(reactions_curation=None, reactions_original=None):
@@ -582,3 +631,11 @@ def execute_procedure(directory=None):
     }
     #Write product information to file.
     write_product(directory=directory, information=information)
+    # Report.
+    report = utility.prepare_curation_report(
+        compartments=compartments_reactions["compartments"],
+        processes=processes_reactions["processes"],
+        reactions=reactions,
+        metabolites=metabolites_reactions["metabolites"]
+    )
+    print(report)
