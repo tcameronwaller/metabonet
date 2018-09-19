@@ -377,7 +377,7 @@ def define_network_subparser(subparsers=None):
         help="Determine candidacy of reactions and metabolites for network."
     )
     parser_network.add_argument(
-        "-c", "--compartmentalize", dest="compartmentalization",
+        "-c", "--compartmentalization", dest="compartmentalization",
         action="store_true", required=False,
         help="Compartmentalize metabolites in candidacy procedure."
     )

@@ -439,7 +439,11 @@ def determine_reaction_simplification(
         match=match_reaction_simplification,
         sequence=simplification_reactions
     )
-    return match is not None
+    if match is not None:
+        omission = match["omission"] == "True"
+    else:
+        omission = False
+    return omission
 
 
 def determine_reaction_process_relevance(
@@ -498,7 +502,8 @@ def determine_set_relevance(identifier=None, filters=None):
         sequence=filters
     )
     if record is not None:
-        return record["relevance"]
+        relevance = record["relevance"] == "True"
+        return relevance
     else:
         # If a set does not have a record in filters, then assume that it is
         # relevant.
@@ -790,9 +795,11 @@ def determine_metabolite_simplification(
             sequence=simplifications_metabolite
         )
         if simplification_compartment is not None:
+            omission = simplification_compartment["omission"] == "True"
+            replication = simplification_compartment["replication"] == "True"
             record = {
-                "omission": simplification_compartment["omission"],
-                "replication": simplification_compartment["replication"]
+                "omission": omission,
+                "replication": replication
             }
         else:
             record = {

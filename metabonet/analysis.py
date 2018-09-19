@@ -379,16 +379,16 @@ def analyze_network_nodes_group(
             "type": nodes[node_identifier]["type"],
             "entity": nodes[node_identifier]["entity"],
             "name": nodes[node_identifier]["name"],
-            "degree_in": degrees[node]["degree_in"],
-            "degree_out": degrees[node]["degree_out"],
-            "degree": degrees[node]["degree"],
-            "centrality_degree": centralities[node]["degree"],
-            "centrality_closeness": centralities[node]["closeness"],
-            "centrality_betweenness": centralities[node]["betweenness"],
+            "degree_in": degrees[node_identifier]["degree_in"],
+            "degree_out": degrees[node_identifier]["degree_out"],
+            "degree": degrees[node_identifier]["degree"],
+            "centrality_degree": centralities[node_identifier]["degree"],
+            "centrality_closeness": centralities[node_identifier]["closeness"],
+            "centrality_betweenness": centralities[node_identifier]["betweenness"],
             #"eccentricity": distances[node]["eccentricity"],
-            "cluster_coefficient": clusters[node]["coefficient"]
+            "cluster_coefficient": clusters[node_identifier]["coefficient"]
         }
-        collection[node] = entry
+        collection[node_identifier] = entry
     return collection
 
 
