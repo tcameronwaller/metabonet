@@ -189,6 +189,7 @@ def bipartite_closeness_centrality(G, nodes, normalized=True):
                 s = (len(sp) - 1.0) / (len(G) - 1)
                 closeness[node] *= s
         else:
+            # TODO: correction of error in original
             closeness[node] = 0.0
     for node in bottom:
         sp = dict(path_length(G, node))
@@ -197,8 +198,10 @@ def bipartite_closeness_centrality(G, nodes, normalized=True):
             closeness[node] = (n + 2 * (m - 1)) / totsp
             if normalized:
                 s = (len(sp) - 1.0) / (len(G) - 1)
+                closeness[node] = (closeness[node] / s)
                 closeness[node] *= s
         else:
+            # TODO: correction of error in original
             closeness[node] = 0.0
     return closeness
 
@@ -455,10 +458,10 @@ def determine_network_nodes_centralities(
     centralities_degree = (
         ntx.algorithms.bipartite.centrality.degree_centrality(network, nodes)
     )
-    centralities_closeness = (
-        bipartite_closeness_centrality(
-            network, nodes, normalized=True
-        )
+    # Normalize centralities to the order of each node's component if network
+    # is discontinuous.
+    centralities_closeness = bipartite_closeness_centrality(
+        network, nodes, normalized=True
     )
     centralities_betweenness = (
         ntx.algorithms.bipartite.centrality.betweenness_centrality(
@@ -841,7 +844,8 @@ def determine_bipartite_network_centralization(
         network, nodes_cis
     )
     # Closeness centrality.
-    # Do not apply supplemental normalization to the order of node's component.
+    # Centralization formulas might not account for the supplemental
+    # normalization to order of node's component.
     closeness = bipartite_closeness_centrality(
         network, nodes_cis, normalized=True
     )
