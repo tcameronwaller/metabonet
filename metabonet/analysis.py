@@ -275,6 +275,9 @@ def instantiate_networkx(nodes=None, links=None):
     return network
 
 
+# Analysis of individual nodes.
+
+
 def analyze_bipartite_network_nodes(
     network=None,
     nodes_reactions_identifiers=None,
@@ -306,12 +309,14 @@ def analyze_bipartite_network_nodes(
 
     # Reactions.
     reactions = analyze_network_nodes_group(
+        type="reaction",
         network=network,
         nodes_identifiers=nodes_reactions_identifiers,
         nodes=nodes_reactions
     )
     # Metabolites.
     metabolites = analyze_network_nodes_group(
+        type="metabolite",
         network=network,
         nodes_identifiers=nodes_metabolites_identifiers,
         nodes=nodes_metabolites
@@ -324,6 +329,7 @@ def analyze_bipartite_network_nodes(
 
 
 def analyze_network_nodes_group(
+    type=None,
     network=None,
     nodes_identifiers=None,
     nodes=None
@@ -343,6 +349,7 @@ def analyze_network_nodes_group(
     clustering coefficient
 
     arguments:
+        type (str): type of nodes in set, reaction or metabolite
         network (object): instance of network in NetworkX
         nodes_identifiers (list<str>): identifiers of nodes in a bipartite set
         nodes (dict<dict>): information about network's nodes in a bipartite
@@ -374,6 +381,11 @@ def analyze_network_nodes_group(
         nodes=nodes_identifiers
     )
     # Rank.
+    ranks = determine_network_nodes_ranks(
+        nodes=nodes_identifiers,
+        degrees=degrees,
+        centralities=centralities
+    )
     # Compile information.
     collection = {}
     for node_identifier in nodes_identifiers:
@@ -387,10 +399,24 @@ def analyze_network_nodes_group(
             "degree": degrees[node_identifier]["degree"],
             "centrality_degree": centralities[node_identifier]["degree"],
             "centrality_closeness": centralities[node_identifier]["closeness"],
-            "centrality_betweenness": centralities[node_identifier]["betweenness"],
+            "centrality_betweenness": (
+                centralities[node_identifier]["betweenness"]
+            ),
             #"eccentricity": distances[node]["eccentricity"],
-            "cluster_coefficient": clusters[node_identifier]["coefficient"]
+            "cluster_coefficient": clusters[node_identifier]["coefficient"],
+            "rank_degree": ranks[node_identifier]["rank_degree"],
+            "rank_centrality_degree": (
+                ranks[node_identifier]["rank_centrality_degree"]
+            ),
+            "rank_centrality_closeness": (
+                ranks[node_identifier]["rank_centrality_closeness"]
+            ),
+            "rank_centrality_betweenness": (
+                ranks[node_identifier]["rank_centrality_betweenness"]
+            ),
         }
+        if type == "metabolite":
+            entry["reference_hmdb"] = nodes[node_identifier]["reference_hmdb"]
         collection[node_identifier] = entry
     return collection
 
@@ -547,6 +573,108 @@ def determine_network_nodes_clusters(
         }
         collection[node] = entry
     return collection
+
+
+def determine_network_nodes_ranks(
+    nodes=None,
+    degrees=None,
+    centralities=None
+):
+    """
+    Assign ranks to nodes according to multiple metrics.
+
+    arguments:
+        nodes (dict<dict>): information about network's nodes in a bipartite
+            set
+        degrees (dict<dict>): information about degrees of network's nodes
+        centralities (dict<dict>): information about centralities of network's
+            nodes
+
+    raises:
+
+    returns:
+        (dict<dict>): information about network's nodes
+
+    """
+
+    # Sort degrees.
+    ranks_degree = sorted(
+        degrees.values(), key=lambda record: record["degree"], reverse=True
+    )
+    # Sort centralities.
+    ranks_centrality_degree = sorted(
+        centralities.values(),
+        key=lambda record: record["degree"],
+        reverse=True
+    )
+    ranks_centrality_closeness = sorted(
+        centralities.values(),
+        key=lambda record: record["closeness"],
+        reverse=True
+    )
+    ranks_centrality_betweenness = sorted(
+        centralities.values(),
+        key=lambda record: record["betweenness"],
+        reverse=True
+    )
+    # Collect ranks for each node.
+    ranks = collect_network_nodes_ranks(
+        nodes=nodes,
+        ranks_degree=ranks_degree,
+        ranks_centrality_degree=ranks_centrality_degree,
+        ranks_centrality_closeness=ranks_centrality_closeness,
+        ranks_centrality_betweenness=ranks_centrality_betweenness
+    )
+    # Return information.
+    return ranks
+
+
+def collect_network_nodes_ranks(
+    nodes=None,
+    ranks_degree=None,
+    ranks_centrality_degree=None,
+    ranks_centrality_closeness=None,
+    ranks_centrality_betweenness=None
+):
+    """
+    Collect ranks of nodes by multiple measurements.
+
+    arguments:
+        nodes (dict<dict>): information about network's nodes in a bipartite
+            set
+        ranks_degree (list<dict>): sort list of nodes by degree
+        ranks_centrality_degree (list<dict>): sort list of nodes by degree
+            centrality
+        ranks_centrality_closeness (list<dict>): sort list of nodes by
+            closeness centrality
+        ranks_centrality_betweenness (list<dict>): sort list of nodes by
+            betweenness centrality
+
+    raises:
+
+    returns:
+        (dict<dict>): information about nodes' ranks by multiple measurements
+
+    """
+
+    ranks = {}
+    for node in nodes:
+        entry = {
+            "identifier": node
+        }
+        ranks[entry["identifier"]] = entry
+    for index, record in enumerate(ranks_degree, start=1):
+        ranks[record["identifier"]]["rank_degree"] = index
+    for index, record in enumerate(ranks_centrality_degree, start=1):
+        ranks[record["identifier"]]["rank_centrality_degree"] = index
+    for index, record in enumerate(ranks_centrality_closeness, start=1):
+        ranks[record["identifier"]]["rank_centrality_closeness"] = index
+    for index, record in enumerate(ranks_centrality_betweenness, start=1):
+        ranks[record["identifier"]]["rank_centrality_betweenness"] = index
+    return ranks
+
+
+# Analysis of entire network.
 
 
 def analyze_bipartite_network(
@@ -1259,16 +1387,25 @@ def execute_procedure(directory=None):
         nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
         nodes_metabolites=source["nodes_metabolites"]
     )
-    #print(list(report_nodes["metabolites"].values())[10])
     # Analyze entire network.
-    report_network = analyze_bipartite_network(
-        network=network,
-        nodes_reactions=source["nodes_reactions_identifiers"],
-        nodes_metabolites=source["nodes_metabolites_identifiers"]
-    )
-    #print(report_network)
+    # TODO: temporarily omit network report for efficiency
+    if False:
+        report_network = analyze_bipartite_network(
+            network=network,
+            nodes_reactions=source["nodes_reactions_identifiers"],
+            nodes_metabolites=source["nodes_metabolites_identifiers"]
+        )
+    else:
+        entry = {
+            "blah": 1,
+            "foo": 2,
+            "bar": 3
+        }
+        report_network = {
+            "metabolites": entry,
+            "reactions": entry
+        }
     # Prepare reports.
-    # TODO: Sort records within reports...
     # Compile information.
     information = {
         "report_nodes_reactions": list(report_nodes["reactions"].values()),

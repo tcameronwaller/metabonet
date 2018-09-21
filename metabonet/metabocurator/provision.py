@@ -236,6 +236,8 @@ def execute_procedure(directory=None):
 
     """
 
+    # TODO: read in MIDAS, hmdb summary, and information from 
+
     # Read source information from file.
     source = read_source(directory=directory)
     # Transfer information to MIDAS library.

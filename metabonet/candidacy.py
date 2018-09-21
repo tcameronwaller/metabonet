@@ -182,6 +182,7 @@ def collect_candidate_reactions(
     compartmentalization=None,
     filtration_compartments=None,
     filtration_processes=None,
+    simplification=None,
     simplification_reactions=None,
     simplification_metabolites=None
 ):
@@ -195,6 +196,8 @@ def collect_candidate_reactions(
             remove metabolites and reactions relevant to specific compartments
         filtration_processes (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific processes
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_reactions (list<dict<str>>): information about whether
             to simplify representations of specific reactions
         simplification_metabolites (list<dict<str>>): information about whether
@@ -216,13 +219,13 @@ def collect_candidate_reactions(
             compartmentalization=compartmentalization,
             filtration_compartments=filtration_compartments,
             filtration_processes=filtration_processes,
+            simplification=simplification,
             simplification_reactions=simplification_reactions,
             simplification_metabolites=simplification_metabolites
         )
         if candidacy:
             reactions_candidacy[record["identifier"]] = record
     return reactions_candidacy
-
 
 def collect_candidate_reaction(
     reaction_identifier=None,
@@ -231,6 +234,7 @@ def collect_candidate_reaction(
     compartmentalization=None,
     filtration_compartments=None,
     filtration_processes=None,
+    simplification=None,
     simplification_reactions=None,
     simplification_metabolites=None
 ):
@@ -246,6 +250,8 @@ def collect_candidate_reaction(
             remove metabolites and reactions relevant to specific compartments
         filtration_processes (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific processes
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_reactions (list<dict<str>>): information about whether
             to simplify representations of specific reactions
         simplification_metabolites (list<dict<str>>): information about whether
@@ -267,12 +273,12 @@ def collect_candidate_reaction(
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
         filtration_processes=filtration_processes,
+        simplification=simplification,
         simplification_reactions=simplification_reactions,
         simplification_metabolites=simplification_metabolites
     )
     # Return information.
     return candidacy
-
 
 def determine_reaction_candidacy(
     reaction_identifier=None,
@@ -281,6 +287,7 @@ def determine_reaction_candidacy(
     compartmentalization=None,
     filtration_compartments=None,
     filtration_processes=None,
+    simplification=None,
     simplification_reactions=None,
     simplification_metabolites=None
 ):
@@ -297,6 +304,8 @@ def determine_reaction_candidacy(
             remove metabolites and reactions relevant to specific compartments
         filtration_processes (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific processes
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_reactions (list<dict<str>>): information about whether
             to simplify representations of specific reactions
         simplification_metabolites (list<dict<str>>): information about whether
@@ -317,6 +326,7 @@ def determine_reaction_candidacy(
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
         filtration_processes=filtration_processes,
+        simplification=simplification,
         simplification_reactions=simplification_reactions,
         simplification_metabolites=simplification_metabolites
     )
@@ -328,6 +338,7 @@ def determine_reaction_candidacy(
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
         filtration_processes=filtration_processes,
+        simplification=simplification,
         simplification_reactions=simplification_reactions,
         simplification_metabolites=simplification_metabolites
     )
@@ -344,13 +355,13 @@ def determine_reaction_candidacy(
     # Return information.
     return (candidacy, record)
 
-
 def determine_reaction_relevance(
     reaction_identifier=None,
     reactions=None,
     compartmentalization=None,
     filtration_compartments=None,
     filtration_processes=None,
+    simplification=None,
     simplification_reactions=None,
     simplification_metabolites=None
 ):
@@ -378,6 +389,8 @@ def determine_reaction_relevance(
             remove metabolites and reactions relevant to specific compartments
         filtration_processes (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific processes
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_reactions (list<dict<str>>): information about whether
             to simplify representations of specific reactions
         simplification_metabolites (list<dict<str>>): information about whether
@@ -391,8 +404,9 @@ def determine_reaction_relevance(
     """
 
     # Simplification.
-    simplification = determine_reaction_simplification(
+    simplification_match = determine_reaction_simplification(
         reaction_identifier=reaction_identifier,
+        simplification=simplification,
         simplification_reactions=simplification_reactions
     )
     # Process.
@@ -407,15 +421,16 @@ def determine_reaction_relevance(
         reactions=reactions,
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     # Determine whether reaction is relevant.
-    relevance = (not simplification) and process and behavior
+    relevance = (not simplification_match) and process and behavior
     return relevance
-
 
 def determine_reaction_simplification(
     reaction_identifier=None,
+    simplification=None,
     simplification_reactions=None
 ):
     """
@@ -423,6 +438,8 @@ def determine_reaction_simplification(
 
     arguments:
         reaction_identifier (str): identifier of a reaction
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_reactions (list<dict<str>>): information about whether
             to simplify representations of specific reactions
 
@@ -435,12 +452,16 @@ def determine_reaction_simplification(
 
     def match_reaction_simplification(record):
         return record["identifier"] == reaction_identifier
-    match = utility.find(
-        match=match_reaction_simplification,
-        sequence=simplification_reactions
-    )
-    if match is not None:
-        omission = match["omission"] == "True"
+    # Determine whether to consider simplifications.
+    if simplification:
+        match = utility.find(
+            match=match_reaction_simplification,
+            sequence=simplification_reactions
+        )
+        if match is not None:
+            omission = match["omission"] == "True"
+        else:
+            omission = False
     else:
         omission = False
     return omission
@@ -515,6 +536,7 @@ def determine_reaction_behavior_relevance(
     reactions=None,
     compartmentalization=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -536,6 +558,8 @@ def determine_reaction_behavior_relevance(
         compartmentalization (bool): whether compartmentalization is relevant
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -556,6 +580,7 @@ def determine_reaction_behavior_relevance(
             reaction_identifier=reaction_identifier,
             reactions=reactions,
             filtration_compartments=filtration_compartments,
+            simplification=simplification,
             simplification_metabolites=simplification_metabolites
         )
     elif reaction["transport"]:
@@ -570,6 +595,7 @@ def determine_reaction_behavior_relevance(
                 reaction_identifier=reaction_identifier,
                 reactions=reactions,
                 filtration_compartments=filtration_compartments,
+                simplification=simplification,
                 simplification_metabolites=simplification_metabolites
             )
         else:
@@ -581,6 +607,7 @@ def determine_reaction_conversion_participation(
     reaction_identifier=None,
     reactions=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -592,6 +619,8 @@ def determine_reaction_conversion_participation(
         reactions (dict<dict>): information about reactions
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -607,6 +636,7 @@ def determine_reaction_conversion_participation(
         reaction_identifier=reaction_identifier,
         reactions=reactions,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     # Determine whether any reactant participants and product participants are
@@ -628,6 +658,7 @@ def determine_reaction_transport_participation(
     reaction_identifier=None,
     reactions=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -639,6 +670,8 @@ def determine_reaction_transport_participation(
         reactions (dict<dict>): information about reactions
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -654,6 +687,7 @@ def determine_reaction_transport_participation(
         reaction_identifier=reaction_identifier,
         reactions=reactions,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     # Determine whether any reactant participants and product participants
@@ -697,6 +731,7 @@ def determine_reaction_relevant_participants(
     reaction_identifier=None,
     reactions=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -714,6 +749,8 @@ def determine_reaction_relevant_participants(
         reactions (dict<dict>): information about reactions
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -737,14 +774,15 @@ def determine_reaction_relevant_participants(
         )
         # Determine relevance of participant's metabolite.
         metabolite = participant["metabolite"]
-        simplification = determine_metabolite_simplification(
+        simplification_match = determine_metabolite_simplification(
             metabolite_identifier=metabolite,
             compartment_identifier=compartment,
+            simplification=simplification,
             simplification_metabolites=simplification_metabolites
         )
         metabolite_relevance = (
-            not simplification["omission"] and
-            not simplification["replication"]
+            not simplification_match["omission"] and
+            not simplification_match["replication"]
         )
         # Determine whether participant is relevant.
         if metabolite_relevance and compartment_relevance:
@@ -755,6 +793,7 @@ def determine_reaction_relevant_participants(
 def determine_metabolite_simplification(
     metabolite_identifier=None,
     compartment_identifier=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -765,6 +804,8 @@ def determine_metabolite_simplification(
     arguments:
         metabolite_identifier (str): identifier of a metabolite
         compartment_identifier (str): identifier of a compartment
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -778,29 +819,41 @@ def determine_metabolite_simplification(
 
     def match_metabolite(record):
         return record["metabolite"] == metabolite_identifier
-    simplifications_metabolite = utility.find_all(
-        match=match_metabolite,
-        sequence=simplification_metabolites
-    )
-    if simplifications_metabolite is not None:
-        # Determine whether any of metabolite's simplifications match the
-        # compartment.
-        def match_compartment(record):
-            return (
-                (record["compartment"] == "all") or
-                (record["compartment"] == compartment_identifier)
-            )
-        simplification_compartment = utility.find(
-            match=match_compartment,
-            sequence=simplifications_metabolite
+    def match_compartment(record):
+        return (
+            (record["compartment"] == "all") or
+            (record["compartment"] == compartment_identifier)
         )
-        if simplification_compartment is not None:
-            omission = simplification_compartment["omission"] == "True"
-            replication = simplification_compartment["replication"] == "True"
-            record = {
-                "omission": omission,
-                "replication": replication
-            }
+    # Determine whether to consider simplifications.
+    if simplification:
+        # There might be multiple records for a metabolite.
+        simplifications_metabolite = utility.find_all(
+            match=match_metabolite,
+            sequence=simplification_metabolites
+        )
+        if simplifications_metabolite is not None:
+            # Determine whether any of metabolite's simplifications match the
+            # compartment.
+            # There should be a single record for a metabolite in a specific
+            # compartment.
+            simplification_compartment = utility.find(
+                match=match_compartment,
+                sequence=simplifications_metabolite
+            )
+            if simplification_compartment is not None:
+                omission = simplification_compartment["omission"] == "True"
+                replication = (
+                    simplification_compartment["replication"] == "True"
+                )
+                record = {
+                    "omission": omission,
+                    "replication": replication
+                }
+            else:
+                record = {
+                    "omission": False,
+                    "replication": False
+                }
         else:
             record = {
                 "omission": False,
@@ -821,6 +874,7 @@ def determine_reaction_redundancy(
     compartmentalization=None,
     filtration_compartments=None,
     filtration_processes=None,
+    simplification=None,
     simplification_reactions=None,
     simplification_metabolites=None
 ):
@@ -841,6 +895,8 @@ def determine_reaction_redundancy(
             remove metabolites and reactions relevant to specific compartments
         filtration_processes (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific processes
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_reactions (list<dict<str>>): information about whether
             to simplify representations of specific reactions
         simplification_metabolites (list<dict<str>>): information about whether
@@ -866,6 +922,7 @@ def determine_reaction_redundancy(
             compartmentalization=compartmentalization,
             filtration_compartments=filtration_compartments,
             filtration_processes=filtration_processes,
+            simplification=simplification,
             simplification_reactions=simplification_reactions,
             simplification_metabolites=simplification_metabolites
         )
@@ -879,6 +936,7 @@ def determine_reaction_redundancy(
             reactions=reactions,
             compartmentalization=compartmentalization,
             filtration_compartments=filtration_compartments,
+            simplification=simplification,
             simplification_metabolites=simplification_metabolites
         )
         return redundancy
@@ -900,6 +958,7 @@ def determine_replicate_reactions_redundancy(
     reactions=None,
     compartmentalization=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -912,6 +971,8 @@ def determine_replicate_reactions_redundancy(
         compartmentalization (bool): whether compartmentalization is relevant
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -936,6 +997,7 @@ def determine_replicate_reactions_redundancy(
         reactions=reactions,
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     # Determine whether reactions are redundant.
@@ -948,6 +1010,7 @@ def determine_reactions_participation_redundancy(
     reactions=None,
     compartmentalization=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -960,6 +1023,8 @@ def determine_reactions_participation_redundancy(
         compartmentalization (bool): whether compartmentalization is relevant
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -975,12 +1040,14 @@ def determine_reactions_participation_redundancy(
         reaction_identifier=reaction_one_identifier,
         reactions=reactions,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     participants_two = determine_reaction_relevant_participants(
         reaction_identifier=reaction_two_identifier,
         reactions=reactions,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     # Determine whether participants are redundant.
@@ -1108,6 +1175,9 @@ def determine_redundant_reaction_priority(
     return priority
 
 
+
+
+
 # Candidate metabolites.
 
 
@@ -1118,6 +1188,7 @@ def collect_candidate_reactions_metabolites(
     compartmentalization=None,
     compartments=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -1131,6 +1202,8 @@ def collect_candidate_reactions_metabolites(
         compartments (dict<dict>): information about compartments
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -1153,6 +1226,7 @@ def collect_candidate_reactions_metabolites(
             compartmentalization=compartmentalization,
             compartments=compartments,
             filtration_compartments=filtration_compartments,
+            simplification=simplification,
             simplification_metabolites=simplification_metabolites
         )
         # Collect candidate reaction.
@@ -1178,6 +1252,7 @@ def collect_candidate_reaction_metabolites(
     compartmentalization=None,
     compartments=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -1192,6 +1267,8 @@ def collect_candidate_reaction_metabolites(
         compartments (dict<dict>): information about compartments
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -1215,6 +1292,7 @@ def collect_candidate_reaction_metabolites(
         participants_original=participants,
         compartmentalization=compartmentalization,
         filtration_compartments=filtration_compartments,
+        simplification=simplification,
         simplification_metabolites=simplification_metabolites
     )
     # Include information about candidate participants in information about
@@ -1253,6 +1331,7 @@ def determine_reaction_candidate_participants(
     participants_original=None,
     compartmentalization=None,
     filtration_compartments=None,
+    simplification=None,
     simplification_metabolites=None
 ):
     """
@@ -1268,6 +1347,8 @@ def determine_reaction_candidate_participants(
         compartmentalization (bool): whether compartmentalization is relevant
         filtration_compartments (list<dict<str>>): information about whether to
             remove metabolites and reactions relevant to specific compartments
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         simplification_metabolites (list<dict<str>>): information about whether
             to simplify representations of specific metabolites
 
@@ -1292,6 +1373,7 @@ def determine_reaction_candidate_participants(
         simplification = determine_metabolite_simplification(
             metabolite_identifier=metabolite,
             compartment_identifier=compartment,
+            simplification=simplification,
             simplification_metabolites=simplification_metabolites
         )
         participant["replication"] = simplification["replication"]
@@ -1621,6 +1703,7 @@ def write_product(directory=None, information=None):
 
 def execute_procedure(
     compartmentalization=None,
+    simplification=None,
     directory=None
 ):
     """
@@ -1631,6 +1714,8 @@ def execute_procedure(
 
     arguments:
         compartmentalization (bool): whether compartmentalization is relevant
+        simplification (bool): whether to simplify representations of specific
+            entities in network
         directory (str): path to directory for source and product files
 
     raises:
@@ -1647,6 +1732,7 @@ def execute_procedure(
         compartmentalization=compartmentalization,
         filtration_compartments=source["filtration_compartments"],
         filtration_processes=source["filtration_processes"],
+        simplification=simplification,
         simplification_reactions=source["simplification_reactions"],
         simplification_metabolites=source["simplification_metabolites"]
     )
@@ -1660,6 +1746,7 @@ def execute_procedure(
         compartmentalization=compartmentalization,
         compartments=source["compartments"],
         filtration_compartments=source["filtration_compartments"],
+        simplification=simplification,
         simplification_metabolites=source["simplification_metabolites"]
     )
     # Include references to candidate reactions with information about

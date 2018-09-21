@@ -155,6 +155,10 @@ def match_measurements_to_candidate_metabolites(
             if candidate["metabolite"] in measurement["metabolites"]:
                 matches.append(candidate["identifier"])
         measurement["candidates"] = matches
+        if len(matches) > 0:
+            measurement["identifier"] = matches[0]
+        else:
+            measurement["identifier"] = "null"
         measurements_novel.append(measurement)
     return measurements_novel
 
@@ -200,13 +204,15 @@ def convert_measurements_text(measurements=None):
     records = []
     for measurement in measurements:
         record = {
+            "measurement": True,
             "name": measurement["name"],
             "fold": measurement["fold"],
             "log_fold": measurement["log_fold"],
             "p_value": measurement["p_value"],
             "hmdb": ";".join(measurement["hmdb"]),
             "metabolites": ";".join(measurement["metabolites"]),
-            "candidates": ";".join(measurement["candidates"])
+            "candidates": ";".join(measurement["candidates"]),
+            "identifier": measurement["identifier"]
         }
         records.append(record)
     return records

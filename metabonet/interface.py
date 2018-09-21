@@ -382,6 +382,11 @@ def define_network_subparser(subparsers=None):
         help="Compartmentalize metabolites in candidacy procedure."
     )
     parser_network.add_argument(
+        "-s", "--simplification", dest="simplification",
+        action="store_true", required=False,
+        help="Simplify specific hubs in network."
+    )
+    parser_network.add_argument(
         "-n", "--network", dest="network", action="store_true",
         help=(
             "Define network's nodes and links for candidate reactions and "
@@ -389,7 +394,7 @@ def define_network_subparser(subparsers=None):
         )
     )
     parser_network.add_argument(
-        "-s", "--component", dest="component", action="store_true",
+        "-p", "--component", dest="component", action="store_true",
         required=False,
         help="Select network's main component."
     )
@@ -614,6 +619,7 @@ def evaluate_network_parameters(arguments):
         # Execute procedure.
         candidacy.execute_procedure(
             compartmentalization=arguments.compartmentalization,
+            simplification=arguments.simplification,
             directory=arguments.directory
         )
     if arguments.network:
