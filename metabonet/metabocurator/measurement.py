@@ -80,6 +80,7 @@ import copy
 import pickle
 import math
 import textwrap
+import statistics
 
 # Packages and modules from third parties
 
@@ -110,30 +111,187 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_measurement = os.path.join(directory, "plasma_metabolites.tsv")
+    # Read information from file.
+    # Compile information.
+    reference = read_source_reference(directory=directory)
+    study_one = read_source_study_one(directory=directory)
+    study_two = read_source_study_two(directory=directory)
+    # Compile and return information.
+    return {
+        "reference": reference,
+        "study_one": study_one,
+        "study_two": study_two
+    }
+
+
+def read_source_reference(directory=None):
+    """
+    Reads and organizes source information from file.
+
+    arguments:
+        directory (str): directory of source files
+
+    raises:
+
+    returns:
+        (object): source information
+
+    """
+
+    # Specify directories and files.
     path_extraction = os.path.join(directory, "extraction")
     path_hmdb = os.path.join(path_extraction, "hmdb_summary.pickle")
     path_conversion = os.path.join(directory, "conversion")
     path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
     # Read information from file.
-    measurements = utility.read_file_table(
-        path_file=path_measurement,
-        names=["set", "subset", "name", "hmdb", "fold", "p_value", "q_value"],
-        delimiter="\t"
-    )
     with open(path_hmdb, "rb") as file_source:
-        summary_hmdb = pickle.load(file_source)
+        hmdb = pickle.load(file_source)
     with open(path_metabolites, "rb") as file_source:
         metabolites = pickle.load(file_source)
     # Compile and return information.
     return {
-        "measurements": measurements,
-        "summary_hmdb": summary_hmdb,
+        "hmdb": hmdb,
         "metabolites": metabolites
     }
 
 
-def extract_measurements(records=None):
+def read_source_study_one(directory=None):
+    """
+    Reads and organizes source information from file.
+
+    arguments:
+        directory (str): directory of source files
+
+    raises:
+
+    returns:
+        (object): source information
+
+    """
+
+    # Specify directories and files.
+    path_measurement = os.path.join(directory, "metabolomic_measurements")
+    path_study_one = os.path.join(
+        path_measurement, "karl_physiological-reports_2017"
+    )
+    path_measurements = os.path.join(
+        path_study_one, "measurements.tsv"
+    )
+    # Read information from file.
+    measurements = utility.read_file_table(
+        path_file=path_measurements,
+        names=["set", "subset", "name", "hmdb", "fold", "p_value", "q_value"],
+        delimiter="\t"
+    )
+    # Compile and return information.
+    return {
+        "measurements": measurements
+    }
+
+
+def read_source_study_two(directory=None):
+    """
+    Reads and organizes source information from file.
+
+    arguments:
+        directory (str): directory of source files
+
+    raises:
+
+    returns:
+        (object): source information
+
+    """
+
+    # Specify directories and files.
+    path_measurement = os.path.join(directory, "metabolomic_measurements")
+    path_study_two = os.path.join(
+        path_measurement, "metabolomics-workbench_pr000058_st000061"
+    )
+    path_samples = os.path.join(path_study_two, "samples.tsv")
+    path_analytes = os.path.join(path_study_two, "analytes.tsv")
+    path_measurements = os.path.join(path_study_two, "measurements.tsv")
+    # Read information from file.
+    samples = utility.read_file_table(
+        path_file=path_samples,
+        names=None,
+        delimiter="\t"
+    )
+    analytes = utility.read_file_table(
+        path_file=path_analytes,
+        names=None,
+        delimiter="\t"
+    )
+    measurements = utility.read_file_table(
+        path_file=path_measurements,
+        names=None,
+        delimiter="\t"
+    )
+    # Compile and return information.
+    return {
+        "samples": samples,
+        "analytes": analytes,
+        "measurements": measurements
+    }
+
+
+# Study one.
+
+
+def curate_measurements_study_one(measurements=None):
+    """
+    Extracts information about measurements.
+
+    arguments:
+        measurements (list<dict>): information from source about measurements
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    # Extract relevant information about measurements.
+    measurements = extract_measurements_study_one(
+        records=source["measurements"]
+    )
+    # Match measurements to identifiers for Human Metabolome Database (HMDB).
+    measurements_hmdb = enhance_measurements_hmdb_references(
+        measurements_original=copy.deepcopy(measurements),
+        summary_hmdb=source["summary_hmdb"]
+    )
+    # Match measurements to metabolites.
+    measurements_metabolites = match_measurements_to_metabolites(
+        reference="hmdb",
+        measurements_original=copy.deepcopy(measurements_hmdb),
+        metabolites=source["metabolites"]
+    )
+    # Filter measurements for those that map to metabolites.
+    measurements_match = filter_measurements_metabolites(
+        measurements_original=copy.deepcopy(measurements_metabolites)
+    )
+    # Calculate base-2 logarithm of fold change.
+    measurements_log = calculate_measurements_log(
+        measurements_original=measurements_match
+    )
+    # Filter analytes for those whose differences have p-values < 0.05.
+    measurements_significance = filter_measurements_significance(
+        p_value_threshold=0.05,
+        measurements_original=measurements_log
+    )
+    # Convert measurement information to table in text format.
+    measurements_text = convert_measurements_text(
+        measurements=measurements_significance
+    )
+    # Compile and return information.
+    return {
+        "measurements": measurements_significance,
+        "measurements_text": measurements_text
+    }
+
+
+def extract_measurements_study_one(records=None):
     """
     Extracts information about measurements.
 
@@ -161,12 +319,319 @@ def extract_measurements(records=None):
     return measurements
 
 
+# Study two.
+
+
+def curate_measurements_study_two(
+    samples=None,
+    analytes=None,
+    measurements=None,
+    hmdb=None,
+    metabolites=None
+):
+    """
+    Curates information about metabolomic measurements from a study.
+
+    arguments:
+        samples (list<dict<str>>): information about samples from a study
+        analytes (list<dict<str>>): information about analytes from a study
+        measurements (list<dict<str>>): information measurements from a study
+        hmdb (dict<dict>): information about metabolites from Human Metabolome
+            Database (HMDB)
+        metabolites (dict<dict>): information about metabolites
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    # Determine analytes' mean fold changes between groups.
+    analytes_fold = determine_study_two_analytes_folds(
+        group_numerator="subcutaneous_fat",
+        group_denominator="visceral_fat",
+        samples=samples,
+        analytes=analytes,
+        measurements=measurements
+    )
+    # Determine analytes' log-2 fold changes between groups.
+    analytes_log = calculate_measurements_log(
+        measurements_original=analytes_fold
+    )
+    # Determine analytes' p-values between groups.
+    analytes_p = determine_study_two_analytes_p_values(
+        samples=samples,
+        analytes=analytes,
+        measurements=measurements
+    )
+
+
+    # Match analytes to metabolites.
+
+    # Compile and return information.
+    return analytes_fold
+
+
+def determine_study_two_analytes_folds(
+    group_numerator=None,
+    group_denominator=None,
+    samples=None,
+    analytes=None,
+    measurements=None
+):
+    """
+    Determines the mean fold changes for each analyte between experimental
+    groups.
+
+    arguments:
+        group_numerator (str): name of experimental group for numerator
+        group_denominator (str): name of experimental group for denominator
+        samples (list<dict<str>>): information about samples from a study
+        analytes (list<dict<str>>): information about analytes from a study
+        measurements (list<dict<str>>): information measurements from a study
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    # Determine identifiers of samples for same patients.
+    patients_samples = determine_study_two_patients_samples(
+        samples=samples
+    )
+    # Determine mean fold changes for each analyte.
+    analytes_novel = []
+    for analyte in analytes:
+        name = analyte["name_study"]
+        fold = determine_study_two_analyte_fold(
+            analyte=name,
+            group_numerator=group_numerator,
+            group_denominator=group_denominator,
+            patients_samples=patients_samples,
+            measurements=measurements
+        )
+        analyte["fold"] = fold
+        analytes_novel.append(analyte)
+    return analytes_novel
+
+
+def determine_study_two_patients_samples(
+    samples=None
+):
+    """
+    Determines the samples for each group for the same patient.
+
+    arguments:
+        samples (list<dict<str>>): information about samples from a study
+
+    raises:
+
+    returns:
+        (dict): samples from each group for each patient
+
+    """
+
+    patients_samples = {}
+    for sample_cis in samples:
+        identifier_cis = sample_cis["identifier"]
+        patient_cis = str(sample_cis["patient"])
+        group_cis = sample_cis["group"]
+        if patient_cis not in patients_samples.keys():
+            # Find sample for same patient and other group.
+            for sample_trans in samples:
+                identifier_trans = sample_trans["identifier"]
+                patient_trans = str(sample_trans["patient"])
+                group_trans = sample_trans["group"]
+                if (
+                    (patient_trans == patient_cis) and
+                    (group_trans != group_cis)
+                ):
+                    # Found the other sample for the same patient.
+                    break
+            patients_samples[patient_cis] = {
+                group_cis: identifier_cis,
+                group_trans: identifier_trans
+            }
+    return patients_samples
+
+
+def determine_study_two_analyte_fold(
+    analyte=None,
+    group_numerator=None,
+    group_denominator=None,
+    patients_samples=None,
+    measurements=None
+):
+    """
+    Determines the mean fold change between experimental groups for an analyte.
+
+    arguments:
+        analyte (str): name of analyte
+        group_numerator (str): name of experimental group for numerator
+        group_denominator (str): name of experimental group for denominator
+        patients_samples (dict): samples from each group for each patient
+        measurements (list<dict<str>>): information measurements from a study
+
+    raises:
+
+    returns:
+        (float): fold change
+
+    """
+
+    # Find measurements for analyte.
+    def match(record):
+        return record["analyte"] == analyte
+    measurements_analyte = utility.find(
+        match=match,
+        sequence=measurements
+    )
+    # Determine fold changes for analyte's measurements.
+    folds = []
+    for patient in patients_samples.keys():
+        sample_numerator = patients_samples[patient][group_numerator]
+        sample_denominator = patients_samples[patient][group_denominator]
+        if (
+            (sample_numerator in measurements_analyte.keys()) and
+            (sample_denominator in measurements_analyte.keys())
+        ):
+            numerator = float(measurements_analyte[sample_numerator])
+            denominator = float(measurements_analyte[sample_denominator])
+            fold = numerator / denominator
+            folds.append(fold)
+    mean = statistics.mean(folds)
+    return mean
+
+
+def determine_study_two_analytes_p_values(
+    samples=None,
+    analytes=None,
+    measurements=None
+):
+    """
+    Determines the mean fold changes for each analyte between experimental
+    groups.
+
+    arguments:
+        group_numerator (str): name of experimental group for numerator
+        group_denominator (str): name of experimental group for denominator
+        samples (list<dict<str>>): information about samples from a study
+        analytes (list<dict<str>>): information about analytes from a study
+        measurements (list<dict<str>>): information measurements from a study
+
+    raises:
+
+    returns:
+        (list<dict>): information about measurements
+
+    """
+
+    # Determine identifiers of samples for each group.
+    groups_samples = determine_study_two_groups_samples(
+        samples=samples
+    )
+    # Determine p-value for each analyte.
+    analytes_novel = []
+    for analyte in analytes:
+        name = analyte["name_study"]
+        p_value = determine_study_two_analyte_p_value(
+            analyte=name,
+            groups_samples=groups_samples,
+            measurements=measurements
+        )
+        analyte["p_value"] = p_value
+        analytes_novel.append(analyte)
+    return analytes_novel
+
+
+def determine_study_two_groups_samples(
+    samples=None
+):
+    """
+    Determines the samples for each group.
+
+    arguments:
+        samples (list<dict<str>>): information about samples from a study
+
+    raises:
+
+    returns:
+        (dict): samples from each group for each patient
+
+    """
+
+    # TODO: Change this so that measuremes are in order by patient?
+
+    groups_samples = {}
+    for sample in samples:
+        identifier = sample["identifier"]
+        group = sample["group"]
+        if group not in groups_samples.keys():
+            groups_samples[group] = [identifier]
+        else:
+            groups_samples[group].append(identifier)
+    return groups_samples
+
+
+def determine_study_two_analyte_p_value(
+    analyte=None,
+    groups_samples=None,
+    measurements=None
+):
+    """
+    Determines the p-value between experimental groups for an analyte.
+
+    arguments:
+        analyte (str): name of analyte
+        groups_samples (dict): samples from each group
+        measurements (list<dict<str>>): information measurements from a study
+
+    raises:
+
+    returns:
+        (float): p-value
+
+    """
+
+    # Find measurements for analyte.
+    def match(record):
+        return record["analyte"] == analyte
+    measurements_analyte = utility.find(
+        match=match,
+        sequence=measurements
+    )
+    # Collect measurements for each experimental group.
+    group_one = list(groups_samples.keys())[0]
+    group_two = list(groups_samples.keys())[1]
+    groups_measurements = {
+        group_one: [],
+        group_two: []
+    }
+    for group in groups_samples.keys():
+        for sample in groups_samples[group]:
+            if sample in measurements_analyte.keys():
+                measurement = float(measurements_analyte[sample])
+                groups_measurements[group].append(measurement)
+    # Determine p-values for analyte's measurements.
+    print("here are the group measurements")
+    print(groups_measurements)
+    #mean = statistics.mean(folds)
+    #return mean
+
+
+
+# General utility.
+
+
 def calculate_measurements_log(measurements_original=None):
     """
     Calculates base-2 logarithm of fold change in measurements.
 
     arguments:
-        records (list<dict>): information about measurements
+        measurements_original (list<dict>): information about measurements
 
     raises:
 
@@ -182,6 +647,8 @@ def calculate_measurements_log(measurements_original=None):
         measurements_novel.append(measurement)
     return measurements_novel
 
+
+# TODO: do I also need to enhance PubChem references?
 
 def enhance_measurements_hmdb_references(
     measurements_original=None, summary_hmdb=None
@@ -468,56 +935,45 @@ def execute_procedure(directory=None):
 
     # Read source information from file.
     source = read_source(directory=directory)
-    # Extract relevant information about measurements.
-    measurements = extract_measurements(records=source["measurements"])
-    # Match measurements to identifiers for Human Metabolome Database (HMDB).
-    measurements_hmdb = enhance_measurements_hmdb_references(
-        measurements_original=copy.deepcopy(measurements),
-        summary_hmdb=source["summary_hmdb"]
+    # Curate measurements from study one.
+    # Measurements from study one represent metabolites in plasma before and
+    # after exercise.
+    if False:
+        study_one = curate_measurements_study_one(
+            measurements=source["study_one"]["measurements"]
+        )
+    # Curate measurements from study two.
+    # Measurements from study two represent metabolites in visceral and
+    # subcutaneous adipose.
+    study_two = curate_measurements_study_two(
+        samples=source["study_two"]["samples"],
+        analytes=source["study_two"]["analytes"],
+        measurements=source["study_two"]["measurements"]
     )
-    # Match measurements to metabolites.
-    measurements_metabolites = match_measurements_to_metabolites(
-        reference="hmdb",
-        measurements_original=copy.deepcopy(measurements_hmdb),
-        metabolites=source["metabolites"]
-    )
-    # Filter measurements for those that map to metabolites.
-    measurements_match = filter_measurements_metabolites(
-        measurements_original=copy.deepcopy(measurements_metabolites)
-    )
-    # Calculate base-2 logarithm of fold change.
-    measurements_log = calculate_measurements_log(
-        measurements_original=measurements_match
-    )
-    # Filter analytes for those whose differences have p-values < 0.05.
-    measurements_significance = filter_measurements_significance(
-        p_value_threshold=0.05,
-        measurements_original=measurements_log
-    )
-    # Convert measurement information to table in text format.
-    measurements_text = convert_measurements_text(
-        measurements=measurements_significance
-    )
-    # Compile information.
-    information = {
-        "measurements": measurements_significance,
-        "measurements_text": measurements_text
-    }
-    #Write product information to file
-    write_product(directory=directory, information=information)
-    # Report.
-    print("measurements before curation...")
-    report = prepare_curation_report(
-        measurements=measurements
-    )
-    print(report)
-    print("measurements after enhancement of HMDB and metabolites")
-    report = prepare_curation_report(
-        measurements=measurements_metabolites
-    )
-    print(report)
-    print("measurements after curation and filters...")
-    report = prepare_curation_report(
-        measurements=measurements_significance
-    )
-    print(report)
+
+
+
+    if False:
+        # Compile information.
+        information = {
+            "measurements_one": measurements_significance,
+            "measurements_one_text": measurements_text
+        }
+        #Write product information to file
+        write_product(directory=directory, information=information)
+        # Report.
+        print("measurements before curation...")
+        report = prepare_curation_report(
+            measurements=measurements
+        )
+        print(report)
+        print("measurements after enhancement of HMDB and metabolites")
+        report = prepare_curation_report(
+            measurements=measurements_metabolites
+        )
+        print(report)
+        print("measurements after curation and filters...")
+        report = prepare_curation_report(
+            measurements=measurements_significance
+        )
+        print(report)
