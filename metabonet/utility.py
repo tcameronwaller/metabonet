@@ -75,6 +75,7 @@ import os
 import csv
 import copy
 import textwrap
+import string
 
 # Relevant
 
@@ -88,6 +89,34 @@ import textwrap
 
 
 # General.
+
+
+def convert_string_low_alpha_num(characters):
+    """
+    Converts string of characters to lower case with only alphabetical or
+    numerical characters.
+
+    arguments:
+        characters (str): characters in a string
+
+    raises:
+
+    returns:
+        (str): characters in a string
+
+    """
+
+    # Convert all characters to lower case.
+    characters_lower = characters.lower()
+    # Remove all characters other than alphabetical or numerical characters.
+    characters_novel = characters_lower
+    for character in characters_lower:
+        if (
+            (character not in string.ascii_letters) and
+            (character not in string.digits)
+        ):
+            characters_novel = characters_novel.replace(character, "")
+    return characters_novel
 
 
 def confirm_path_directory(path=None):
@@ -621,15 +650,16 @@ def filter_hmdb_entries_by_synonyms(
     keys = []
     for key, record in summary_hmdb.items():
         synonyms = record["synonyms"]
-        synonyms_lower = []
+        synonyms_comparison = []
         for synonym in synonyms:
-            synonyms_lower.append(synonym.lower())
+            synonym_comparison = convert_string_low_alpha_num(synonym)
+            synonyms_comparison.append(synonym_comparison)
         # Determine whether any of entry's identifiers match the metabolite's
         # references
         checks = []
         for name in names:
-            name_lower = name.lower()
-            check = name_lower in synonyms_lower
+            name_comparison = convert_string_low_alpha_num(name)
+            check = name_comparison in synonyms_comparison
             checks.append(check)
         if any(checks):
             # The entry matches the metabolite's references
