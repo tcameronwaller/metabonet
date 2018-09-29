@@ -1638,7 +1638,6 @@ def convert_metabolites_text(metabolites=None):
     for metabolite in metabolites.values():
         record = {
             "identifier": metabolite["identifier"],
-            "metabolite": metabolite["metabolite"],
             "name": metabolite["name"],
             "metabolite": metabolite["metabolite"],
             "compartment": metabolite["compartment"],

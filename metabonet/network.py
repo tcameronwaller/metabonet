@@ -127,6 +127,10 @@ def read_source(directory=None):
     path_metabolites_candidacy = os.path.join(
         path_candidacy, "metabolites.pickle"
     )
+    path_measurement = os.path.join(directory, "measurement")
+    path_metabolites_measurement = os.path.join(
+        path_measurement, "metabolites.pickle"
+    )
     # Read information from file.
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
@@ -140,6 +144,8 @@ def read_source(directory=None):
         reactions_candidacy = pickle.load(file_source)
     with open(path_metabolites_candidacy, "rb") as file_source:
         metabolites_candidacy = pickle.load(file_source)
+    with open(path_metabolites_measurement, "rb") as file_source:
+        metabolites_measurement = pickle.load(file_source)
     # Compile and return information.
     return {
         "compartments": compartments,
@@ -148,6 +154,7 @@ def read_source(directory=None):
         "metabolites": metabolites,
         "reactions_candidacy": reactions_candidacy,
         "metabolites_candidacy": metabolites_candidacy,
+        "metabolites_measurement": metabolites_measurement
     }
 
 
@@ -314,6 +321,13 @@ def define_metabolite_node(
         compartment_name = compartments[compartment]
     else:
         compartment_name = "null"
+    # Measurements.
+    measurements = metabolite_candidacy["measurements"]
+    study_one = measurements["study_one"]
+    study_two = measurements["study_two"]
+    study_three = measurements["study_three"]
+    study_four = measurements["study_four"]
+    study_five = measurements["study_five"]
     # Compile information.
     metabolite_node = {
         "identifier": metabolite_candidacy["identifier"],
@@ -326,7 +340,22 @@ def define_metabolite_node(
         "reference_hmdb": metabolite["references"]["hmdb"],
         "reference_pubchem": metabolite["references"]["pubchem"],
         "replication": metabolite_candidacy["replication"],
-        "type": "metabolite"
+        "type": "metabolite",
+        "measurement_one_fold": study_one["fold"],
+        "measurement_one_log_fold": study_one["log_fold"],
+        "measurement_one_p_value": study_one["p_value"],
+        "measurement_two_fold": study_two["fold"],
+        "measurement_two_log_fold": study_two["log_fold"],
+        "measurement_two_p_value": study_two["p_value"],
+        "measurement_three_fold": study_three["fold"],
+        "measurement_three_log_fold": study_three["log_fold"],
+        "measurement_three_p_value": study_three["p_value"],
+        "measurement_four_fold": study_four["fold"],
+        "measurement_four_log_fold": study_four["log_fold"],
+        "measurement_four_p_value": study_four["p_value"],
+        "measurement_five_fold": study_five["fold"],
+        "measurement_five_log_fold": study_five["log_fold"],
+        "measurement_five_p_value": study_five["p_value"]
     }
     # Return information.
     return metabolite_node
@@ -683,9 +712,13 @@ def execute_procedure(
         compartments=source["compartments"],
         processes=source["processes"]
     )
+
+    # TODO: integrate measurement info with nodes...
+    # TODO: I also need to include in export for Cytoscape
+
     # Define network's nodes for metabolites.
     nodes_metabolites = collect_metabolites_nodes(
-        metabolites_candidacy=source["metabolites_candidacy"],
+        metabolites_candidacy=source["metabolites_measurement"],
         reactions=source["reactions"],
         metabolites=source["metabolites"],
         compartments=source["compartments"],

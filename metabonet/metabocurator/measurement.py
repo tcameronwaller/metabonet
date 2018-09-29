@@ -112,18 +112,33 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
+    path_measurement = os.path.join(directory, "metabolomic_measurements")
     # Read information from file.
     # Compile information.
     reference = read_source_reference(directory=directory)
-    study_one = read_source_study_one(directory=directory)
-    study_two = read_source_study_two(directory=directory)
-    study_three_four = read_source_study_three_four(directory=directory)
+    study_one = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000058_st000061"
+    )
+    study_two = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000305_st000390"
+    )
+    study_three_four = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000322_st000412"
+    )
+    study_five = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000599_st000842"
+    )
     # Compile and return information.
     return {
         "reference": reference,
         "study_one": study_one,
         "study_two": study_two,
-        "study_three_four": study_three_four
+        "study_three_four": study_three_four,
+        "study_five": study_five
     }
 
 
@@ -192,11 +207,12 @@ def read_source_study_zero(directory=None):
     }
 
 
-def read_source_study_one(directory=None):
+def read_source_study(path=None, directory=None):
     """
     Reads and organizes source information from file.
 
     arguments:
+        path (str): path to directory
         directory (str): directory of source files
 
     raises:
@@ -207,102 +223,7 @@ def read_source_study_one(directory=None):
     """
 
     # Specify directories and files.
-    path_measurement = os.path.join(directory, "metabolomic_measurements")
-    path_study = os.path.join(
-        path_measurement, "metabolomics-workbench_pr000058_st000061"
-    )
-    path_samples = os.path.join(path_study, "samples.tsv")
-    path_analytes = os.path.join(path_study, "analytes.tsv")
-    path_measurements = os.path.join(path_study, "measurements.tsv")
-    # Read information from file.
-    samples = utility.read_file_table(
-        path_file=path_samples,
-        names=None,
-        delimiter="\t"
-    )
-    analytes = utility.read_file_table(
-        path_file=path_analytes,
-        names=None,
-        delimiter="\t"
-    )
-    measurements = utility.read_file_table(
-        path_file=path_measurements,
-        names=None,
-        delimiter="\t"
-    )
-    # Compile and return information.
-    return {
-        "samples": samples,
-        "analytes": analytes,
-        "measurements": measurements
-    }
-
-
-def read_source_study_two(directory=None):
-    """
-    Reads and organizes source information from file.
-
-    arguments:
-        directory (str): directory of source files
-
-    raises:
-
-    returns:
-        (object): source information
-
-    """
-
-    # Specify directories and files.
-    path_measurement = os.path.join(directory, "metabolomic_measurements")
-    path_study = os.path.join(
-        path_measurement, "metabolomics-workbench_pr000305_st000390"
-    )
-    path_samples = os.path.join(path_study, "samples.tsv")
-    path_analytes = os.path.join(path_study, "analytes.tsv")
-    path_measurements = os.path.join(path_study, "measurements.tsv")
-    # Read information from file.
-    samples = utility.read_file_table(
-        path_file=path_samples,
-        names=None,
-        delimiter="\t"
-    )
-    analytes = utility.read_file_table(
-        path_file=path_analytes,
-        names=None,
-        delimiter="\t"
-    )
-    measurements = utility.read_file_table(
-        path_file=path_measurements,
-        names=None,
-        delimiter="\t"
-    )
-    # Compile and return information.
-    return {
-        "samples": samples,
-        "analytes": analytes,
-        "measurements": measurements
-    }
-
-
-def read_source_study_three_four(directory=None):
-    """
-    Reads and organizes source information from file.
-
-    arguments:
-        directory (str): directory of source files
-
-    raises:
-
-    returns:
-        (object): source information
-
-    """
-
-    # Specify directories and files.
-    path_measurement = os.path.join(directory, "metabolomic_measurements")
-    path_study = os.path.join(
-        path_measurement, "metabolomics-workbench_pr000322_st000412"
-    )
+    path_study = os.path.join(path, directory)
     path_samples = os.path.join(path_study, "samples.tsv")
     path_analytes = os.path.join(path_study, "analytes.tsv")
     path_measurements = os.path.join(path_study, "measurements.tsv")
@@ -414,10 +335,11 @@ def extract_measurements_study_zero(records=None):
     return measurements
 
 
-# Study with dependent pairs of samples.
+# Curate summary of study.
 
 
-def curate_measurements_study_pairs(
+def curate_measurements_study(
+    pairs=None,
     group_numerator=None,
     group_denominator=None,
     samples=None,
@@ -430,6 +352,7 @@ def curate_measurements_study_pairs(
     Curates information about metabolomic measurements from a study.
 
     arguments:
+        pairs (bool): whether samples have dependent pairs
         group_numerator (str): name of experimental group for numerator
         group_denominator (str): name of experimental group for denominator
         samples (list<dict<str>>): information about samples from a study
@@ -451,16 +374,29 @@ def curate_measurements_study_pairs(
     summary = extract_analytes_summary(
         analytes=analytes
     )
+    # Filter analytes by coverage of measurements for samples.
+    summary_coverage = filter_analytes_coverage(
+        pairs=pairs,
+        summary=summary,
+        group_one=group_numerator,
+        group_two=group_denominator,
+        samples=samples,
+        measurements=measurements
+    )
     # Enhance analyte references.
     summary_reference = enhance_analytes_references(
-        summary=summary,
+        summary=summary_coverage,
         hmdb=hmdb
+    )
+    # Filter analytes by references to PubChem.
+    summary_reference_coverage = filter_analytes_reference(
+        summary=summary_reference
     )
     # Determine priority analytes.
     summary_priority = determine_priority_redundant_analytes(
         group_control=group_denominator,
         samples=samples,
-        summary=summary_reference,
+        summary=summary_reference_coverage,
         measurements=measurements
     )
     # Match analytes to metabolites.
@@ -470,16 +406,23 @@ def curate_measurements_study_pairs(
         summary=summary_priority,
         metabolites=metabolites
     )
-    #print("summary_metabolite")
-    #print(summary_metabolite)
     # Determine fold changes.
-    summary_fold = calculate_analytes_pairs_folds(
-        summary=summary_metabolite,
-        group_numerator=group_numerator,
-        group_denominator=group_denominator,
-        samples=samples,
-        measurements=measurements
-    )
+    if pairs:
+        summary_fold = calculate_analytes_folds_pairs(
+            summary=summary_metabolite,
+            group_numerator=group_numerator,
+            group_denominator=group_denominator,
+            samples=samples,
+            measurements=measurements
+        )
+    else:
+        summary_fold = calculate_analytes_folds(
+            summary=summary_metabolite,
+            group_numerator=group_numerator,
+            group_denominator=group_denominator,
+            samples=samples,
+            measurements=measurements
+        )
     # Determine logarithms-base-2 of fold changes.
     summary_log = calculate_folds_logarithms(
         records=summary_fold
@@ -487,108 +430,22 @@ def curate_measurements_study_pairs(
     # Determine p-values.
     # Compare pairs of samples in both groups.
     # Apply pair t-test for dependent sample populations.
-    summary_p = calculate_analytes_pairs_p_values(
-        summary=summary_log,
-        group_one=group_numerator,
-        group_two=group_denominator,
-        samples=samples,
-        measurements=measurements
-    )
-    #print("summary_p")
-    #print(summary_p)
-    # Filter for anlaytes that match metabolites.
-    summary_match = filter_analytes_metabolites(
-        summary=copy.deepcopy(summary_p)
-    )
-    # Convert measurement information to table in text format.
-    summary_text = convert_summary_text(summary=summary_match)
-    # Report.
-    print("analytes, measurements after curation...")
-    report = prepare_curation_report(summary=summary_p)
-    print(report)
-    # Compile and return information.
-    return {
-        "summary": summary_match,
-        "summary_text": summary_text
-    }
-
-
-# Study with independent samples.
-
-
-def curate_measurements_study(
-    group_numerator=None,
-    group_denominator=None,
-    samples=None,
-    analytes=None,
-    measurements=None,
-    hmdb=None,
-    metabolites=None
-):
-    """
-    Curates information about metabolomic measurements from a study.
-
-    arguments:
-        group_numerator (str): name of experimental group for numerator
-        group_denominator (str): name of experimental group for denominator
-        samples (list<dict<str>>): information about samples from a study
-        analytes (list<dict<str>>): information about analytes from a study
-        measurements (list<dict<str>>): information about measurements from a
-            study
-        hmdb (dict<dict>): information about metabolites from Human Metabolome
-            Database (HMDB)
-        metabolites (dict<dict>): information about metabolites
-
-    raises:
-
-    returns:
-        (dict): information about measurements for analytes
-
-    """
-
-    # Derive summary from analytes.
-    summary = extract_analytes_summary(
-        analytes=analytes
-    )
-    # Enhance analyte references.
-    summary_reference = enhance_analytes_references(
-        summary=summary,
-        hmdb=hmdb
-    )
-    # Determine priority analytes.
-    summary_priority = determine_priority_redundant_analytes(
-        group_control=group_denominator,
-        samples=samples,
-        summary=summary_reference,
-        measurements=measurements
-    )
-    # Match analytes to metabolites.
-    # Match by PubChem identifiers.
-    summary_metabolite = match_analytes_to_metabolites(
-        reference="pubchem",
-        summary=summary_priority,
-        metabolites=metabolites
-    )
-    # Determine fold changes.
-    summary_fold = calculate_analytes_folds(
-        summary=summary_metabolite,
-        group_numerator=group_numerator,
-        group_denominator=group_denominator,
-        samples=samples,
-        measurements=measurements
-    )
-    # Determine logarithms-base-2 of fold changes.
-    summary_log = calculate_folds_logarithms(
-        records=summary_fold
-    )
-    # Determine p-values.
-    summary_p = calculate_analytes_p_values(
-        summary=summary_log,
-        group_one=group_numerator,
-        group_two=group_denominator,
-        samples=samples,
-        measurements=measurements
-    )
+    if pairs:
+        summary_p = calculate_analytes_p_values_pairs(
+            summary=summary_log,
+            group_one=group_numerator,
+            group_two=group_denominator,
+            samples=samples,
+            measurements=measurements
+        )
+    else:
+        summary_p = calculate_analytes_p_values(
+            summary=summary_log,
+            group_one=group_numerator,
+            group_two=group_denominator,
+            samples=samples,
+            measurements=measurements
+        )
     # Filter for anlaytes that match metabolites.
     summary_match = filter_analytes_metabolites(
         summary=copy.deepcopy(summary_p)
@@ -645,6 +502,291 @@ def extract_analytes_summary(analytes=None):
     return summary
 
 
+def filter_analytes_coverage(
+    pairs=None,
+    summary=None,
+    group_one=None,
+    group_two=None,
+    samples=None,
+    measurements=None
+):
+    """
+    Filters analytes by coverage of measurements for samples.
+
+    arguments:
+        pairs (bool): whether samples have dependent pairs
+        summary (list<dict<str>>): information about measurements for analytes
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    if pairs:
+        # Filter analytes with adequate coverage of pairs of samples.
+        # Determine pairs of samples.
+        pairs_samples = determine_pairs_samples(
+            group_one=group_one,
+            group_two=group_two,
+            samples=samples
+        )
+        summary_novel = []
+        for record in summary:
+            analyte = record["identifier"]
+            coverage = determine_analyte_coverage_pairs(
+                analyte=analyte,
+                group_one=group_one,
+                group_two=group_two,
+                pairs_samples=pairs_samples,
+                measurements=measurements
+            )
+            if coverage:
+                summary_novel.append(record)
+        return summary_novel
+    else:
+        # Filter analytes with adequate coverage of samples.
+        # Determine all relevant samples.
+        groups_samples = determine_groups_samples(
+            group_one=group_one,
+            group_two=group_two,
+            samples=samples
+        )
+        group_one_samples = groups_samples[group_one]
+        group_two_samples = groups_samples[group_two]
+        samples_coverage = group_one_samples
+        samples_coverage.extend(group_two_samples)
+        summary_novel = []
+        for record in summary:
+            analyte = record["identifier"]
+            coverage = determine_analyte_coverage(
+                analyte=analyte,
+                samples_coverage=samples_coverage,
+                measurements=measurements
+            )
+            if coverage:
+                summary_novel.append(record)
+        return summary_novel
+
+
+def determine_analyte_coverage(
+    analyte=None,
+    samples_coverage=None,
+    measurements=None
+):
+    """
+    Determines whether an analyte has coverage of measurements for samples.
+
+    arguments:
+        analyte (str): identifier of an analyte
+        samples_coverage (list<str>): identifiers of samples
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (bool): whether the analyte has coverage of measurements for samples
+
+    """
+
+    # Find measurements for analyte.
+    measurements_analyte = find_analyte_measurements(
+        identifier=analyte,
+        measurements=measurements
+    )
+    # Collect values of measurements for analyte in samples.
+    coverages = []
+    for sample in samples_coverage:
+        if (
+            (sample in measurements_analyte.keys()) and
+            (len(measurements_analyte[sample]) > 0)
+        ):
+            value = float(measurements_analyte[sample])
+            if value > 0:
+                coverages.append(True)
+            else:
+                coverages.append(False)
+        else:
+            coverages.append(False)
+    # Filter for samples with coverage.
+    coverages_true = list(filter(lambda value: value, coverages))
+    return len(coverages_true) > 1
+
+
+def determine_analyte_coverage_pairs(
+    analyte=None,
+    group_one=None,
+    group_two=None,
+    pairs_samples=None,
+    measurements=None
+):
+    """
+    Determines whether an analyte has coverage of measurements for samples.
+
+    arguments:
+        analyte (str): identifier of an analyte
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        pairs_samples (dict): pairs of samples from both groups
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (bool): whether the analyte has coverage of measurements for samples
+
+    """
+
+    # Find measurements for analyte.
+    measurements_analyte = find_analyte_measurements(
+        identifier=analyte,
+        measurements=measurements
+    )
+    # Collect values of measurements for analyte in samples.
+    coverages = []
+    for pair in pairs_samples.values():
+        sample_one = pair[group_one]
+        sample_two = pair[group_two]
+        if (
+            (
+                (sample_one in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample_one]) > 0)
+            ) and
+            (
+                (sample_two in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample_two]) > 0)
+            )
+        ):
+            value_one = float(measurements_analyte[sample_one])
+            value_two = float(measurements_analyte[sample_two])
+            if value_one > 0 and value_two > 0:
+                coverages.append(True)
+            else:
+                coverages.append(False)
+        else:
+            coverages.append(False)
+    # Filter for samples with coverage.
+    coverages_true = list(filter(lambda value: value, coverages))
+    return len(coverages_true) > 1
+
+
+def enhance_analytes_references(
+    summary=None, hmdb=None
+):
+    """
+    Enhances analytes' references to Human Metabolome Database (HMDB) and to
+    PubChem.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+        hmdb (dict<dict>): information about metabolites from Human Metabolome
+            Database (HMDB)
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    summary_novel = []
+    for record in summary:
+        name_one = record["identifier"]
+        name_two = record["name"]
+        hmdb_keys = utility.match_hmdb_entries_by_identifiers_names(
+            identifiers=[],
+            names=[name_one, name_two],
+            summary_hmdb=hmdb
+        )
+        # Include references to HMDB.
+        record["references"]["hmdb"] = hmdb_keys
+        # Enhance references to PubChem.
+        pubchem = []
+        for key in hmdb_keys:
+            hmdb_entry = hmdb[key]
+            hmdb_pubchem = hmdb_entry["reference_pubchem"]
+            if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
+                pubchem.append(hmdb_pubchem)
+        if len(record["references"]["pubchem"]) > 0:
+            pubchem.append(record["references"]["pubchem"])
+        pubchem_unique = utility.collect_unique_elements(pubchem)
+        record["references"]["pubchem"] = pubchem_unique
+        summary_novel.append(record)
+    return summary_novel
+
+
+def match_analytes_to_metabolites(
+    reference=None,
+    summary=None,
+    metabolites=None
+):
+    """
+    Matches measurements to metabolites.
+
+    arguments:
+        reference (str): name of attribute to use for match
+        summary (list<dict<str>>): information about measurements for analytes
+        metabolites (dict<dict>): information about metabolites
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    summary_novel = []
+    for record in summary:
+        references_record = record["references"][reference]
+        # Find metabolites that match the record's reference.
+        metabolites_matches = []
+        for metabolite in metabolites.values():
+            references_metabolite = metabolite["references"][reference]
+            # Determine whether any references match.
+            matches = utility.filter_common_elements(
+                list_one=references_record,
+                list_two=references_metabolite
+            )
+            if len(matches) > 0:
+                metabolites_matches.append(metabolite["identifier"])
+        record["references"]["metabolite"] = metabolites_matches
+        summary_novel.append(record)
+    return summary_novel
+
+
+def filter_analytes_reference(
+    summary=None
+):
+    """
+    Filters analytes by coverage of references.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    summary_novel = []
+    for record in summary:
+        references = record["references"]
+        pubchem = references["pubchem"]
+        if len(pubchem) > 0:
+            summary_novel.append(record)
+    return summary_novel
+
+
 def determine_priority_redundant_analytes(
     group_control=None,
     samples=None,
@@ -672,10 +814,6 @@ def determine_priority_redundant_analytes(
     # Collect unique entities.
     # Each entity can have representation by multiple analytes.
     entities = collect_entities_analytes(summary=summary)
-
-    # TODO: also... only include analytes with measurements for all samples
-
-
     # Prioritize a single analyte for each entity.
     analytes_priority = determine_entities_priority_analytes(
         entities=entities,
@@ -859,7 +997,10 @@ def calculate_analytes_measurements_variances(
         # Collect values of measurements for analyte in control group samples.
         values = []
         for sample in group_samples:
-            if (sample in measurements_analyte.keys()):
+            if (
+                (sample in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample]) > 0)
+            ):
                 value = float(measurements_analyte[sample])
                 values.append(value)
         # Calculate variance of values.
@@ -897,90 +1038,6 @@ def filter_analytes_priority(
         analyte = record["identifier"]
         if analyte in analytes:
             summary_novel.append(record)
-    return summary_novel
-
-
-def enhance_analytes_references(
-    summary=None, hmdb=None
-):
-    """
-    Enhances analytes' references to Human Metabolome Database (HMDB) and to
-    PubChem.
-
-    arguments:
-        summary (list<dict<str>>): information about measurements for analytes
-        hmdb (dict<dict>): information about metabolites from Human Metabolome
-            Database (HMDB)
-
-    raises:
-
-    returns:
-        (list<dict<str>>): information about measurements for analytes
-
-    """
-
-    summary_novel = []
-    for record in summary:
-        name_one = record["identifier"]
-        name_two = record["name"]
-        hmdb_keys = utility.match_hmdb_entries_by_identifiers_names(
-            identifiers=[],
-            names=[name_one, name_two],
-            summary_hmdb=hmdb
-        )
-        # Include references to HMDB.
-        record["references"]["hmdb"] = hmdb_keys
-        # Enhance references to PubChem.
-        pubchem = []
-        for key in hmdb_keys:
-            hmdb_entry = hmdb[key]
-            hmdb_pubchem = hmdb_entry["reference_pubchem"]
-            if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
-                pubchem.append(hmdb_pubchem)
-        if len(record["references"]["pubchem"]) > 0:
-            pubchem.append(record["references"]["pubchem"])
-        pubchem_unique = utility.collect_unique_elements(pubchem)
-        record["references"]["pubchem"] = pubchem_unique
-        summary_novel.append(record)
-    return summary_novel
-
-
-def match_analytes_to_metabolites(
-    reference=None,
-    summary=None,
-    metabolites=None
-):
-    """
-    Matches measurements to metabolites.
-
-    arguments:
-        reference (str): name of attribute to use for match
-        summary (list<dict<str>>): information about measurements for analytes
-        metabolites (dict<dict>): information about metabolites
-
-    raises:
-
-    returns:
-        (list<dict<str>>): information about measurements for analytes
-
-    """
-
-    summary_novel = []
-    for record in summary:
-        references_record = record["references"][reference]
-        # Find metabolites that match the record's reference.
-        metabolites_matches = []
-        for metabolite in metabolites.values():
-            references_metabolite = metabolite["references"][reference]
-            # Determine whether any references match.
-            matches = utility.filter_common_elements(
-                list_one=references_record,
-                list_two=references_metabolite
-            )
-            if len(matches) > 0:
-                metabolites_matches.append(metabolite["identifier"])
-        record["references"]["metabolite"] = metabolites_matches
-        summary_novel.append(record)
     return summary_novel
 
 
@@ -1099,12 +1156,18 @@ def calculate_analyte_fold(
     # Determine fold changes for analyte's measurements.
     numerator_values = []
     for sample in groups_samples[group_numerator]:
-        if (sample in measurements_analyte.keys()):
+        if (
+            (sample in measurements_analyte.keys()) and
+            (len(measurements_analyte[sample]) > 0)
+        ):
             value = float(measurements_analyte[sample])
             numerator_values.append(value)
     denominator_values = []
     for sample in groups_samples[group_denominator]:
-        if (sample in measurements_analyte.keys()):
+        if (
+            (sample in measurements_analyte.keys()) and
+            (len(measurements_analyte[sample]) > 0)
+        ):
             value = float(measurements_analyte[sample])
             denominator_values.append(value)
     numerator_mean = statistics.mean(numerator_values)
@@ -1113,7 +1176,7 @@ def calculate_analyte_fold(
     return fold
 
 
-def calculate_analytes_pairs_folds(
+def calculate_analytes_folds_pairs(
     summary=None,
     group_numerator=None,
     group_denominator=None,
@@ -1149,7 +1212,7 @@ def calculate_analytes_pairs_folds(
     summary_novel = []
     for record in summary:
         identifier = record["identifier"]
-        fold = calculate_analyte_pairs_fold(
+        fold = calculate_analyte_fold_pairs(
             identifier=identifier,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
@@ -1210,7 +1273,7 @@ def determine_pairs_samples(
     return pairs_samples
 
 
-def calculate_analyte_pairs_fold(
+def calculate_analyte_fold_pairs(
     identifier=None,
     group_numerator=None,
     group_denominator=None,
@@ -1246,13 +1309,20 @@ def calculate_analyte_pairs_fold(
         sample_numerator = pair[group_numerator]
         sample_denominator = pair[group_denominator]
         if (
-            (sample_numerator in measurements_analyte.keys()) and
-            (sample_denominator in measurements_analyte.keys())
+            (
+                (sample_numerator in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample_numerator]) > 0)
+            ) and
+            (
+                (sample_denominator in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample_denominator]) > 0)
+            )
         ):
             numerator = float(measurements_analyte[sample_numerator])
             denominator = float(measurements_analyte[sample_denominator])
-            fold = numerator / denominator
-            folds.append(fold)
+            if (numerator > 0 and denominator > 0):
+                fold = numerator / denominator
+                folds.append(fold)
     mean = statistics.mean(folds)
     return mean
 
@@ -1340,8 +1410,8 @@ def calculate_analytes_p_values(
 
     # Determine samples in each group.
     groups_samples = determine_groups_samples(
-        group_one=group_numerator,
-        group_two=group_denominator,
+        group_one=group_one,
+        group_two=group_two,
         samples=samples
     )
     # Determine p-value for each analyte.
@@ -1392,12 +1462,18 @@ def calculate_analyte_p_value(
     # Collect measurements for samples from both groups.
     one_values = []
     for sample in groups_samples[group_one]:
-        if (sample in measurements_analyte.keys()):
+        if (
+            (sample in measurements_analyte.keys()) and
+            (len(measurements_analyte[sample]) > 0)
+        ):
             value = float(measurements_analyte[sample])
             one_values.append(value)
     two_values = []
     for sample in groups_samples[group_two]:
-        if (sample in measurements_analyte.keys()):
+        if (
+            (sample in measurements_analyte.keys()) and
+            (len(measurements_analyte[sample]) > 0)
+        ):
             value = float(measurements_analyte[sample])
             two_values.append(value)
     # Determine p-value.
@@ -1405,7 +1481,7 @@ def calculate_analyte_p_value(
     return p_value
 
 
-def calculate_analytes_pairs_p_values(
+def calculate_analytes_p_values_pairs(
     summary=None,
     group_one=None,
     group_two=None,
@@ -1441,7 +1517,7 @@ def calculate_analytes_pairs_p_values(
     summary_novel = []
     for record in summary:
         identifier = record["identifier"]
-        p_value = calculate_analyte_pairs_p_value(
+        p_value = calculate_analyte_p_value_pairs(
             identifier=identifier,
             group_one=group_one,
             group_two=group_two,
@@ -1453,7 +1529,7 @@ def calculate_analytes_pairs_p_values(
     return summary_novel
 
 
-def calculate_analyte_pairs_p_value(
+def calculate_analyte_p_value_pairs(
     identifier=None,
     group_one=None,
     group_two=None,
@@ -1491,8 +1567,14 @@ def calculate_analyte_pairs_p_value(
         sample_one = pair[group_one]
         sample_two = pair[group_two]
         if (
-            (sample_one in measurements_analyte.keys()) and
-            (sample_two in measurements_analyte.keys())
+            (
+                (sample_one in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample_one]) > 0)
+            ) and
+            (
+                (sample_two in measurements_analyte.keys()) and
+                (len(measurements_analyte[sample_two]) > 0)
+            )
         ):
             groups_measurements[group_one].append(
                 float(measurements_analyte[sample_one])
@@ -1696,50 +1778,43 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
+    # Write information to file.
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
-    path_study_one_pickle = os.path.join(path, "study_one.pickle")
-    path_study_one_text = os.path.join(path, "study_one.tsv")
-    path_study_two_pickle = os.path.join(path, "study_two.pickle")
-    path_study_two_text = os.path.join(path, "study_two.tsv")
-    path_study_three_pickle = os.path.join(path, "study_three.pickle")
-    path_study_three_text = os.path.join(path, "study_three.tsv")
-    path_study_four_pickle = os.path.join(path, "study_four.pickle")
-    path_study_four_text = os.path.join(path, "study_four.tsv")
-    # Write information to file.
-    with open(path_study_one_pickle, "wb") as file_product:
-        pickle.dump(information["study_one"]["summary"], file_product)
-    utility.write_file_table(
-        information=information["study_one"]["summary_text"],
-        path_file=path_study_one_text,
-        names=information["study_one"]["summary_text"][0].keys(),
-        delimiter="\t"
-    )
-    with open(path_study_two_pickle, "wb") as file_product:
-        pickle.dump(information["study_two"]["summary"], file_product)
-    utility.write_file_table(
-        information=information["study_two"]["summary_text"],
-        path_file=path_study_two_text,
-        names=information["study_two"]["summary_text"][0].keys(),
-        delimiter="\t"
-    )
-    with open(path_study_three_pickle, "wb") as file_product:
-        pickle.dump(information["study_three"]["summary"], file_product)
-    utility.write_file_table(
-        information=information["study_three"]["summary_text"],
-        path_file=path_study_three_text,
-        names=information["study_three"]["summary_text"][0].keys(),
-        delimiter="\t"
-    )
-    with open(path_study_four_pickle, "wb") as file_product:
-        pickle.dump(information["study_four"]["summary"], file_product)
-    utility.write_file_table(
-        information=information["study_four"]["summary_text"],
-        path_file=path_study_four_text,
-        names=information["study_four"]["summary_text"][0].keys(),
-        delimiter="\t"
-    )
+    write_product(study="study_one", path=path, information=information)
+    write_product(study="study_two", path=path, information=information)
+    write_product(study="study_three", path=path, information=information)
+    write_product(study="study_four", path=path, information=information)
+    write_product(study="study_five", path=path, information=information)
 
+
+def write_product_study(study=None, path=None, information=None):
+    """
+    Writes product information to file
+
+    arguments:
+        study (str): name of study
+        path (str): path to directory
+        information (object): information to write to file
+
+    raises:
+
+    returns:
+
+    """
+
+    # Specify directories and files.
+    path_pickle = os.path.join(path, (study + ".pickle"))
+    path_text = os.path.join(path, (study + ".tsv"))
+    # Write information to file.
+    with open(path_pickle, "wb") as file_product:
+        pickle.dump(information[study]["summary"], file_product)
+    utility.write_file_table(
+        information=information[study]["summary_text"],
+        path_file=path_text,
+        names=information[study]["summary_text"][0].keys(),
+        delimiter="\t"
+    )
 
 
 ###############################################################################
@@ -1762,6 +1837,9 @@ def execute_procedure(directory=None):
 
     """
 
+    # TODO: Maybe I should implement a function to access measurement values
+    # TODO: Maybe I should implement a separate function to access pairs of measurement values
+
     # Read source information from file.
     source = read_source(directory=directory)
     # Curate measurements from study zero.
@@ -1771,47 +1849,63 @@ def execute_procedure(directory=None):
         study_zero = curate_measurements_study_zero(
             measurements=source["study_zero"]["measurements"]
         )
-    # Curate measurements from study one.
-    # Measurements from study two represent metabolites in visceral versus
-    # subcutaneous adipose.
-    study_one = curate_measurements_study_pairs(
-        group_numerator="visceral_fat",
-        group_denominator="subcutaneous_fat",
-        samples=source["study_one"]["samples"],
-        analytes=source["study_one"]["analytes"],
-        measurements=source["study_one"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study two.
-    # Measurements from study two represent metabolites in normal versus tumor
-    # lung.
-    study_two = curate_measurements_study_pairs(
-        group_numerator="tumor",
-        group_denominator="normal",
-        samples=source["study_two"]["samples"],
-        analytes=source["study_two"]["analytes"],
-        measurements=source["study_two"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study three.
-    study_three = curate_measurements_study(
-        group_numerator="ischemia",
-        group_denominator="normal",
-        samples=source["study_three_four"]["samples"],
-        analytes=source["study_three_four"]["analytes"],
-        measurements=source["study_three_four"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study four.
-    study_four = curate_measurements_study(
-        group_numerator="steatosis",
-        group_denominator="normal",
-        samples=source["study_three_four"]["samples"],
-        analytes=source["study_three_four"]["analytes"],
-        measurements=source["study_three_four"]["measurements"],
+    if False:
+        # Curate measurements from study one.
+        # Measurements from study two represent metabolites in visceral versus
+        # subcutaneous adipose.
+        study_one = curate_measurements_study(
+            pairs=True,
+            group_numerator="visceral_fat",
+            group_denominator="subcutaneous_fat",
+            samples=source["study_one"]["samples"],
+            analytes=source["study_one"]["analytes"],
+            measurements=source["study_one"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study two.
+        # Measurements from study two represent metabolites in normal versus tumor
+        # lung.
+        study_two = curate_measurements_study(
+            pairs=True,
+            group_numerator="tumor",
+            group_denominator="normal",
+            samples=source["study_two"]["samples"],
+            analytes=source["study_two"]["analytes"],
+            measurements=source["study_two"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study three.
+        study_three = curate_measurements_study(
+            pairs=False,
+            group_numerator="ischemia",
+            group_denominator="normal",
+            samples=source["study_three_four"]["samples"],
+            analytes=source["study_three_four"]["analytes"],
+            measurements=source["study_three_four"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study four.
+        study_four = curate_measurements_study(
+            pairs=False,
+            group_numerator="steatosis",
+            group_denominator="normal",
+            samples=source["study_three_four"]["samples"],
+            analytes=source["study_three_four"]["analytes"],
+            measurements=source["study_three_four"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+    # Curate measurements from study five.
+    study_five = curate_measurements_study(
+        pairs=True,
+        group_numerator="after_exercise",
+        group_denominator="before_exercise",
+        samples=source["study_five"]["samples"],
+        analytes=source["study_five"]["analytes"],
+        measurements=source["study_five"]["measurements"],
         hmdb=source["reference"]["hmdb"],
         metabolites=source["reference"]["metabolites"]
     )
@@ -1820,7 +1914,8 @@ def execute_procedure(directory=None):
         "study_one": study_one,
         "study_two": study_two,
         "study_three": study_three,
-        "study_four": study_four
+        "study_four": study_four,
+        "study_five": study_five
     }
     #Write product information to file
     write_product(directory=directory, information=information)

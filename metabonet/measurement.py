@@ -110,57 +110,223 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_measurement = os.path.join(directory, "measurement")
-    path_measurements = os.path.join(path_measurement, "measurements.pickle")
     path_candidacy = os.path.join(directory, "candidacy")
     path_candidates = os.path.join(path_candidacy, "metabolites.pickle")
     # Read information from file.
-    with open(path_measurements, "rb") as file_source:
-        measurements = pickle.load(file_source)
     with open(path_candidates, "rb") as file_source:
         metabolites_candidacy = pickle.load(file_source)
+    # Specify directories and files.
+    path_measurement = os.path.join(directory, "measurement")
+    # Read information from file.
+    study_one = read_source_study(
+        study="study_one",
+        path=path_measurement
+    )
+    study_two = read_source_study(
+        study="study_two",
+        path=path_measurement
+    )
+    study_three = read_source_study(
+        study="study_three",
+        path=path_measurement
+    )
+    study_four = read_source_study(
+        study="study_four",
+        path=path_measurement
+    )
+    study_five = read_source_study(
+        study="study_five",
+        path=path_measurement
+    )
     # Compile and return information.
     return {
-        "measurements": measurements,
-        "metabolites_candidacy": metabolites_candidacy
+        "metabolites_candidacy": metabolites_candidacy,
+        "study_one": study_one,
+        "study_two": study_two,
+        "study_three": study_three,
+        "study_four": study_four,
+        "study_five": study_five
     }
 
 
+def read_source_study(study=None, path=None):
+    """
+    Reads and organizes source information from file.
+
+    arguments:
+        study (str): name of study
+        path (str): path to directory
+
+    raises:
+
+    returns:
+        (object): source information
+
+    """
+
+    # Specify directories and files.
+    path_study = os.path.join(path, (study + ".pickle"))
+    # Read information from file.
+    with open(path_study, "rb") as file_source:
+        summary = pickle.load(file_source)
+    # Return information.
+    return summary
+
+
 def match_measurements_to_candidate_metabolites(
-    measurements_original=None,
+    study_one=None,
+    study_two=None,
+    study_three=None,
+    study_four=None,
+    study_five=None,
     metabolites_candidacy=None
 ):
     """
     Matches measurements to candidate metabolites.
 
     arguments:
-        measurements_original (list<dict>): information about measurements
+        study_one (list<dict<str>>): information about measurements for
+            analytes
+        study_two (list<dict<str>>): information about measurements for
+            analytes
+        study_three (list<dict<str>>): information about measurements for
+            analytes
+        study_four (list<dict<str>>): information about measurements for
+            analytes
+        study_five (list<dict<str>>): information about measurements for
+            analytes
         metabolites_candidacy (dict<dict>): information about candidate
             metabolites
 
     raises:
 
     returns:
-        (list<dict>): information about measurements
+        (dict<dict>): information about candidate metabolites
 
     """
 
-    measurements_novel = []
-    for measurement in measurements_original:
-        # Find candidate metabolites that match the measurement's metabolite.
-        matches = []
-        for candidate in metabolites_candidacy.values():
-            # Determine whether candidate metabolite matches any of
-            # measurement's metabolites.
-            if candidate["metabolite"] in measurement["metabolites"]:
-                matches.append(candidate["identifier"])
-        measurement["candidates"] = matches
-        if len(matches) > 0:
-            measurement["identifier"] = matches[0]
-        else:
-            measurement["identifier"] = "null"
-        measurements_novel.append(measurement)
-    return measurements_novel
+    # Integrate information about measurements with information about candidate
+    # metabolites.
+
+    metabolites_measurements = {}
+    for metabolite_candidacy in metabolites_candidacy.values():
+        metabolite = metabolite_candidacy["metabolite"]
+        measurements = determine_metabolite_measurements(
+            metabolite=metabolite,
+            study_one=study_one,
+            study_two=study_two,
+            study_three=study_three,
+            study_four=study_four,
+            study_five=study_five
+        )
+        metabolite_candidacy["measurements"] = measurements
+        metabolites_measurements[metabolite_candidacy["identifier"]] = (
+            metabolite_candidacy
+        )
+    return metabolites_measurements
+
+
+def determine_metabolite_measurements(
+    metabolite=None,
+    study_one=None,
+    study_two=None,
+    study_three=None,
+    study_four=None,
+    study_five=None
+):
+    """
+    Determines information about measurements for a metabolite.
+
+    arguments:
+        metabolite (str): identifier of a metabolite
+        study_one (list<dict<str>>): information about measurements for
+            analytes
+        study_two (list<dict<str>>): information about measurements for
+            analytes
+        study_three (list<dict<str>>): information about measurements for
+            analytes
+        study_four (list<dict<str>>): information about measurements for
+            analytes
+        study_five (list<dict<str>>): information about measurements for
+            analytes
+
+    raises:
+
+    returns:
+        (dict<dict>): information about measurements for a candidate metabolite
+
+    """
+
+    # Determine measurements for the metabolite from each study.
+    measurements_one = determine_metabolite_study_measurements(
+        metabolite=metabolite,
+        study=study_one
+    )
+    measurements_two = determine_metabolite_study_measurements(
+        metabolite=metabolite,
+        study=study_two
+    )
+    measurements_three = determine_metabolite_study_measurements(
+        metabolite=metabolite,
+        study=study_three
+    )
+    measurements_four = determine_metabolite_study_measurements(
+        metabolite=metabolite,
+        study=study_four
+    )
+    measurements_five = determine_metabolite_study_measurements(
+        metabolite=metabolite,
+        study=study_five
+    )
+    # Compile and return information.
+    return {
+        "study_one": measurements_one,
+        "study_two": measurements_two,
+        "study_three": measurements_three,
+        "study_four": measurements_four,
+        "study_five": measurements_five
+    }
+
+
+def determine_metabolite_study_measurements(
+    metabolite=None,
+    study=None
+):
+    """
+    Determines information about measurements for a metabolite.
+
+    arguments:
+        metabolite (str): identifier of a metabolite
+        study (list<dict<str>>): information about measurements for analytes
+
+    raises:
+
+    returns:
+        (dict): information about measurements for a candidate metabolite
+
+    """
+
+    measurements = []
+    for analyte in study:
+        metabolites = analyte["references"]["metabolite"]
+        if metabolite in metabolites:
+            # Analyte matches metabolite.
+            record = {
+                "fold": analyte["fold"],
+                "log_fold": analyte["log_fold"],
+                "p_value": analyte["p_value"]
+            }
+            measurements.append(record)
+    # Determine whether any measurements match the metabolite.
+    if len(measurements) < 1:
+        # Include an empty measurement for the metabolite.
+        record = {
+            "fold": None,
+            "log_fold": None,
+            "p_value": None
+        }
+        measurements.append(record)
+    return measurements[0]
 
 
 def filter_measurements_candidates(
@@ -187,34 +353,60 @@ def filter_measurements_candidates(
     return measurements_novel
 
 
-def convert_measurements_text(measurements=None):
+def convert_metabolites_text(metabolites=None):
     """
-    Converts information about measurements to text format.
+    Converts information about metabolites to text format.
 
     arguments:
-        measurements_original (list<dict>): information about measurements
+        metabolites (dict<dict>): information about metabolites
 
     returns:
-        (list<dict>): information about measurements
+        (list<dict>): information about metabolites
 
     raises:
 
     """
 
     records = []
-    for measurement in measurements:
+    for metabolite in metabolites.values():
+        measurements = metabolite["measurements"]
+        study_one = measurements["study_one"]
+        study_two = measurements["study_two"]
+        study_three = measurements["study_three"]
+        study_four = measurements["study_four"]
+        study_five = measurements["study_five"]
         record = {
-            "measurement": True,
-            "name": measurement["name"],
-            "fold": measurement["fold"],
-            "log_fold": measurement["log_fold"],
-            "p_value": measurement["p_value"],
-            "hmdb": ";".join(measurement["hmdb"]),
-            "metabolites": ";".join(measurement["metabolites"]),
-            "candidates": ";".join(measurement["candidates"]),
-            "identifier": measurement["identifier"]
+            "identifier": metabolite["identifier"],
+            "name": metabolite["name"],
+            "metabolite": metabolite["metabolite"],
+            "compartment": metabolite["compartment"],
+            "reactions_candidacy": ";".join(
+                metabolite["reactions_candidacy"]
+            ),
+            "reactions_candidacy_count": (
+                metabolite["reactions_candidacy_count"]
+            ),
+            "measurement_one_fold": study_one["fold"],
+            "measurement_one_log_fold": study_one["log_fold"],
+            "measurement_one_p_value": study_one["p_value"],
+            "measurement_two_fold": study_two["fold"],
+            "measurement_two_log_fold": study_two["log_fold"],
+            "measurement_two_p_value": study_two["p_value"],
+            "measurement_three_fold": study_three["fold"],
+            "measurement_three_log_fold": study_three["log_fold"],
+            "measurement_three_p_value": study_three["p_value"],
+            "measurement_four_fold": study_four["fold"],
+            "measurement_four_log_fold": study_four["log_fold"],
+            "measurement_four_p_value": study_four["p_value"],
+            "measurement_five_fold": study_five["fold"],
+            "measurement_five_log_fold": study_five["log_fold"],
+            "measurement_five_p_value": study_five["p_value"],
         }
         records.append(record)
+    records.sort(
+        key=lambda record: record["reactions_candidacy_count"],
+        reverse=True
+    )
     return records
 
 
@@ -235,15 +427,15 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
-    path_pickle = os.path.join(path, "measurements_candidacy.pickle")
-    path_text = os.path.join(path, "measurements_candidacy_text.tsv")
+    path_pickle = os.path.join(path, "metabolites.pickle")
+    path_text = os.path.join(path, "metabolites_text.tsv")
     # Write information to file.
     with open(path_pickle, "wb") as file_product:
-        pickle.dump(information["measurements_candidacy"], file_product)
+        pickle.dump(information["metabolites_measurement"], file_product)
     utility.write_file_table(
-        information=information["measurements_candidacy_text"],
+        information=information["metabolites_measurement_text"],
         path_file=path_text,
-        names=information["measurements_candidacy_text"][0].keys(),
+        names=information["metabolites_measurement_text"][0].keys(),
         delimiter="\t"
     )
 
@@ -271,22 +463,22 @@ def execute_procedure(directory=None):
     # Read source information from file.
     source = read_source(directory=directory)
     # Match analytes to candidate metabolites.
-    measurements_candidacy = match_measurements_to_candidate_metabolites(
-        measurements_original=source["measurements"],
+    metabolites_measurement = match_measurements_to_candidate_metabolites(
+        study_one=source["study_one"],
+        study_two=source["study_two"],
+        study_three=source["study_three"],
+        study_four=source["study_four"],
+        study_five=source["study_five"],
         metabolites_candidacy=source["metabolites_candidacy"]
     )
-    # Filter measurements for those that map to candidate metabolites.
-    measurements_match = filter_measurements_candidates(
-        measurements_original=measurements_candidacy
-    )
     # Convert measurement information to table in text format.
-    measurements_candidacy_text = convert_measurements_text(
-        measurements=measurements_match
+    metabolites_measurement_text = convert_metabolites_text(
+        metabolites=metabolites_measurement
     )
     # Compile information.
     information = {
-        "measurements_candidacy": measurements_candidacy,
-        "measurements_candidacy_text": measurements_candidacy_text
+        "metabolites_measurements": metabolites_measurement,
+        "metabolites_measurements_text": metabolites_measurement_text
     }
     #Write product information to file
     write_product(directory=directory, information=information)
