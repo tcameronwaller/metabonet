@@ -470,6 +470,8 @@ def curate_measurements_study_pairs(
         summary=summary_priority,
         metabolites=metabolites
     )
+    #print("summary_metabolite")
+    #print(summary_metabolite)
     # Determine fold changes.
     summary_fold = calculate_analytes_pairs_folds(
         summary=summary_metabolite,
@@ -492,6 +494,8 @@ def curate_measurements_study_pairs(
         samples=samples,
         measurements=measurements
     )
+    #print("summary_p")
+    #print(summary_p)
     # Filter for anlaytes that match metabolites.
     summary_match = filter_analytes_metabolites(
         summary=copy.deepcopy(summary_p)
@@ -668,6 +672,10 @@ def determine_priority_redundant_analytes(
     # Collect unique entities.
     # Each entity can have representation by multiple analytes.
     entities = collect_entities_analytes(summary=summary)
+
+    # TODO: also... only include analytes with measurements for all samples
+
+
     # Prioritize a single analyte for each entity.
     analytes_priority = determine_entities_priority_analytes(
         entities=entities,
@@ -927,7 +935,8 @@ def enhance_analytes_references(
         for key in hmdb_keys:
             hmdb_entry = hmdb[key]
             hmdb_pubchem = hmdb_entry["reference_pubchem"]
-            pubchem.append(hmdb_pubchem)
+            if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
+                pubchem.append(hmdb_pubchem)
         if len(record["references"]["pubchem"]) > 0:
             pubchem.append(record["references"]["pubchem"])
         pubchem_unique = utility.collect_unique_elements(pubchem)
@@ -958,7 +967,7 @@ def match_analytes_to_metabolites(
 
     summary_novel = []
     for record in summary:
-        references_record = [record["references"][reference]]
+        references_record = record["references"][reference]
         # Find metabolites that match the record's reference.
         metabolites_matches = []
         for metabolite in metabolites.values():
