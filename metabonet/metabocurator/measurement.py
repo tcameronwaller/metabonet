@@ -443,7 +443,7 @@ def curate_measurements_study_pairs(
     raises:
 
     returns:
-        (list<dict>): information about measurements
+        (dict): information about measurements for analytes
 
     """
 
@@ -456,11 +456,18 @@ def curate_measurements_study_pairs(
         summary=summary,
         hmdb=hmdb
     )
+    # Determine priority analytes.
+    summary_priority = determine_priority_redundant_analytes(
+        group_control=group_denominator,
+        samples=samples,
+        summary=summary_reference,
+        measurements=measurements
+    )
     # Match analytes to metabolites.
     # Match by PubChem identifiers.
     summary_metabolite = match_analytes_to_metabolites(
         reference="pubchem",
-        summary=summary_reference,
+        summary=summary_priority,
         metabolites=metabolites
     )
     # Determine fold changes.
@@ -531,7 +538,7 @@ def curate_measurements_study(
     raises:
 
     returns:
-        (list<dict>): information about measurements
+        (dict): information about measurements for analytes
 
     """
 
@@ -544,11 +551,18 @@ def curate_measurements_study(
         summary=summary,
         hmdb=hmdb
     )
+    # Determine priority analytes.
+    summary_priority = determine_priority_redundant_analytes(
+        group_control=group_denominator,
+        samples=samples,
+        summary=summary_reference,
+        measurements=measurements
+    )
     # Match analytes to metabolites.
     # Match by PubChem identifiers.
     summary_metabolite = match_analytes_to_metabolites(
         reference="pubchem",
-        summary=summary_reference,
+        summary=summary_priority,
         metabolites=metabolites
     )
     # Determine fold changes.
@@ -625,6 +639,257 @@ def extract_analytes_summary(analytes=None):
         }
         summary.append(record)
     return summary
+
+
+def determine_priority_redundant_analytes(
+    group_control=None,
+    samples=None,
+    summary=None,
+    measurements=None
+):
+    """
+    Determines whether any analytes are redundant and determines priority
+    analytes.
+
+    arguments:
+        group_control (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+        summary (list<dict<str>>): information about measurements for analytes
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    # Collect unique entities.
+    # Each entity can have representation by multiple analytes.
+    entities = collect_entities_analytes(summary=summary)
+    # Prioritize a single analyte for each entity.
+    analytes_priority = determine_entities_priority_analytes(
+        entities=entities,
+        group_control=group_control,
+        samples=samples,
+        measurements=measurements
+    )
+    # Filter analytes to include only a single priority analyte for each
+    # entity.
+    summary_unique = filter_analytes_priority(
+        analytes=analytes_priority,
+        summary=summary
+    )
+    return summary_unique
+
+
+def collect_entities_analytes(summary=None):
+    """
+    Collects unique entities and their analytes.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+
+    raises:
+
+    returns:
+        (dict): information about entities and their analytes
+
+    """
+
+    entities = {}
+    for record in summary:
+        identifier = record["references"]["pubchem"][0]
+        name = record["name"]
+        analyte_identifier = record["identifier"]
+        if identifier not in entities.keys():
+            entry = {
+                "identifier": identifier,
+                "name": name,
+                "analytes": [analyte_identifier]
+            }
+            entities[identifier] = entry
+        else:
+            entities[identifier]["analytes"].append(analyte_identifier)
+    return entities
+
+
+def filter_redundant_entities(entities=None):
+    """
+    Filters entities with redundant analytes.
+
+    arguments:
+        entities (dict): information about entities and their analytes
+
+    raises:
+
+    returns:
+        (dict): information about entities and their analytes
+
+    """
+
+    entities_redundancy = {}
+    for entity in entities.values():
+        identifier = entity["identifier"]
+        analytes = entity["analytes"]
+        if len(analytes) > 1:
+            entities_redundancy[identifier] = entity
+    return entities_redundancy
+
+
+def determine_entities_priority_analytes(
+    entities=None,
+    group_control=None,
+    samples=None,
+    measurements=None
+):
+    """
+    Determines a single priority analyte for each entity.
+
+    arguments:
+        entities (dict): information about entities and their analytes
+        group_control (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<str>): identifiers of analytes
+
+    """
+
+    # Determine samples in each group.
+    groups_samples = determine_groups_samples(
+        group_one=group_control,
+        group_two="null",
+        samples=samples
+    )
+    group_samples = groups_samples[group_control]
+    analytes_priority = []
+    for entity in entities.values():
+        analytes = entity["analytes"]
+        if len(analytes) == 1:
+            analytes_priority.append(analytes[0])
+        else:
+            analyte_priority = determine_entity_priority_analyte(
+                analytes=analytes,
+                group_samples=group_samples,
+                measurements=measurements
+            )
+            analytes_priority.append(analyte_priority)
+    return analytes_priority
+
+
+def determine_entity_priority_analyte(
+    analytes=None,
+    group_samples=None,
+    measurements=None
+):
+    """
+    Determines a the single priority analyte for an entity.
+
+    arguments:
+        analytes (list<str>): identifiers of analytes
+        group_samples (list<str>): identifiers of samples in a group
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (str): identifier of an analyte
+
+    """
+
+    # Collect measurements for each of entity's redundant analytes.
+    analytes_variances = calculate_analytes_measurements_variances(
+        analytes=analytes,
+        group_samples=group_samples,
+        measurements=measurements
+    )
+    # Prioritize analytes by minimal variance of measurements.
+    analytes_rank = sorted(
+        analytes_variances,
+        key=lambda record: record["variance"],
+        reverse=False
+    )
+    # Select priority analyte.
+    return analytes_rank[0]["analyte"]
+
+
+def calculate_analytes_measurements_variances(
+    analytes=None,
+    group_samples=None,
+    measurements=None
+):
+    """
+    Calculates the variances of measurement values for each analyte.
+
+    arguments:
+        analytes (list<str>): identifiers of analytes
+        group_samples (list<str>): identifiers of samples in a group
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<dict>): information about analytes
+
+    """
+
+    analytes_variances = []
+    for analyte in analytes:
+        # Find measurements for analyte.
+        measurements_analyte = find_analyte_measurements(
+            identifier=analyte,
+            measurements=measurements
+        )
+        # Collect values of measurements for analyte in control group samples.
+        values = []
+        for sample in group_samples:
+            if (sample in measurements_analyte.keys()):
+                value = float(measurements_analyte[sample])
+                values.append(value)
+        # Calculate variance of values.
+        variance = statistics.variance(values)
+        # Compile information.
+        record = {
+            "analyte": analyte,
+            "values": values,
+            "variance": variance
+        }
+        analytes_variances.append(record)
+    return analytes_variances
+
+
+def filter_analytes_priority(
+    analytes=None,
+    summary=None
+):
+    """
+    Determines a single priority analyte for each entity.
+
+    arguments:
+        analytes (list<str>): identifiers of analytes
+        summary (list<dict<str>>): information about measurements for analytes
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    summary_novel = []
+    for record in summary:
+        analyte = record["identifier"]
+        if analyte in analytes:
+            summary_novel.append(record)
+    return summary_novel
 
 
 def enhance_analytes_references(
