@@ -108,7 +108,8 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_customization = os.path.join(directory, "customization")
+    path_source = os.path.join(directory, "source")
+    path_customization = os.path.join(path_source, "customization")
     path_compartments_curation = os.path.join(
         path_customization, "curation_compartments.tsv"
     )
@@ -320,8 +321,6 @@ def curate_processes(
     }
 
 
-# TODO: Implement more curation... enhancement of HMDB references for example
-
 def curate_metabolites(
     metabolites_curation=None,
     metabolites_original=None,
@@ -400,11 +399,75 @@ def curate_metabolites(
                 # Change name.
                 if identifier_novel in metabolites_novel:
                     metabolites_novel[identifier_novel]["name"] = name_novel
+            # Curate metabolite's references.
+            metabolites_novel = curate_metabolites_references(
+                metabolite_curation=record,
+                metabolites=metabolites_novel
+            )
     # Compile and return information.
     return {
         "metabolites": metabolites_novel,
         "reactions": reactions_novel
     }
+
+
+def curate_metabolites_references(
+    metabolite_curation=None,
+    metabolites=None
+):
+    """
+    Curates references for a metabolite.
+
+    arguments:
+        metabolite_curation (dict<str>): information to change about a
+            metabolite
+        metabolites (dict<dict>): information about metabolites
+
+    returns:
+        (dict<dict>): information about metabolites
+
+    raises:
+
+    """
+
+    # Interpretation.
+    identifier = metabolite_curation["identifier_novel"]
+    hmdb_novel = metabolite_curation["hmdb_novel"]
+    hmdb_error = metabolite_curation["hmdb_error"]
+    pubchem_novel = metabolite_curation["pubchem_novel"]
+    pubchem_error = metabolite_curation["pubchem_error"]
+    if identifier in metabolites.keys():
+        if len(hmdb_novel) > 0:
+            references_original = metabolites[identifier]["references"]["hmdb"]
+            references_original.append(hmdb_novel)
+            references_novel = utility.collect_unique_elements(
+                references_original
+            )
+            metabolites[identifier]["references"]["hmdb"] = references_novel
+        if len(hmdb_error) > 0:
+            def match(reference):
+                return reference != hmdb_error
+            references_original = metabolites[identifier]["references"]["hmdb"]
+            references_novel = list(filter(match, references_original))
+            metabolites[identifier]["references"]["hmdb"] = references_novel
+        if len(pubchem_novel) > 0:
+            references_original = (
+                metabolites[identifier]["references"]["pubchem"]
+            )
+            references_original.append(pubchem_novel)
+            references_novel = utility.collect_unique_elements(
+                references_original
+            )
+            metabolites[identifier]["references"]["pubchem"] = references_novel
+        if len(pubchem_error) > 0:
+            def match(reference):
+                return reference != pubchem_error
+            references_original = (
+                metabolites[identifier]["references"]["pubchem"]
+            )
+            references_novel = list(filter(match, references_original))
+            metabolites[identifier]["references"]["pubchem"] = references_novel
+    return metabolites
 
 
 def change_reactions_participants_metabolite(

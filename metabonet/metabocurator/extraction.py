@@ -109,7 +109,8 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_hmdb = os.path.join(directory, "hmdb_metabolites.xml")
+    path_source = os.path.join(directory, "source")
+    path_hmdb = os.path.join(path_source, "hmdb_metabolites.xml")
     # Read information from file.
     #hmdb = et.parse(path_hmdb)
     # Compile and return information.

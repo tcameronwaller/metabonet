@@ -108,8 +108,9 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_model = os.path.join(directory, "recon2m2.xml")
-    path_customization = os.path.join(directory, "customization")
+    path_source = os.path.join(directory, "source")
+    path_customization = os.path.join(path_source, "customization")
+    path_model = os.path.join(path_source, "recon2m2.xml")
     path_compartments = os.path.join(
         path_customization, "reconciliation_compartments.tsv"
     )

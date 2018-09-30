@@ -712,10 +712,6 @@ def execute_procedure(
         compartments=source["compartments"],
         processes=source["processes"]
     )
-
-    # TODO: integrate measurement info with nodes...
-    # TODO: I also need to include in export for Cytoscape
-
     # Define network's nodes for metabolites.
     nodes_metabolites = collect_metabolites_nodes(
         metabolites_candidacy=source["metabolites_measurement"],

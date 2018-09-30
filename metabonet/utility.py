@@ -138,6 +138,40 @@ def confirm_path_directory(path=None):
         os.makedirs(path)
 
 
+def remove_file(path=None):
+    """
+    Removes a file if it exists.
+
+    arguments:
+        path (str): path to file
+
+    raises:
+
+    returns:
+
+    """
+
+    if os.path.exists(path):
+        os.remove(path)
+
+
+def remove_empty_directory(path=None):
+    """
+    Removes a directory if it is empty.
+
+    arguments:
+        path (str): path to directory
+
+    raises:
+
+    returns:
+
+    """
+
+    if len(os.listdir(path)) < 1:
+        os.rmdir(path)
+
+
 def read_file_table(path_file=None, names=None, delimiter=None):
     """
     Reads and organizes source information from file

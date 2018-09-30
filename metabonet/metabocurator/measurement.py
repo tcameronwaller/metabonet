@@ -112,7 +112,8 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_measurement = os.path.join(directory, "metabolomic_measurements")
+    path_source = os.path.join(directory, "source")
+    path_measurement = os.path.join(path_source, "measurement")
     # Read information from file.
     # Compile information.
     reference = read_source_reference(directory=directory)
@@ -1781,11 +1782,13 @@ def write_product(directory=None, information=None):
     # Write information to file.
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
-    write_product(study="study_one", path=path, information=information)
-    write_product(study="study_two", path=path, information=information)
-    write_product(study="study_three", path=path, information=information)
-    write_product(study="study_four", path=path, information=information)
-    write_product(study="study_five", path=path, information=information)
+    write_product_study(study="study_one", path=path, information=information)
+    write_product_study(study="study_two", path=path, information=information)
+    write_product_study(
+        study="study_three", path=path, information=information
+    )
+    write_product_study(study="study_four", path=path, information=information)
+    write_product_study(study="study_five", path=path, information=information)
 
 
 def write_product_study(study=None, path=None, information=None):
@@ -1837,9 +1840,6 @@ def execute_procedure(directory=None):
 
     """
 
-    # TODO: Maybe I should implement a function to access measurement values
-    # TODO: Maybe I should implement a separate function to access pairs of measurement values
-
     # Read source information from file.
     source = read_source(directory=directory)
     # Curate measurements from study zero.
@@ -1849,55 +1849,54 @@ def execute_procedure(directory=None):
         study_zero = curate_measurements_study_zero(
             measurements=source["study_zero"]["measurements"]
         )
-    if False:
-        # Curate measurements from study one.
-        # Measurements from study two represent metabolites in visceral versus
-        # subcutaneous adipose.
-        study_one = curate_measurements_study(
-            pairs=True,
-            group_numerator="visceral_fat",
-            group_denominator="subcutaneous_fat",
-            samples=source["study_one"]["samples"],
-            analytes=source["study_one"]["analytes"],
-            measurements=source["study_one"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study two.
-        # Measurements from study two represent metabolites in normal versus tumor
-        # lung.
-        study_two = curate_measurements_study(
-            pairs=True,
-            group_numerator="tumor",
-            group_denominator="normal",
-            samples=source["study_two"]["samples"],
-            analytes=source["study_two"]["analytes"],
-            measurements=source["study_two"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study three.
-        study_three = curate_measurements_study(
-            pairs=False,
-            group_numerator="ischemia",
-            group_denominator="normal",
-            samples=source["study_three_four"]["samples"],
-            analytes=source["study_three_four"]["analytes"],
-            measurements=source["study_three_four"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study four.
-        study_four = curate_measurements_study(
-            pairs=False,
-            group_numerator="steatosis",
-            group_denominator="normal",
-            samples=source["study_three_four"]["samples"],
-            analytes=source["study_three_four"]["analytes"],
-            measurements=source["study_three_four"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
+    # Curate measurements from study one.
+    # Measurements from study two represent metabolites in visceral versus
+    # subcutaneous adipose.
+    study_one = curate_measurements_study(
+        pairs=True,
+        group_numerator="visceral_fat",
+        group_denominator="subcutaneous_fat",
+        samples=source["study_one"]["samples"],
+        analytes=source["study_one"]["analytes"],
+        measurements=source["study_one"]["measurements"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study two.
+    # Measurements from study two represent metabolites in normal versus tumor
+    # lung.
+    study_two = curate_measurements_study(
+        pairs=True,
+        group_numerator="tumor",
+        group_denominator="normal",
+        samples=source["study_two"]["samples"],
+        analytes=source["study_two"]["analytes"],
+        measurements=source["study_two"]["measurements"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study three.
+    study_three = curate_measurements_study(
+        pairs=False,
+        group_numerator="ischemia",
+        group_denominator="normal",
+        samples=source["study_three_four"]["samples"],
+        analytes=source["study_three_four"]["analytes"],
+        measurements=source["study_three_four"]["measurements"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study four.
+    study_four = curate_measurements_study(
+        pairs=False,
+        group_numerator="steatosis",
+        group_denominator="normal",
+        samples=source["study_three_four"]["samples"],
+        analytes=source["study_three_four"]["analytes"],
+        measurements=source["study_three_four"]["measurements"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
     # Curate measurements from study five.
     study_five = curate_measurements_study(
         pairs=True,

@@ -277,18 +277,46 @@ def define_model_epilog():
     epilog = textwrap.dedent("""\
 
         --------------------------------------------------
+        source information in root directory
+
+        The root directory must contain several sources of information before
+        execution of the procedure.
+
+        /root/source/
+            recon2m2.xml
+            hmdb_metabolites.xml
+        /root/source/customization/
+            curation_compartments.tsv
+            curation_metabolites.tsv
+            curation_processes.tsv
+            curation_reactions.tsv
+            filtration_compartments.tsv
+            filtration_processes.tsv
+            reconciliation_compartments.tsv
+            reconciliation_metabolites.tsv
+            simplification_metabolites.tsv
+            simplification_reactions.tsv
+        /root/source/measurement/metabolomics-workbench_pr000058_st000061/
+            analytes.tsv
+            measurements.tsv
+            samples.tsv
+        /root/source/measurement/metabolomics-workbench_pr000305_st000390/
+            analytes.tsv
+            measurements.tsv
+            samples.tsv
+        /root/source/measurement/metabolomics-workbench_pr000322_st000412/
+            analytes.tsv
+            measurements.tsv
+            samples.tsv
+        /root/source/measurement/metabolomics-workbench_pr000599_st000842/
+            analytes.tsv
+            measurements.tsv
+            samples.tsv
+
+        --------------------------------------------------
         reconciliation
 
         Reconcile information in human metabolic model to MetaNetX.
-
-        source
-        1. model of human metabolism in
-           Systems Biology Markup Language (SBML) format
-        2. curation information about metabolites in
-           text table with tab delimiters
-
-        product
-        ...
 
         --------------------------------------------------
         collection
@@ -296,27 +324,22 @@ def define_model_epilog():
         Collect relevant information from metabolic model and from MetaNetX
         about compartments, processes, reactions, and metabolites.
 
-        ...
-
         --------------------------------------------------
         extraction
 
         Extract relevant information about metabolites from entries in Human
         Metabolome Database (HMDB).
-        ...
 
         --------------------------------------------------
         enhancement
 
         Enhance information about metabolites and reactions.
-        ...
 
         --------------------------------------------------
         curation
 
         Curate information about compartments, processes, reactions, and
         metabolites.
-        ...
 
         --------------------------------------------------
         conversion
@@ -324,15 +347,11 @@ def define_model_epilog():
         Convert information about compartments, processes, reactions, and
         metabolites to versatile formats.
 
-        ...
-
         --------------------------------------------------
         measurement
 
         Curate information about measurements of metabolites for integration
         with metabolic network.
-
-        ...
 
         --------------------------------------------------
         --------------------------------------------------
@@ -384,7 +403,14 @@ def define_network_subparser(subparsers=None):
     parser_network.add_argument(
         "-s", "--simplification", dest="simplification",
         action="store_true", required=False,
-        help="Simplify specific hubs in network."
+        help=(
+            "Simplify specific metabolites and reactions in candidacy " +
+            "procedure."
+        )
+    )
+    parser_network.add_argument(
+        "-m", "--measurement", dest="measurement", action="store_true",
+        help="Integrate information about measurements of metabolites."
     )
     parser_network.add_argument(
         "-n", "--network", dest="network", action="store_true",
@@ -396,15 +422,11 @@ def define_network_subparser(subparsers=None):
     parser_network.add_argument(
         "-p", "--component", dest="component", action="store_true",
         required=False,
-        help="Select network's main component."
+        help="Select network's main component in network procedure."
     )
     parser_network.add_argument(
         "-v", "--conversion", dest="conversion", action="store_true",
         help="Convert information to formats for export."
-    )
-    parser_network.add_argument(
-        "-m", "--measurement", dest="measurement", action="store_true",
-        help="Curate information about measurements of metabolites."
     )
     parser_network.add_argument(
         "-a", "--analysis", dest="analysis", action="store_true",
@@ -461,19 +483,26 @@ def define_network_epilog():
         --------------------------------------------------
         candidacy
 
-        Integrate custom specifications of compartmentalization and
-        simplifications of individual reactions and metabolites to determine
-        candidacy of reactions and metabolites for representation in metabolic
-        network.
+        Determine candidacy of reactions and metabolites for representation in
+        metabolic network.
 
-        ...
+        Optionally represent compartmental or general metabolites.
+
+        Optionally simplify representations of specific reactions and
+        metabolites.
+
+        --------------------------------------------------
+        measurement
+
+        Integrate information about measurements of metabolites with candidate
+        metabolites for representation in metabolic network.
 
         --------------------------------------------------
         network
 
         Define network's nodes and links from reactions and metabolites.
 
-        ...
+        Optionally select only the network's main component.
 
         --------------------------------------------------
         conversion
@@ -481,20 +510,10 @@ def define_network_epilog():
         Convert information about network's elements (nodes and links) to
         formats for transfer to NetworkX and CytoScape.
 
-        ...
-
         --------------------------------------------------
         analysis
 
         Analyze metabolic network in NetworkX.
-        ...
-
-        --------------------------------------------------
-        measurement
-
-        Integrate information about measurements of metabolites with network's
-        nodes.
-        ...
 
         --------------------------------------------------
         --------------------------------------------------
@@ -519,7 +538,9 @@ def define_clean_subparser(subparsers=None):
 
     parser_clean = subparsers.add_parser(
         name="clean",
-        description="Remove files and directories.",
+        description=(
+            "Remove all directories and files that these procedures create."
+        ),
         help="Help for clean procedure."
     )
     parser_clean.add_argument(
@@ -660,8 +681,12 @@ def evaluate_clean_parameters(arguments):
 
     """
 
+    # Report status.
     print("... call to clean procedure ...")
-    # TODO: call clean procedures both for the model and network procedures...
+    # Execute procedure.
+    metabocurator.clean.execute_procedure(
+        directory=arguments.directory
+    )
 
 
 ###############################################################################
