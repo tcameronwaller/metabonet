@@ -1682,8 +1682,6 @@ def filter_measurements_significance(
     return measurements_novel
 
 
-# TODO: not done with this function yet...
-
 def prepare_report_metaboanalyst(
     pairs=None,
     summary=None,
@@ -1711,12 +1709,13 @@ def prepare_report_metaboanalyst(
 
     """
 
-    # record keys...
-    # sample, sample_1, sample_2, sample_3, etc...
-    # record 1 specifies the labels for each sample...
-
-    # pairs only needs to distinguish the definition of labels (groups)
-
+    # Collect identifiers of analytes that satisfy criteria for inclusion in
+    # analysis.
+    analytes_identifiers = utility.collect_value_from_records(
+        key="name",
+        records=summary
+    )
+    # Collect records in report.
     records = []
     # Prepare record of labels to designate pairs and groups of samples.
     samples_labels = determine_samples_labels(
@@ -1730,21 +1729,24 @@ def prepare_report_metaboanalyst(
     records.append(record_label)
     # Prepare records to match measurements to samples.
     for measurement in measurements:
-        analyte = measurement["analyte"]
-        record_measurement = {
-            "sample": analyte,
-        }
-        # Iterate on valid samples.
-        for sample in samples_labels.keys():
-            # Determine whether a valid measurement exists for the sample.
-            # TODO: include valid measurement if it exists... otherwise give
-            # TODO: a zero or an empty entry.
-
-            pass
-        # TODO: iterate on samples within the measurement record?
-        # TODO: record_measurement[sample] = measurement...
-
-        records.append(record_measurement)
+        # Determine whether the measurement's analyte satisfies criteria for
+        # inclusion in analysis.
+        analyte_identifier = measurement["analyte"]
+        if analyte_identifier in analytes_identifiers:
+            record_measurement = {
+                "sample": measurement["name"],
+            }
+            # Iterate on relevant samples.
+            for sample in samples_labels.keys():
+                # Determine whether a valid measurement exists for the sample.
+                if (determine_measurements_validity(
+                    samples=[sample],
+                    measurements=measurement
+                )):
+                    record_measurement[sample] = str(measurement[sample])
+                else:
+                    record_measurement[sample] = str(0)
+            records.append(record_measurement)
     return records
 
 
@@ -1974,6 +1976,7 @@ def write_product_study(study=None, path=None, information=None):
     # Specify directories and files.
     path_pickle = os.path.join(path, (study + ".pickle"))
     path_text = os.path.join(path, (study + ".tsv"))
+    path_metaboanalyst = os.path.join(path, (study + "_metaboanalyst.tsv"))
     # Write information to file.
     with open(path_pickle, "wb") as file_product:
         pickle.dump(information[study]["summary"], file_product)
@@ -1981,6 +1984,12 @@ def write_product_study(study=None, path=None, information=None):
         information=information[study]["summary_text"],
         path_file=path_text,
         names=information[study]["summary_text"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information[study]["summary_metaboanalyst"],
+        path_file=path_metaboanalyst,
+        names=information[study]["summary_metaboanalyst"][0].keys(),
         delimiter="\t"
     )
 
