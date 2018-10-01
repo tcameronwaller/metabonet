@@ -798,6 +798,8 @@ def determine_priority_redundant_analytes(
     Determines whether any analytes are redundant and determines priority
     analytes.
 
+
+
     arguments:
         group_control (str): name of experimental group
         samples (list<dict<str>>): information about samples from a study
@@ -936,7 +938,10 @@ def determine_entity_priority_analyte(
     measurements=None
 ):
     """
-    Determines a the single priority analyte for an entity.
+    Determines the single priority analyte for an entity.
+
+    If multiple analytes represent a single chemical entity redundantly, then
+    prioritize the analyte whose measurements have the least dispersion.
 
     arguments:
         analytes (list<str>): identifiers of analytes
@@ -952,28 +957,31 @@ def determine_entity_priority_analyte(
     """
 
     # Collect measurements for each of entity's redundant analytes.
-    analytes_variances = calculate_analytes_measurements_variances(
+    analytes_dispersions = calculate_analytes_measurements_dispersions(
         analytes=analytes,
         group_samples=group_samples,
         measurements=measurements
     )
     # Prioritize analytes by minimal variance of measurements.
     analytes_rank = sorted(
-        analytes_variances,
-        key=lambda record: record["variance"],
+        analytes_dispersions,
+        key=lambda record: record["dispersion"],
         reverse=False
     )
     # Select priority analyte.
     return analytes_rank[0]["analyte"]
 
 
-def calculate_analytes_measurements_variances(
+def calculate_analytes_measurements_dispersions(
     analytes=None,
     group_samples=None,
     measurements=None
 ):
     """
-    Calculates the variances of measurement values for each analyte.
+    Calculates the dispersions of measurement values for each analyte.
+
+    The index of dispersion, coefficient of dispersion, or relative variance is
+    the quotient of division of the variance by the mean.
 
     arguments:
         analytes (list<str>): identifiers of analytes
@@ -988,7 +996,7 @@ def calculate_analytes_measurements_variances(
 
     """
 
-    analytes_variances = []
+    analytes_dispersions = []
     for analyte in analytes:
         # Find measurements for analyte.
         measurements_analyte = find_analyte_measurements(
@@ -1006,14 +1014,16 @@ def calculate_analytes_measurements_variances(
                 values.append(value)
         # Calculate variance of values.
         variance = statistics.variance(values)
+        mean = statistics.mean(values)
+        dispersion = variance / mean
         # Compile information.
         record = {
             "analyte": analyte,
             "values": values,
-            "variance": variance
+            "dispersion": dispersion
         }
-        analytes_variances.append(record)
-    return analytes_variances
+        analytes_dispersions.append(record)
+    return analytes_dispersions
 
 
 def filter_analytes_priority(

@@ -114,7 +114,8 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_customization = os.path.join(directory, "customization")
+    path_source = os.path.join(directory, "source")
+    path_customization = os.path.join(path_source, "customization")
     path_filtration_compartments = os.path.join(
         path_customization, "filtration_compartments.tsv"
     )

@@ -404,6 +404,7 @@ def analyze_network_nodes_group(
             ),
             #"eccentricity": distances[node]["eccentricity"],
             "cluster_coefficient": clusters[node_identifier]["coefficient"],
+            "rank": ranks[node_identifier]["rank"],
             "rank_degree": ranks[node_identifier]["rank_degree"],
             "rank_centrality_degree": (
                 ranks[node_identifier]["rank_centrality_degree"]
@@ -671,7 +672,53 @@ def collect_network_nodes_ranks(
         ranks[record["identifier"]]["rank_centrality_closeness"] = index
     for index, record in enumerate(ranks_centrality_betweenness, start=1):
         ranks[record["identifier"]]["rank_centrality_betweenness"] = index
+    # Determine overall rank.
+    for entry in ranks.values():
+        identifier = entry["identifier"]
+        rank_centrality_degree = entry["rank_centrality_degree"]
+        rank_centrality_betweenness = entry["rank_centrality_betweenness"]
+        rank = calculate_total_rank(
+            factor_degree=0.5,
+            factor_betweenness=0.5,
+            rank_centrality_degree=rank_centrality_degree,
+            rank_centrality_betweenness=rank_centrality_betweenness
+        )
+        ranks[identifier]["rank"] = rank
     return ranks
+
+
+def calculate_total_rank(
+    factor_degree=None,
+    factor_betweenness=None,
+    rank_centrality_degree=None,
+    rank_centrality_betweenness=None
+):
+    """
+    Calculate the total rank of a node by a linear combination (weighted mean)
+    of ranks by degree centrality and betweenness centrality.
+
+    arguments:
+        factor_degree (float): factor weight for degree centrality
+        factor_betweenness (float): factor weight for betweenness centrality
+        rank_centrality_degree (int): rank by degree centrality
+        rank_centrality_betweenness (int): rank by betweenness centrality
+
+    raises:
+
+    returns:
+        (int): rank by linear combination of ranks by degree centrality and
+            betweenness centrality
+
+    """
+
+    rank = (
+        (
+            (factor_degree * rank_centrality_degree) +
+            (factor_betweenness * rank_centrality_betweenness)
+        ) /
+        (factor_degree + factor_betweenness)
+    )
+    return rank
 
 
 # Analysis of entire network.
@@ -1388,14 +1435,12 @@ def execute_procedure(directory=None):
         nodes_metabolites=source["nodes_metabolites"]
     )
     # Analyze entire network.
-    # TODO: temporarily omit network report for efficiency
+    report_network = analyze_bipartite_network(
+        network=network,
+        nodes_reactions=source["nodes_reactions_identifiers"],
+        nodes_metabolites=source["nodes_metabolites_identifiers"]
+    )
     if False:
-        report_network = analyze_bipartite_network(
-            network=network,
-            nodes_reactions=source["nodes_reactions_identifiers"],
-            nodes_metabolites=source["nodes_metabolites_identifiers"]
-        )
-    else:
         entry = {
             "blah": 1,
             "foo": 2,
@@ -1405,6 +1450,10 @@ def execute_procedure(directory=None):
             "metabolites": entry,
             "reactions": entry
         }
+
+
+    # TODO: I might actually want pickle files for down-stream analysis and charting...
+
     # Prepare reports.
     # Compile information.
     information = {

@@ -192,7 +192,7 @@ def define_model_subparser(subparsers=None):
         name="model",
         description=description,
         epilog=epilog,
-        help="Help for model procedure.",
+        help="Help for model routine.",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     # Define arguments.
@@ -275,6 +275,9 @@ def define_model_epilog():
     """
 
     epilog = textwrap.dedent("""\
+
+        --------------------------------------------------
+        model routine
 
         --------------------------------------------------
         source information in root directory
@@ -383,7 +386,7 @@ def define_network_subparser(subparsers=None):
         name="network",
         description=description,
         epilog=epilog,
-        help="Help for network procedure.",
+        help="Help for network routine.",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     # Define arguments.
@@ -409,10 +412,6 @@ def define_network_subparser(subparsers=None):
         )
     )
     parser_network.add_argument(
-        "-m", "--measurement", dest="measurement", action="store_true",
-        help="Integrate information about measurements of metabolites."
-    )
-    parser_network.add_argument(
         "-n", "--network", dest="network", action="store_true",
         help=(
             "Define network's nodes and links for candidate reactions and "
@@ -427,6 +426,10 @@ def define_network_subparser(subparsers=None):
     parser_network.add_argument(
         "-v", "--conversion", dest="conversion", action="store_true",
         help="Convert information to formats for export."
+    )
+    parser_network.add_argument(
+        "-m", "--measurement", dest="measurement", action="store_true",
+        help="Integrate information about measurements of metabolites."
     )
     parser_network.add_argument(
         "-a", "--analysis", dest="analysis", action="store_true",
@@ -479,6 +482,10 @@ def define_network_epilog():
     """
 
     epilog = textwrap.dedent("""\
+
+        --------------------------------------------------
+        network routine
+
 
         --------------------------------------------------
         candidacy
@@ -541,7 +548,7 @@ def define_clean_subparser(subparsers=None):
         description=(
             "Remove all directories and files that these procedures create."
         ),
-        help="Help for clean procedure."
+        help="Help for clean routine."
     )
     parser_clean.add_argument(
         "-d", "--directory", dest="directory", type=str, required=True,
@@ -566,7 +573,8 @@ def evaluate_model_parameters(arguments):
 
     """
 
-    print("... call to model procedure ...")
+    print("--------------------------------------------------")
+    print("... call to model routine ...")
     # Execute procedure.
     if arguments.reconciliation:
         # Report status.
@@ -632,7 +640,8 @@ def evaluate_network_parameters(arguments):
 
     """
 
-    print("... call to network procedure ...")
+    print("--------------------------------------------------")
+    print("... call to network routine ...")
     # Execute procedure.
     if arguments.candidacy:
         # Report status.
@@ -656,16 +665,16 @@ def evaluate_network_parameters(arguments):
         print("... executing conversion procedure ...")
         # Execute procedure.
         conversion.execute_procedure(directory=arguments.directory)
-    if arguments.analysis:
-        # Report status.
-        print("... executing analysis procedure ...")
-        # Execute procedure.
-        analysis.execute_procedure(directory=arguments.directory)
     if arguments.measurement:
         # Report status.
         print("... executing measurement procedure ...")
         # Execute procedure.
         measurement.execute_procedure(directory=arguments.directory)
+    if arguments.analysis:
+        # Report status.
+        print("... executing analysis procedure ...")
+        # Execute procedure.
+        analysis.execute_procedure(directory=arguments.directory)
 
 
 def evaluate_clean_parameters(arguments):
@@ -682,7 +691,8 @@ def evaluate_clean_parameters(arguments):
     """
 
     # Report status.
-    print("... call to clean procedure ...")
+    print("--------------------------------------------------")
+    print("... call to clean routine ...")
     # Execute procedure.
     metabocurator.clean.execute_procedure(
         directory=arguments.directory

@@ -111,10 +111,13 @@ def read_source(directory=None):
 
     # Specify directories and files.
     path_candidacy = os.path.join(directory, "candidacy")
-    path_candidates = os.path.join(path_candidacy, "metabolites.pickle")
+    path_metabolites = os.path.join(path_candidacy, "metabolites.pickle")
+    path_reactions = os.path.join(path_candidacy, "reactions.pickle")
     # Read information from file.
-    with open(path_candidates, "rb") as file_source:
+    with open(path_metabolites, "rb") as file_source:
         metabolites_candidacy = pickle.load(file_source)
+    with open(path_reactions, "rb") as file_source:
+        reactions_candidacy = pickle.load(file_source)
     # Specify directories and files.
     path_measurement = os.path.join(directory, "measurement")
     # Read information from file.
@@ -140,6 +143,7 @@ def read_source(directory=None):
     )
     # Compile and return information.
     return {
+        "reactions_candidacy": reactions_candidacy,
         "metabolites_candidacy": metabolites_candidacy,
         "study_one": study_one,
         "study_two": study_two,
@@ -321,9 +325,9 @@ def determine_metabolite_study_measurements(
     if len(measurements) < 1:
         # Include an empty measurement for the metabolite.
         record = {
-            "fold": None,
-            "log_fold": None,
-            "p_value": None
+            "fold": "",
+            "log_fold": "",
+            "p_value": ""
         }
         measurements.append(record)
     return measurements[0]
@@ -410,6 +414,57 @@ def convert_metabolites_text(metabolites=None):
     return records
 
 
+def convert_reactions_text(reactions=None):
+    """
+    Converts information about reactions to text format.
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+
+    returns:
+        (list<dict>): information about reactions
+
+    raises:
+
+    """
+
+    records = []
+    for reaction in reactions.values():
+        record = {
+            "identifier": reaction["identifier"],
+            "reaction": reaction["reaction"],
+            "name": reaction["name"],
+            "replicates": ";".join(reaction["replicates"]),
+            "metabolites_candidacy": ";".join(
+                reaction["metabolites_candidacy"]
+            ),
+            "metabolites_candidacy_count": (
+                reaction["metabolites_candidacy_count"]
+            ),
+            "measurement_one_fold": "",
+            "measurement_one_log_fold": "",
+            "measurement_one_p_value": "",
+            "measurement_two_fold": "",
+            "measurement_two_log_fold": "",
+            "measurement_two_p_value": "",
+            "measurement_three_fold": "",
+            "measurement_three_log_fold": "",
+            "measurement_three_p_value": "",
+            "measurement_four_fold": "",
+            "measurement_four_log_fold": "",
+            "measurement_four_p_value": "",
+            "measurement_five_fold": "",
+            "measurement_five_log_fold": "",
+            "measurement_five_p_value": ""
+        }
+        records.append(record)
+    records.sort(
+        key=lambda record: record["metabolites_candidacy_count"],
+        reverse=True
+    )
+    return records
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -428,16 +483,24 @@ def write_product(directory=None, information=None):
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
     path_pickle = os.path.join(path, "metabolites.pickle")
-    path_text = os.path.join(path, "metabolites_text.tsv")
+    path_metabolites_text = os.path.join(path, "metabolites.tsv")
+    path_reactions_text = os.path.join(path, "reactions.tsv")
     # Write information to file.
     with open(path_pickle, "wb") as file_product:
         pickle.dump(information["metabolites_measurement"], file_product)
     utility.write_file_table(
         information=information["metabolites_measurement_text"],
-        path_file=path_text,
+        path_file=path_metabolites_text,
         names=information["metabolites_measurement_text"][0].keys(),
         delimiter="\t"
     )
+    utility.write_file_table(
+        information=information["reactions_measurement_text"],
+        path_file=path_reactions_text,
+        names=information["reactions_measurement_text"][0].keys(),
+        delimiter="\t"
+    )
+
 
 
 ###############################################################################
@@ -475,10 +538,14 @@ def execute_procedure(directory=None):
     metabolites_measurement_text = convert_metabolites_text(
         metabolites=metabolites_measurement
     )
+    reactions_measurement_text = convert_reactions_text(
+        reactions=source["reactions_candidacy"]
+    )
     # Compile information.
     information = {
-        "metabolites_measurements": metabolites_measurement,
-        "metabolites_measurements_text": metabolites_measurement_text
+        "metabolites_measurement": metabolites_measurement,
+        "metabolites_measurement_text": metabolites_measurement_text,
+        "reactions_measurement_text": reactions_measurement_text
     }
     #Write product information to file
     write_product(directory=directory, information=information)

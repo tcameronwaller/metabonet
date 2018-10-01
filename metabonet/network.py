@@ -127,10 +127,6 @@ def read_source(directory=None):
     path_metabolites_candidacy = os.path.join(
         path_candidacy, "metabolites.pickle"
     )
-    path_measurement = os.path.join(directory, "measurement")
-    path_metabolites_measurement = os.path.join(
-        path_measurement, "metabolites.pickle"
-    )
     # Read information from file.
     with open(path_compartments, "rb") as file_source:
         compartments = pickle.load(file_source)
@@ -144,8 +140,6 @@ def read_source(directory=None):
         reactions_candidacy = pickle.load(file_source)
     with open(path_metabolites_candidacy, "rb") as file_source:
         metabolites_candidacy = pickle.load(file_source)
-    with open(path_metabolites_measurement, "rb") as file_source:
-        metabolites_measurement = pickle.load(file_source)
     # Compile and return information.
     return {
         "compartments": compartments,
@@ -153,8 +147,7 @@ def read_source(directory=None):
         "reactions": reactions,
         "metabolites": metabolites,
         "reactions_candidacy": reactions_candidacy,
-        "metabolites_candidacy": metabolites_candidacy,
-        "metabolites_measurement": metabolites_measurement
+        "metabolites_candidacy": metabolites_candidacy
     }
 
 
@@ -225,20 +218,47 @@ def define_reaction_node(
     # Access information.
     reaction_candidacy = reactions_candidacy[reaction_candidacy_identifier]
     reaction = reactions[reaction_candidacy["reaction"]]
+    # Compartments.
+    compartments_reaction = utility.collect_value_from_records(
+        key="compartment", records=reaction["participants"]
+    )
+    compartments_unique = utility.collect_unique_elements(
+        elements_original=compartments_reaction
+    )
+    compartments_names = utility.collect_values_from_records_in_reference(
+        key="name",
+        identifiers=compartments_unique,
+        reference=compartments
+    )
+    # Processes.
     processes_names = utility.collect_values_from_records_in_reference(
         key="name",
         identifiers=reaction["processes"],
         reference=processes
     )
+    # Metabolites.
+    metabolites_reaction = utility.collect_value_from_records(
+        key="metabolite", records=reaction["participants"]
+    )
+    metabolites_unique = utility.collect_unique_elements(
+        elements_original=metabolites_reaction
+    )
+    metabolites_names = utility.collect_values_from_records_in_reference(
+        key="name",
+        identifiers=metabolites_unique,
+        reference=metabolites
+    )
     # Compile information.
     reaction_node = {
         "identifier": reaction_candidacy["identifier"],
+        "type": "reaction",
         "entity": reaction["identifier"],
         "name": reaction_candidacy["name"],
         "reversibility": reaction_candidacy["reversibility"],
+        "metabolites": ";".join(metabolites_names),
+        "compartments": ";".join(compartments_names),
+        "processes": ";".join(processes_names),
         "replicates": reaction_candidacy["replicates"],
-        "processes": processes_names,
-        "type": "reaction"
     }
     # Return information.
     return reaction_node
@@ -321,16 +341,10 @@ def define_metabolite_node(
         compartment_name = compartments[compartment]
     else:
         compartment_name = "null"
-    # Measurements.
-    measurements = metabolite_candidacy["measurements"]
-    study_one = measurements["study_one"]
-    study_two = measurements["study_two"]
-    study_three = measurements["study_three"]
-    study_four = measurements["study_four"]
-    study_five = measurements["study_five"]
     # Compile information.
     metabolite_node = {
         "identifier": metabolite_candidacy["identifier"],
+        "type": "metabolite",
         "entity": metabolite["identifier"],
         "name": metabolite_candidacy["name"],
         "compartment": compartment_name,
@@ -339,23 +353,7 @@ def define_metabolite_node(
         "charge": metabolite["charge"],
         "reference_hmdb": metabolite["references"]["hmdb"],
         "reference_pubchem": metabolite["references"]["pubchem"],
-        "replication": metabolite_candidacy["replication"],
-        "type": "metabolite",
-        "measurement_one_fold": study_one["fold"],
-        "measurement_one_log_fold": study_one["log_fold"],
-        "measurement_one_p_value": study_one["p_value"],
-        "measurement_two_fold": study_two["fold"],
-        "measurement_two_log_fold": study_two["log_fold"],
-        "measurement_two_p_value": study_two["p_value"],
-        "measurement_three_fold": study_three["fold"],
-        "measurement_three_log_fold": study_three["log_fold"],
-        "measurement_three_p_value": study_three["p_value"],
-        "measurement_four_fold": study_four["fold"],
-        "measurement_four_log_fold": study_four["log_fold"],
-        "measurement_four_p_value": study_four["p_value"],
-        "measurement_five_fold": study_five["fold"],
-        "measurement_five_log_fold": study_five["log_fold"],
-        "measurement_five_p_value": study_five["p_value"]
+        "replication": metabolite_candidacy["replication"]
     }
     # Return information.
     return metabolite_node
@@ -714,7 +712,7 @@ def execute_procedure(
     )
     # Define network's nodes for metabolites.
     nodes_metabolites = collect_metabolites_nodes(
-        metabolites_candidacy=source["metabolites_measurement"],
+        metabolites_candidacy=source["metabolites_candidacy"],
         reactions=source["reactions"],
         metabolites=source["metabolites"],
         compartments=source["compartments"],
