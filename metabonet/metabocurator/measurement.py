@@ -404,7 +404,7 @@ def curate_measurements_study(
     # Match by PubChem identifiers.
     summary_metabolite = match_analytes_to_metabolites(
         reference="pubchem",
-        summary=summary_priority,
+        summary=copy.deepcopy(summary_priority),
         metabolites=metabolites
     )
     # Determine fold changes.
@@ -453,6 +453,15 @@ def curate_measurements_study(
     )
     # Convert measurement information to table in text format.
     summary_text = convert_summary_text(summary=summary_match)
+    # Convert information for analysis in MetaboAnalyst.
+    summary_metaboanalyst = prepare_report_metaboanalyst(
+        pairs=pairs,
+        summary=copy.deepcopy(summary_p),
+        group_one=group_numerator,
+        group_two=group_denominator,
+        samples=samples,
+        measurements=measurements
+    )
     # Report.
     print("analytes, measurements after curation...")
     report = prepare_curation_report(summary=summary_p)
@@ -460,7 +469,8 @@ def curate_measurements_study(
     # Compile and return information.
     return {
         "summary": summary_match,
-        "summary_text": summary_text
+        "summary_text": summary_text,
+        "summary_metaboanalyst": summary_metaboanalyst
     }
 
 
@@ -541,6 +551,8 @@ def filter_analytes_coverage(
         summary_novel = []
         for record in summary:
             analyte = record["identifier"]
+            # Determine whether valid measurements exist for multiple pairs of
+            # samples in each group.
             coverage = determine_analyte_coverage_pairs(
                 analyte=analyte,
                 group_one=group_one,
@@ -559,16 +571,16 @@ def filter_analytes_coverage(
             group_two=group_two,
             samples=samples
         )
-        group_one_samples = groups_samples[group_one]
-        group_two_samples = groups_samples[group_two]
-        samples_coverage = group_one_samples
-        samples_coverage.extend(group_two_samples)
         summary_novel = []
         for record in summary:
             analyte = record["identifier"]
+            # Determine whether valid measurements exist for multiple samples
+            # in each group.
             coverage = determine_analyte_coverage(
                 analyte=analyte,
-                samples_coverage=samples_coverage,
+                group_one=group_one,
+                group_two=group_two,
+                groups_samples=groups_samples,
                 measurements=measurements
             )
             if coverage:
@@ -578,7 +590,9 @@ def filter_analytes_coverage(
 
 def determine_analyte_coverage(
     analyte=None,
-    samples_coverage=None,
+    group_one=None,
+    group_two=None,
+    groups_samples=None,
     measurements=None
 ):
     """
@@ -586,7 +600,9 @@ def determine_analyte_coverage(
 
     arguments:
         analyte (str): identifier of an analyte
-        samples_coverage (list<str>): identifiers of samples
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        groups_samples (dict<list<str>>): samples from both groups
         measurements (list<dict<str>>): information about measurements from a
             study
 
@@ -602,23 +618,29 @@ def determine_analyte_coverage(
         identifier=analyte,
         measurements=measurements
     )
-    # Collect values of measurements for analyte in samples.
-    coverages = []
-    for sample in samples_coverage:
-        if (
-            (sample in measurements_analyte.keys()) and
-            (len(measurements_analyte[sample]) > 0)
-        ):
-            value = float(measurements_analyte[sample])
-            if value > 0:
-                coverages.append(True)
-            else:
-                coverages.append(False)
+    # Collect valid measurements for samples in each group.
+    coverages_one = []
+    for sample in groups_samples[group_one]:
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
+            coverages_one.append(True)
         else:
-            coverages.append(False)
+            coverages_one.append(False)
+    coverages_two = []
+    for sample in groups_samples[group_two]:
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
+            coverages_two.append(True)
+        else:
+            coverages_two.append(False)
     # Filter for samples with coverage.
-    coverages_true = list(filter(lambda value: value, coverages))
-    return len(coverages_true) > 1
+    coverages_one_true = list(filter(lambda value: value, coverages_one))
+    coverages_two_true = list(filter(lambda value: value, coverages_two))
+    return ((len(coverages_one_true) > 1) and (len(coverages_two_true) > 1)
 
 
 def determine_analyte_coverage_pairs(
@@ -656,22 +678,11 @@ def determine_analyte_coverage_pairs(
     for pair in pairs_samples.values():
         sample_one = pair[group_one]
         sample_two = pair[group_two]
-        if (
-            (
-                (sample_one in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample_one]) > 0)
-            ) and
-            (
-                (sample_two in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample_two]) > 0)
-            )
-        ):
-            value_one = float(measurements_analyte[sample_one])
-            value_two = float(measurements_analyte[sample_two])
-            if value_one > 0 and value_two > 0:
-                coverages.append(True)
-            else:
-                coverages.append(False)
+        if (determine_measurements_validity(
+            samples=[sample_one, sample_two],
+            measurements=measurements_analyte
+        )):
+            coverages.append(True)
         else:
             coverages.append(False)
     # Filter for samples with coverage.
@@ -1167,18 +1178,18 @@ def calculate_analyte_fold(
     # Determine fold changes for analyte's measurements.
     numerator_values = []
     for sample in groups_samples[group_numerator]:
-        if (
-            (sample in measurements_analyte.keys()) and
-            (len(measurements_analyte[sample]) > 0)
-        ):
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
             value = float(measurements_analyte[sample])
             numerator_values.append(value)
     denominator_values = []
     for sample in groups_samples[group_denominator]:
-        if (
-            (sample in measurements_analyte.keys()) and
-            (len(measurements_analyte[sample]) > 0)
-        ):
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
             value = float(measurements_analyte[sample])
             denominator_values.append(value)
     numerator_mean = statistics.mean(numerator_values)
@@ -1278,6 +1289,7 @@ def determine_pairs_samples(
                         # Found the other sample for the same patient.
                         break
                 pairs_samples[pair_cis] = {
+                    pair: pair_cis,
                     group_cis: identifier_cis,
                     group_trans: identifier_trans
                 }
@@ -1319,16 +1331,10 @@ def calculate_analyte_fold_pairs(
     for pair in pairs_samples.values():
         sample_numerator = pair[group_numerator]
         sample_denominator = pair[group_denominator]
-        if (
-            (
-                (sample_numerator in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample_numerator]) > 0)
-            ) and
-            (
-                (sample_denominator in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample_denominator]) > 0)
-            )
-        ):
+        if (determine_measurements_validity(
+            samples=[sample_numerator, sample_denominator],
+            measurements=measurements_analyte
+        )):
             numerator = float(measurements_analyte[sample_numerator])
             denominator = float(measurements_analyte[sample_denominator])
             if (numerator > 0 and denominator > 0):
@@ -1473,18 +1479,18 @@ def calculate_analyte_p_value(
     # Collect measurements for samples from both groups.
     one_values = []
     for sample in groups_samples[group_one]:
-        if (
-            (sample in measurements_analyte.keys()) and
-            (len(measurements_analyte[sample]) > 0)
-        ):
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
             value = float(measurements_analyte[sample])
             one_values.append(value)
     two_values = []
     for sample in groups_samples[group_two]:
-        if (
-            (sample in measurements_analyte.keys()) and
-            (len(measurements_analyte[sample]) > 0)
-        ):
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
             value = float(measurements_analyte[sample])
             two_values.append(value)
     # Determine p-value.
@@ -1577,16 +1583,10 @@ def calculate_analyte_p_value_pairs(
     for pair in pairs_samples.values():
         sample_one = pair[group_one]
         sample_two = pair[group_two]
-        if (
-            (
-                (sample_one in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample_one]) > 0)
-            ) and
-            (
-                (sample_two in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample_two]) > 0)
-            )
-        ):
+        if (determine_measurements_validity(
+            samples=[sample_one, sample_two],
+            measurements=measurements_analyte
+        )):
             groups_measurements[group_one].append(
                 float(measurements_analyte[sample_one])
             )
@@ -1680,6 +1680,161 @@ def filter_measurements_significance(
         if p_value < p_value_threshold:
             measurements_novel.append(measurement)
     return measurements_novel
+
+
+# TODO: not done with this function yet...
+
+def prepare_report_metaboanalyst(
+    pairs=None,
+    summary=None,
+    group_one=None,
+    group_two=None,
+    samples=None,
+    measurements=None
+):
+    """
+    Prepares a report for analysis in MetaboAnalyst.
+
+    arguments:
+        pairs (bool): whether samples have dependent pairs
+        summary (list<dict<str>>): information about measurements for analytes
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    # record keys...
+    # sample, sample_1, sample_2, sample_3, etc...
+    # record 1 specifies the labels for each sample...
+
+    # pairs only needs to distinguish the definition of labels (groups)
+
+    records = []
+    # Prepare record of labels to designate pairs and groups of samples.
+    samples_labels = determine_samples_labels(
+        pairs=pairs,
+        group_one=group_one,
+        group_two=group_two,
+        samples=samples
+    )
+    record_label = copy.deepcopy(samples_labels)
+    record_label["sample"] = "label"
+    records.append(record_label)
+    # Prepare records to match measurements to samples.
+    for measurement in measurements:
+        analyte = measurement["analyte"]
+        record_measurement = {
+            "sample": analyte,
+        }
+        # Iterate on valid samples.
+        for sample in samples_labels.keys():
+            # Determine whether a valid measurement exists for the sample.
+            # TODO: include valid measurement if it exists... otherwise give
+            # TODO: a zero or an empty entry.
+
+            pass
+        # TODO: iterate on samples within the measurement record?
+        # TODO: record_measurement[sample] = measurement...
+
+        records.append(record_measurement)
+    return records
+
+
+def determine_samples_labels(
+    pairs=None,
+    group_one=None,
+    group_two=None,
+    samples=None
+):
+    """
+    Prepares a report for analysis in MetaboAnalyst.
+
+    arguments:
+        pairs (bool): whether samples have dependent pairs
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+
+    raises:
+
+    returns:
+        (dict<str>): labels for pairs and groups of samples
+
+    """
+
+    samples_labels = {}
+    if pairs:
+        # Determine pairs of samples.
+        pairs_samples = determine_pairs_samples(
+            group_one=group_one,
+            group_two=group_two,
+            samples=samples
+        )
+        # Collect pairs of samples.
+        for pair_samples in pairs_samples.values():
+            pair = int(pair_samples["pair"])
+            sample_one = pair_samples[group_one]
+            sample_two = pair_samples[group_two]
+            samples_labels[sample_one] = str(int(1 * pair)
+            samples_labels[sample_two] = str(int(-1 * pair))
+    else:
+        # Determine all relevant samples.
+        groups_samples = determine_groups_samples(
+            group_one=group_one,
+            group_two=group_two,
+            samples=samples
+        )
+        # Collect groups of samples.
+        for sample_one in groups_samples[group_one]:
+            samples_labels[sample_one] = group_one
+        for sample_two in groups_samples[group_two]:
+            samples_labels[sample_two] = group_two
+    return samples_labels
+
+
+def determine_measurements_validity(
+    samples=None,
+    measurements=None
+):
+    """
+    Determines whether valid measurements exist for samples.
+
+    Valid measurements have a non-empty value that is great than zero.
+
+    arguments:
+        samples (list<str>): identifiers of samples
+        measurements (dict<str>): information about measurements for an analyte
+
+    raises:
+
+    returns:
+        (bool): whether valid measurements exist for samples
+
+    """
+
+    checks = []
+    for sample in samples:
+        check_existence = (
+            sample in measurements.keys() and
+            len(str(measurements[sample]) > 0)
+        )
+        if check_existence:
+            check_validity = (float(measurements[sample]) > 0)
+            if check_validity:
+                checks.append(True)
+            else:
+                checks.append(False)
+        else:
+            checks.append(False)
+    return all(checks)
 
 
 def prepare_curation_report(
