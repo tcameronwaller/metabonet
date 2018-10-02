@@ -82,7 +82,9 @@ import network
 import conversion
 import measurement
 import analysis
+import plot
 import utility
+import clean
 
 #dir()
 #importlib.reload()
@@ -435,6 +437,10 @@ def define_network_subparser(subparsers=None):
         "-a", "--analysis", dest="analysis", action="store_true",
         help="Analyze metabolic network."
     )
+    parser_network.add_argument(
+        "-t", "--plot", dest="plot", action="store_true",
+        help="Generate visual plots from analysis."
+    )
     # Define behavior.
     parser_network.set_defaults(func=evaluate_network_parameters)
     # Return parser.
@@ -675,6 +681,11 @@ def evaluate_network_parameters(arguments):
         print("... executing analysis procedure ...")
         # Execute procedure.
         analysis.execute_procedure(directory=arguments.directory)
+    if arguments.plot:
+        # Report status.
+        print("... executing plot procedure ...")
+        # Execute procedure.
+        plot.execute_procedure(directory=arguments.directory)
 
 
 def evaluate_clean_parameters(arguments):
@@ -697,6 +708,8 @@ def evaluate_clean_parameters(arguments):
     metabocurator.clean.execute_procedure(
         directory=arguments.directory
     )
+    clean.execute_procedure(directory=arguments.directory)
+
 
 
 ###############################################################################

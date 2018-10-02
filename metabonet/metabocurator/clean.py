@@ -169,4 +169,19 @@ def execute_procedure(directory=None):
     utility.remove_file(os.path.join(path_measurement, "study_three.tsv"))
     utility.remove_file(os.path.join(path_measurement, "study_four.tsv"))
     utility.remove_file(os.path.join(path_measurement, "study_five.tsv"))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_one_metaboanalyst.tsv"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_two_metaboanalyst.tsv"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_three_metaboanalyst.tsv"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_four_metaboanalyst.tsv"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_five_metaboanalyst.tsv"
+    ))
     utility.remove_empty_directory(path_measurement)

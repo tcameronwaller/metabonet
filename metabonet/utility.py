@@ -168,7 +168,7 @@ def remove_empty_directory(path=None):
 
     """
 
-    if len(os.listdir(path)) < 1:
+    if (os.path.exists(path)) and (len(os.listdir(path)) < 1):
         os.rmdir(path)
 
 

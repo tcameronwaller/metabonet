@@ -77,6 +77,7 @@ import os
 # Relevant
 
 # Custom
+import utility
 
 #dir()
 #importlib.reload()
@@ -106,40 +107,41 @@ def execute_procedure(directory=None):
     """
 
     # Specify directories and files.
-    path_reconciliation = os.path.join(directory, "reconciliation")
-    path_extraction = os.path.join(directory, "extraction")
-    path_extrication = os.path.join(directory, "extrication")
-    path_enhancement = os.path.join(directory, "enhancement")
-    path_curation = os.path.join(directory, "curation")
+    path_candidacy = os.path.join(directory, "candidacy")
+    path_network = os.path.join(directory, "network")
+    path_conversion = os.path.join(directory, "conversion")
+    path_measurement = os.path.join(directory, "measurement")
+    path_analysis = os.path.join(directory, "analysis")
     # Remove directories and files.
-    if (False):
-        os.remove(path_reconciliation, "recon2m2_reconciliation.xml")
-        os.remove(path_reconciliation, "recon2m2_metanetx_compartments.tsv")
-        os.remove(path_reconciliation, "recon2m2_metanetx_genes.tsv")
-        os.remove(path_reconciliation, "recon2m2_metanetx_metabolites.tsv")
-        os.remove(path_reconciliation, "recon2m2_metanetx_reactions.tsv")
-    os.remove(os.path.join(path_extraction, "compartments.pickle"))
-    os.remove(os.path.join(path_extraction, "processes.pickle"))
-    os.remove(os.path.join(path_extraction, "reactions.pickle"))
-    os.remove(os.path.join(path_extraction, "metabolites.pickle"))
-    os.remove(os.path.join(path_extraction, "reactions.tsv"))
-    os.remove(os.path.join(path_extraction, "metabolites.tsv"))
-    os.rmdir(path_extraction)
-    os.remove(os.path.join(path_extrication, "hmdb_summary.pickle"))
-    os.remove(os.path.join(path_extrication, "hmdb_summary.tsv"))
-    os.rmdir(path_extrication)
-    os.remove(os.path.join(path_enhancement, "compartments.pickle"))
-    os.remove(os.path.join(path_enhancement, "processes.pickle"))
-    os.remove(os.path.join(path_enhancement, "reactions.pickle"))
-    os.remove(os.path.join(path_enhancement, "metabolites.pickle"))
-    os.remove(os.path.join(path_enhancement, "reactions.tsv"))
-    os.remove(os.path.join(path_enhancement, "metabolites.tsv"))
-    os.remove(os.path.join(path_enhancement, "reactions_filter.tsv"))
-    os.rmdir(path_enhancement)
-    os.remove(os.path.join(path_curation, "compartments.pickle"))
-    os.remove(os.path.join(path_curation, "processes.pickle"))
-    os.remove(os.path.join(path_curation, "reactions.pickle"))
-    os.remove(os.path.join(path_curation, "metabolites.pickle"))
-    os.remove(os.path.join(path_curation, "reactions.tsv"))
-    os.remove(os.path.join(path_curation, "metabolites.tsv"))
-    os.rmdir(path_curation)
+    # Candidacy.
+    utility.remove_file(os.path.join(path_candidacy, "metabolites.pickle"))
+    utility.remove_file(os.path.join(path_candidacy, "reactions.pickle"))
+    utility.remove_file(os.path.join(path_candidacy, "reactions.tsv"))
+    utility.remove_file(os.path.join(path_candidacy, "metabolites.tsv"))
+    utility.remove_empty_directory(path_candidacy)
+    # Network.
+    utility.remove_file(os.path.join(path_network, "links.pickle"))
+    utility.remove_file(os.path.join(path_network, "nodes_metabolites.pickle"))
+    utility.remove_file(os.path.join(path_network, "nodes_reactions.pickle"))
+    utility.remove_empty_directory(path_network)
+    # Conversion.
+    utility.remove_file(os.path.join(
+        path_conversion, "network_elements_cytoscape.json"
+    ))
+    utility.remove_file(os.path.join(
+        path_conversion, "network_elements_networkx.pickle"
+    ))
+    utility.remove_empty_directory(path_conversion)
+    # Measurement.
+    utility.remove_file(os.path.join(path_measurement, "metabolites.pickle"))
+    utility.remove_file(os.path.join(path_measurement, "reactions.pickle"))
+    utility.remove_file(os.path.join(path_measurement, "reactions.tsv"))
+    utility.remove_file(os.path.join(path_measurement, "metabolites.tsv"))
+    utility.remove_file(os.path.join(path_measurement, "metabolites.tsv"))
+    utility.remove_empty_directory(path_measurement)
+    # Analysis.
+    utility.remove_file(os.path.join(path_analysis, "nodes_reactions.tsv"))
+    utility.remove_file(os.path.join(path_analysis, "nodes_metabolites.tsv"))
+    utility.remove_file(os.path.join(path_analysis, "network_reactions.tsv"))
+    utility.remove_file(os.path.join(path_analysis, "network_metabolites.tsv"))
+    utility.remove_empty_directory(path_analysis)

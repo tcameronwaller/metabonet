@@ -640,7 +640,7 @@ def determine_analyte_coverage(
     # Filter for samples with coverage.
     coverages_one_true = list(filter(lambda value: value, coverages_one))
     coverages_two_true = list(filter(lambda value: value, coverages_two))
-    return ((len(coverages_one_true) > 1) and (len(coverages_two_true) > 1)
+    return ((len(coverages_one_true) > 1) and (len(coverages_two_true) > 1))
 
 
 def determine_analyte_coverage_pairs(
@@ -1289,7 +1289,7 @@ def determine_pairs_samples(
                         # Found the other sample for the same patient.
                         break
                 pairs_samples[pair_cis] = {
-                    pair: pair_cis,
+                    "pair": pair_cis,
                     group_cis: identifier_cis,
                     group_trans: identifier_trans
                 }
@@ -1375,6 +1375,38 @@ def find_analyte_measurements(identifier=None, measurements=None):
     if measurements_analyte is None:
         print("error finding measurements for analyte: " + identifier)
     return measurements_analyte
+
+
+def find_analyte_record(identifier=None, analytes=None):
+    """
+    Finds information about an analyte.
+
+    arguments:
+        identifier (str): identifier of an analyte
+        analytes (list<dict<str>>): information about analytes
+
+    raises:
+
+    returns:
+        (dict<str>): information about an analyte
+
+    """
+
+    def match(record):
+        analyte_comparison = utility.convert_string_low_alpha_num(
+            record["identifier"]
+        )
+        identifier_comparison = utility.convert_string_low_alpha_num(
+            identifier
+        )
+        return analyte_comparison == identifier_comparison
+    analyte = utility.find(
+        match=match,
+        sequence=analytes
+    )
+    if analyte is None:
+        print("error finding analyte: " + identifier)
+    return analyte
 
 
 def calculate_folds_logarithms(records=None):
@@ -1712,7 +1744,7 @@ def prepare_report_metaboanalyst(
     # Collect identifiers of analytes that satisfy criteria for inclusion in
     # analysis.
     analytes_identifiers = utility.collect_value_from_records(
-        key="name",
+        key="identifier",
         records=summary
     )
     # Collect records in report.
@@ -1733,8 +1765,13 @@ def prepare_report_metaboanalyst(
         # inclusion in analysis.
         analyte_identifier = measurement["analyte"]
         if analyte_identifier in analytes_identifiers:
+            # Determine analyte's name.
+            analyte = find_analyte_record(
+                identifier=analyte_identifier,
+                analytes=summary
+            )
             record_measurement = {
-                "sample": measurement["name"],
+                "sample": analyte["name"],
             }
             # Iterate on relevant samples.
             for sample in samples_labels.keys():
@@ -1785,7 +1822,7 @@ def determine_samples_labels(
             pair = int(pair_samples["pair"])
             sample_one = pair_samples[group_one]
             sample_two = pair_samples[group_two]
-            samples_labels[sample_one] = str(int(1 * pair)
+            samples_labels[sample_one] = str(int(1 * pair))
             samples_labels[sample_two] = str(int(-1 * pair))
     else:
         # Determine all relevant samples.
@@ -1826,7 +1863,7 @@ def determine_measurements_validity(
     for sample in samples:
         check_existence = (
             sample in measurements.keys() and
-            len(str(measurements[sample]) > 0)
+            len(str(measurements[sample])) > 0
         )
         if check_existence:
             check_validity = (float(measurements[sample]) > 0)
