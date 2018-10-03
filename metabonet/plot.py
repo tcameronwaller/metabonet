@@ -87,9 +87,11 @@ import os
 import pickle
 import copy
 
-# Relevant
+# Relevant.
+import numpy
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as pyplot
-
 # Custom
 import utility
 
@@ -135,11 +137,48 @@ def read_source(directory=None):
     }
 
 
+def define_font_properties():
+    """
+    Defines font properties.
+
+    arguments:
+
+    raises:
+
+    returns:
+        (dict<object>): references to definitions of font properties
+
+    """
+
+    font_one = matplotlib.font_manager.FontProperties(
+        family="sans-serif",
+        style="normal",
+        variant="normal",
+        stretch=500,
+        weight=1000,
+        size=30
+    )
+    font_two = matplotlib.font_manager.FontProperties(
+        family="sans-serif",
+        style="normal",
+        variant="normal",
+        stretch=500,
+        weight=500,
+        size=25
+    )
+    # Compile and return references.
+    return {
+        "font_one": font_one,
+        "font_two": font_two,
+    }
+
+
 def plot_two_distributions_histograms(
     series_one=None,
     series_two=None,
     name_one=None,
-    name_two=None
+    name_two=None,
+    fonts=None
 ):
     """
     Creates a histogram chart to represent frequency distributions of two
@@ -150,6 +189,7 @@ def plot_two_distributions_histograms(
         series_two (list<int>): series of counts
         name_one (str): name of distribution
         name_two (str): name of distribution
+        fonts (dict<object>): references to definitions of font properties
 
     raises:
 
@@ -158,13 +198,73 @@ def plot_two_distributions_histograms(
 
     """
 
-    #figure = plt.figure()
-    #figure.suptitle("title")
-    pyplot.hist(series_one, "auto", label=name_one)
-    pyplot.hist(series_two, "auto", label=name_two)
-    pyplot.legent(loc="upper right")
-
-
+    # Determine histogram bins.
+    hist, bin_edges = numpy.histogram(series_one, bins=50)
+    # Create chart.
+    figure = pyplot.figure(
+        figsize=(15.748, 11.811),
+        tight_layout=True
+    )
+    axes = pyplot.axes()
+    values_one, bins_one, patches_one = axes.hist(
+        series_one,
+        bins=bin_edges,
+        histtype="bar",
+        align="left",
+        orientation="vertical",
+        rwidth=0.35,
+        log=True,
+        color=(0.0, 0.2, 0.5, 1.0),
+        label=name_one,
+        stacked=False
+    )
+    values_two, bins_two, patches_two = axes.hist(
+        series_two,
+        bins=bin_edges,
+        histtype="bar",
+        align="mid",
+        orientation="vertical",
+        rwidth=0.35,
+        log=True,
+        color=(1.0, 0.6, 0.2, 1.0),
+        label=name_two,
+        stacked=False
+    )
+    axes.legend(
+        loc="upper right",
+        markerscale=2.5,
+        markerfirst=True,
+        prop=fonts["font_one"],
+        edgecolor=(0.0, 0.0, 0.0, 1.0)
+    )
+    axes.set_xlabel(
+        xlabel="Node Degree (Count)",
+        labelpad=25,
+        alpha=1.0,
+        backgroundcolor=(1.0, 1.0, 1.0, 1.0),
+        color=(0.0, 0.0, 0.0, 1.0),
+        fontproperties=fonts["font_one"]
+    )
+    axes.set_ylabel(
+        ylabel="Count of Nodes",
+        labelpad=25,
+        alpha=1.0,
+        backgroundcolor=(1.0, 1.0, 1.0, 1.0),
+        color=(0.0, 0.0, 0.0, 1.0),
+        fontproperties=fonts["font_one"]
+    )
+    axes.tick_params(
+        axis="both",
+        which="both",
+        direction="out",
+        length=5.0,
+        width=3.0,
+        color=(0.0, 0.0, 0.0, 1.0),
+        pad=5,
+        labelsize=fonts["font_two"].get_size(),
+        labelcolor=(0.0, 0.0, 0.0, 1.0)
+    )
+    return figure
 
 
 def write_product(directory=None, information=None):
@@ -184,9 +284,9 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "plot")
     utility.confirm_path_directory(path)
-    path_histogram = os.path.join(path, "metabolite_degree_histogram.pdf")
+    path_histogram = os.path.join(path, "metabolite_degree_histogram.svg")
     # Write information to file.
-    pyplot.savefig(
+    information["chart_histogram"].savefig(
         path_histogram,
         format="svg",
         dpi=600,
@@ -216,7 +316,8 @@ def execute_procedure(directory=None):
 
     # Read source information from file.
     source = read_source(directory=directory)
-    print(source["nodes_metabolites"])
+    # Define font properties.
+    fonts = define_font_properties()
 
     # Histogram plot for nodes' degree distributions.
     # Plot distributions for nodes' degrees before and after simplification.
@@ -233,7 +334,8 @@ def execute_procedure(directory=None):
         series_one=series_one,
         series_two=series_two,
         name_one="completion",
-        name_two="simplification"
+        name_two="simplification",
+        fonts=fonts
     )
     # Parallel coordinates plot.
 
