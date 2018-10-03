@@ -673,17 +673,29 @@ def collect_network_nodes_ranks(
     for index, record in enumerate(ranks_centrality_betweenness, start=1):
         ranks[record["identifier"]]["rank_centrality_betweenness"] = index
     # Determine overall rank.
+    ranks_total_raw = []
     for entry in ranks.values():
         identifier = entry["identifier"]
         rank_centrality_degree = entry["rank_centrality_degree"]
         rank_centrality_betweenness = entry["rank_centrality_betweenness"]
-        rank = calculate_total_rank(
+        rank_total_raw = calculate_total_rank(
             factor_degree=0.5,
             factor_betweenness=0.5,
             rank_centrality_degree=rank_centrality_degree,
             rank_centrality_betweenness=rank_centrality_betweenness
         )
-        ranks[identifier]["rank"] = rank
+        record = {
+            "identifier": identifier,
+            "rank_total_raw": rank_total_raw
+        }
+        ranks_total_raw.append(record)
+    ranks_total_raw_sort = sorted(
+        ranks_total_raw,
+        key=lambda record: record["rank_total_raw"],
+        reverse=False
+    )
+    for index, record in enumerate(ranks_total_raw_sort, start=1):
+        ranks[record["identifier"]]["rank"] = index
     return ranks
 
 

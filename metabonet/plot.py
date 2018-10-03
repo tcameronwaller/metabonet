@@ -318,7 +318,6 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Define font properties.
     fonts = define_font_properties()
-
     # Histogram plot for nodes' degree distributions.
     # Plot distributions for nodes' degrees before and after simplification.
     # TODO: prepare series within a separate function?
@@ -338,6 +337,7 @@ def execute_procedure(directory=None):
         fonts=fonts
     )
     # Parallel coordinates plot.
+    # http://benalexkeen.com/parallel-coordinates-in-matplotlib/
 
     # Word cloud.
 
