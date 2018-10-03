@@ -163,14 +163,65 @@ def define_font_properties():
         style="normal",
         variant="normal",
         stretch=500,
-        weight=500,
+        weight=1000,
         size=25
+    )
+    font_three = matplotlib.font_manager.FontProperties(
+        family="sans-serif",
+        style="normal",
+        variant="normal",
+        stretch=500,
+        weight=1000,
+        size=15
     )
     # Compile and return references.
     return {
         "font_one": font_one,
         "font_two": font_two,
+        "font_three": font_three
     }
+
+
+def plot_degrees(
+    nodes_metabolites_completion=None,
+    nodes_metabolites_simplification=None,
+    fonts=None
+):
+    """
+    Creates a chart to represent distributions of degrees of metabolites'
+    nodes.
+
+    arguments:
+        nodes_metabolites_completion (dict<dict>): information about
+            metabolites' nodes
+        nodes_metabolites_simplification (dict<dict>): information about
+            metabolites' nodes
+        fonts (dict<object>): references to definitions of font properties
+
+    raises:
+
+    returns:
+        (object): chart object
+
+    """
+
+    series_one = utility.collect_value_from_records(
+        key="degree",
+        records=nodes_metabolites_completion.values()
+    )
+    series_two = utility.collect_value_from_records(
+        key="degree",
+        records=nodes_metabolites_simplification.values()
+    )
+    chart_degrees = plot_two_distributions_histograms(
+        series_one=series_one,
+        series_two=series_two,
+        name_one="completion",
+        name_two="simplification",
+        fonts=fonts
+    )
+    # Return reference to figure.
+    return chart_degrees
 
 
 def plot_two_distributions_histograms(
@@ -267,6 +318,305 @@ def plot_two_distributions_histograms(
     return figure
 
 
+# TODO: this old version might be useful for word clouds?
+
+def prepare_metabolites_ranks_maybe_useful_for_word_clouds(
+    nodes_metabolites=None
+):
+    """
+    Prepares summary information about ranks of metabolites' nodes.
+
+    arguments:
+        nodes_metabolites (dict<dict>): information about metabolites' nodes
+
+    raises:
+
+    returns:
+        (dict<list<dict<str>>): summaries of metabolites' nodes' ranks
+
+    """
+
+    # TODO: do not need to split the ranks up... keep together...
+
+    # Filter records to include the nodes with the top 25 total ranks.
+    ranks_total = extract_sort_filter_ranks(
+        rank="rank",
+        filter_by="count",
+        count=26,
+        nodes_metabolites=nodes_metabolites
+    )
+    # Filter records to include all nodes with the top 25 total ranks.
+    ranks_total_identifiers = utility.collect_value_from_records(
+        key="identifier",
+        records=ranks_total
+    )
+    ranks_degree = extract_sort_filter_ranks(
+        rank="rank_centrality_degree",
+        filter_by="identifier",
+        identifiers=ranks_total_identifiers,
+        nodes_metabolites=nodes_metabolites
+    )
+    ranks_betweenness = extract_sort_filter_ranks(
+        rank="rank_centrality_betweenness",
+        filter_by="identifier",
+        identifiers=ranks_total_identifiers,
+        nodes_metabolites=nodes_metabolites
+    )
+    # Compile and return information.
+    return {
+        "total": ranks_total,
+        "degree": ranks_degree,
+        "betweenness": ranks_betweenness
+    }
+
+
+def extract_sort_filter_ranks(
+    rank=None,
+    filter_by=None,
+    count=None,
+    identifiers=None,
+    nodes_metabolites=None
+):
+    """
+    Extracts, sorts, and filters information about ranks of metabolites' nodes.
+
+    arguments:
+        rank (str): key of rank's value in each entry
+        filter_by (str): whether to filter records by count of ranks or by
+            identifiers
+        count (int): count of ranks to include in summary
+        identifiers (list<str>): identifiers of nodes to include in summary
+        nodes_metabolites (dict<dict>): information about metabolites' nodes
+
+    raises:
+
+    returns:
+        (list<dict<str>): summary of metabolites' nodes' ranks
+
+    """
+
+    # Extract relevant information.
+    ranks_raw = []
+    for node in nodes_metabolites.values():
+        identifier = node["identifier"]
+        name = node["name"]
+        rank_node = node[rank]
+        record = {
+            "identifier": identifier,
+            "name": name,
+            "rank": rank_node
+        }
+        ranks_raw.append(record)
+    # Sort information by rank.
+    ranks_sort = sorted(
+        ranks_raw,
+        key=lambda record: record["rank"],
+        reverse=False
+    )
+    # Filter information.
+    if filter_by == "count":
+        ranks_filter = list(filter(
+            lambda record: record["rank"] < count,
+            ranks_sort
+        ))
+    elif filter_by == "identifier":
+        ranks_filter = list(filter(
+            lambda record: record["identifier"] in identifiers,
+            ranks_sort
+        ))
+    return ranks_filter
+
+
+def determine_ranks_summary_extremes(ranks_summary=None):
+    """
+    Determines minimal and maximal values of all ranks in summary.
+
+    arguments:
+        ranks_summary (list<dict<str>): summary of metabolites' nodes' ranks
+
+    raises:
+
+    returns:
+        (tuple<int, int>): minimal and maximal ranks
+
+    """
+
+    ranks = []
+    for record in ranks_summary:
+        ranks.append(record["rank_total"])
+        ranks.append(record["rank_degree"])
+        ranks.append(record["rank_betweenness"])
+    minimum = min(ranks)
+    maximum = max(ranks)
+    return (minimum, maximum)
+
+
+def plot_ranks(
+    count=None,
+    nodes_metabolites=None,
+    fonts=None
+):
+    """
+    Creates a chart to represent ranks of metabolites' nodes.
+
+    arguments:
+        count (int): count of metabolites' nodes to include in summary
+        nodes_metabolites (dict<dict>): information about metabolites' nodes
+        fonts (dict<object>): references to definitions of font properties
+
+    raises:
+
+    returns:
+        (object): chart object
+
+    """
+
+    ranks_summary = prepare_ranks_summary(
+        count=count,
+        nodes_metabolites=nodes_metabolites
+    )
+    chart_ranks = plot_three_ranks_parallel_coordinates(
+        ranks_summary=ranks_summary,
+        fonts=fonts
+    )
+    # Return reference to figure.
+    return chart_ranks
+
+
+def prepare_ranks_summary(
+    count=None,
+    nodes_metabolites=None
+):
+    """
+    Prepares summary information about ranks of metabolites' nodes.
+
+    arguments:
+        count (int): count of metabolites' nodes to include in summary
+        nodes_metabolites (dict<dict>): information about metabolites' nodes
+
+    raises:
+
+    returns:
+        (list<dict<str>): summary of metabolites' nodes' ranks
+
+    """
+
+    # Extract relevant information.
+    summary_raw = []
+    for node in nodes_metabolites.values():
+        identifier = node["identifier"]
+        name = node["name"]
+        rank_total = node["rank"]
+        rank_degree = node["rank_centrality_degree"]
+        rank_betweenness = node["rank_centrality_betweenness"]
+        record = {
+            "identifier": identifier,
+            "name": name,
+            "rank_total": rank_total,
+            "rank_degree": rank_degree,
+            "rank_betweenness": rank_betweenness
+        }
+        summary_raw.append(record)
+    # Sort summary by total rank.
+    summary_sort = sorted(
+        summary_raw,
+        key=lambda record: record["rank_total"],
+        reverse=False
+    )
+    # Filter summary by total rank.
+    summary_filter = list(filter(
+        lambda record: record["rank_total"] < (count + 1),
+        summary_sort
+    ))
+    return summary_filter
+
+
+def plot_three_ranks_parallel_coordinates(
+    ranks_summary=None,
+    fonts=None
+):
+    """
+    Creates a parallel coordinates chart to represent ranks of metabolites'
+    nodes.
+
+    arguments:
+        ranks_summary (list<dict<str>): summary of metabolites' nodes' ranks
+        fonts (dict<object>): references to definitions of font properties
+
+    raises:
+
+    returns:
+        (object): chart object
+
+    """
+
+    # Determine minimal and maximal values for all axes.
+    minimum, maximum = determine_ranks_summary_extremes(
+        ranks_summary=ranks_summary
+    )
+    # Extract information for each axis.
+    categories = ["Degree Rank", "Total Rank", "Betweenness Rank"]
+    # Create chart.
+    figure = pyplot.figure(
+        figsize=(11.811, 15.748),
+        tight_layout=True
+    )
+    axes = pyplot.axes()
+    axes.invert_yaxis()
+    axes.set_ylabel(
+        ylabel="Node Ranks",
+        labelpad=25,
+        alpha=1.0,
+        backgroundcolor=(1.0, 1.0, 1.0, 1.0),
+        color=(0.0, 0.0, 0.0, 1.0),
+        fontproperties=fonts["font_one"]
+    )
+    axes.tick_params(
+        axis="both",
+        which="both",
+        direction="out",
+        length=5.0,
+        width=3.0,
+        color=(0.0, 0.0, 0.0, 1.0),
+        pad=5,
+        labelsize=fonts["font_two"].get_size(),
+        labelcolor=(0.0, 0.0, 0.0, 1.0)
+    )
+    for category in categories:
+        axes.axvline(
+            category,
+            ymin=0,
+            ymax=1,
+            alpha=1.0,
+            color=(0.0, 0.0, 0.0, 1.0)
+        )
+    # Create a plot for each value.
+    for record in ranks_summary:
+        values = [
+            record["rank_degree"],
+            record["rank_total"],
+            record["rank_betweenness"]
+        ]
+        axes.plot(
+            categories,
+            values,
+            color=(0.0, 0.2, 0.5, 0.75),
+            linewidth=1.0
+        )
+        axes.text(
+            categories[1],
+            values[1],
+            record["name"],
+            backgroundcolor=(1.0, 1.0, 1.0, 0.5),
+            color=(0.0, 0.0, 0.0, 1.0),
+            fontproperties=fonts["font_three"],
+            horizontalalignment="center",
+            verticalalignment="center"
+        )
+    # Return reference to figure.
+    return figure
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -284,10 +634,30 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "plot")
     utility.confirm_path_directory(path)
-    path_histogram = os.path.join(path, "metabolite_degree_histogram.svg")
+    path_degrees = os.path.join(path, "metabolite_degrees.svg")
+    path_ranks_completion = os.path.join(
+        path, "metabolite_ranks_completion.svg"
+    )
+    path_ranks_simplification = os.path.join(
+        path, "metabolite_ranks_simplification.svg"
+    )
     # Write information to file.
-    information["chart_histogram"].savefig(
-        path_histogram,
+    information["chart_degrees"].savefig(
+        path_degrees,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w"
+    )
+    information["chart_ranks_completion"].savefig(
+        path_ranks_completion,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w"
+    )
+    information["chart_ranks_simplification"].savefig(
+        path_ranks_simplification,
         format="svg",
         dpi=600,
         facecolor="w",
@@ -318,32 +688,43 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Define font properties.
     fonts = define_font_properties()
-    # Histogram plot for nodes' degree distributions.
     # Plot distributions for nodes' degrees before and after simplification.
-    # TODO: prepare series within a separate function?
-    series_one = utility.collect_value_from_records(
-        key="degree",
-        records=source["nodes_metabolites_completion"].values()
-    )
-    series_two = utility.collect_value_from_records(
-        key="degree",
-        records=source["nodes_metabolites_simplification"].values()
-    )
-    chart_histogram = plot_two_distributions_histograms(
-        series_one=series_one,
-        series_two=series_two,
-        name_one="completion",
-        name_two="simplification",
+    chart_degrees = plot_degrees(
+        nodes_metabolites_completion=source["nodes_metabolites_completion"],
+        nodes_metabolites_simplification=(
+            source["nodes_metabolites_simplification"]
+        ),
         fonts=fonts
     )
-    # Parallel coordinates plot.
-    # http://benalexkeen.com/parallel-coordinates-in-matplotlib/
-
+    # Parallel coordinates chart for ranks of metabolites' nodes.
+    chart_ranks_completion = plot_ranks(
+        count=20,
+        nodes_metabolites=source["nodes_metabolites_completion"],
+        fonts=fonts
+    )
+    chart_ranks_simplification = plot_ranks(
+        count=20,
+        nodes_metabolites=source["nodes_metabolites_simplification"],
+        fonts=fonts
+    )
     # Word cloud.
+    # TODO: implement...
+    chart_names_completion = plot_names(
+        count=500,
+        nodes_metabolites=source["nodes_metabolites_completion"],
+        fonts=fonts
+    )
+    chart_names_simplification = plot_names(
+        count=500,
+        nodes_metabolites=source["nodes_metabolites_simplification"],
+        fonts=fonts
+    )
 
     # Compile information.
     information = {
-        "chart_histogram": chart_histogram,
+        "chart_degrees": chart_degrees,
+        "chart_ranks_completion": chart_ranks_completion,
+        "chart_ranks_simplification": chart_ranks_simplification
     }
     #Write product information to file.
     write_product(directory=directory, information=information)
