@@ -92,6 +92,8 @@ import numpy
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as pyplot
+import wordcloud
+
 # Custom
 import utility
 
@@ -172,7 +174,7 @@ def define_font_properties():
         variant="normal",
         stretch=500,
         weight=1000,
-        size=15
+        size=20
     )
     # Compile and return references.
     return {
@@ -216,8 +218,8 @@ def plot_degrees(
     chart_degrees = plot_two_distributions_histograms(
         series_one=series_one,
         series_two=series_two,
-        name_one="completion",
-        name_two="simplification",
+        name_one="Completion",
+        name_two="Simplification",
         fonts=fonts
     )
     # Return reference to figure.
@@ -289,7 +291,7 @@ def plot_two_distributions_histograms(
         edgecolor=(0.0, 0.0, 0.0, 1.0)
     )
     axes.set_xlabel(
-        xlabel="Node Degree (Count)",
+        xlabel="Node Degree",
         labelpad=25,
         alpha=1.0,
         backgroundcolor=(1.0, 1.0, 1.0, 1.0),
@@ -579,7 +581,7 @@ def plot_three_ranks_parallel_coordinates(
         width=3.0,
         color=(0.0, 0.0, 0.0, 1.0),
         pad=5,
-        labelsize=fonts["font_two"].get_size(),
+        labelsize=fonts["font_one"].get_size(),
         labelcolor=(0.0, 0.0, 0.0, 1.0)
     )
     for category in categories:
@@ -617,6 +619,51 @@ def plot_three_ranks_parallel_coordinates(
     return figure
 
 
+def plot_names(
+    count=None,
+    nodes_metabolites=None,
+    fonts=None
+):
+    """
+    Creates a chart to represent dominance of metabolites' nodes.
+
+    arguments:
+        count (int): count of metabolites' nodes to include in summary
+        nodes_metabolites (dict<dict>): information about metabolites' nodes
+        fonts (dict<object>): references to definitions of font properties
+
+    raises:
+
+    returns:
+        (object): chart object
+
+    """
+
+    # Determine frequencies of names.
+    names_frequencies = {}
+    for record in nodes_metabolites.values():
+        name = record["name"]
+        degree = record["degree"]
+        names_frequencies[name] = degree
+    # Create word cloud.
+    chart_names = wordcloud.WordCloud(
+        width=6000,#2000, 4000, 6000,
+        height=4500,#1500, 3000, 4500,
+        min_font_size=5,
+        max_font_size=500,#500
+        max_words=count,
+        colormap="viridis",#"viridis", "plasma", "ocean", "gist_earth",
+        background_color="white",
+        prefer_horizontal=0.90,
+        relative_scaling=0.75,
+        stopwords=[""],
+    ).generate_from_frequencies(
+        names_frequencies
+    )
+    # Return reference to figure.
+    return chart_names
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -641,6 +688,12 @@ def write_product(directory=None, information=None):
     path_ranks_simplification = os.path.join(
         path, "metabolite_ranks_simplification.svg"
     )
+    path_names_completion = os.path.join(
+        path, "metabolite_names_completion.png"
+    )
+    path_names_simplification = os.path.join(
+        path, "metabolite_names_simplification.png"
+    )
     # Write information to file.
     information["chart_degrees"].savefig(
         path_degrees,
@@ -662,6 +715,12 @@ def write_product(directory=None, information=None):
         dpi=600,
         facecolor="w",
         edgecolor="w"
+    )
+    information["chart_names_completion"].to_file(
+        path_names_completion
+    )
+    information["chart_names_simplification"].to_file(
+        path_names_simplification
     )
 
 
@@ -708,23 +767,23 @@ def execute_procedure(directory=None):
         fonts=fonts
     )
     # Word cloud.
-    # TODO: implement...
     chart_names_completion = plot_names(
-        count=500,
+        count=3000,
         nodes_metabolites=source["nodes_metabolites_completion"],
         fonts=fonts
     )
     chart_names_simplification = plot_names(
-        count=500,
+        count=3000,
         nodes_metabolites=source["nodes_metabolites_simplification"],
         fonts=fonts
     )
-
     # Compile information.
     information = {
         "chart_degrees": chart_degrees,
         "chart_ranks_completion": chart_ranks_completion,
-        "chart_ranks_simplification": chart_ranks_simplification
+        "chart_ranks_simplification": chart_ranks_simplification,
+        "chart_names_completion": chart_names_completion,
+        "chart_names_simplification": chart_names_simplification
     }
     #Write product information to file.
     write_product(directory=directory, information=information)
