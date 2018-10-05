@@ -340,7 +340,7 @@ def extract_measurements_study_zero(records=None):
 
 
 def curate_measurements_study(
-    pairs=None,
+    pair=None,
     group_numerator=None,
     group_denominator=None,
     samples=None,
@@ -353,7 +353,7 @@ def curate_measurements_study(
     Curates information about metabolomic measurements from a study.
 
     arguments:
-        pairs (bool): whether samples have dependent pairs
+        pair (bool): whether samples have dependent pairs
         group_numerator (str): name of experimental group for numerator
         group_denominator (str): name of experimental group for denominator
         samples (list<dict<str>>): information about samples from a study
@@ -377,7 +377,7 @@ def curate_measurements_study(
     )
     # Filter analytes by coverage of measurements for samples.
     summary_coverage = filter_analytes_coverage(
-        pairs=pairs,
+        pair=pair,
         summary=summary,
         group_one=group_numerator,
         group_two=group_denominator,
@@ -408,7 +408,7 @@ def curate_measurements_study(
         metabolites=metabolites
     )
     # Determine fold changes.
-    if pairs:
+    if pair:
         summary_fold = calculate_analytes_folds_pairs(
             summary=summary_metabolite,
             group_numerator=group_numerator,
@@ -431,7 +431,7 @@ def curate_measurements_study(
     # Determine p-values.
     # Compare pairs of samples in both groups.
     # Apply pair t-test for dependent sample populations.
-    if pairs:
+    if pair:
         summary_p = calculate_analytes_p_values_pairs(
             summary=summary_log,
             group_one=group_numerator,
@@ -455,7 +455,7 @@ def curate_measurements_study(
     summary_text = convert_summary_text(summary=summary_match)
     # Convert information for analysis in MetaboAnalyst.
     summary_metaboanalyst = prepare_report_metaboanalyst(
-        pairs=pairs,
+        pair=pair,
         summary=copy.deepcopy(summary_p),
         group_one=group_numerator,
         group_two=group_denominator,
@@ -468,9 +468,11 @@ def curate_measurements_study(
     print(report)
     # Compile and return information.
     return {
+        "pair": pair,
         "summary": summary_match,
         "summary_text": summary_text,
-        "summary_metaboanalyst": summary_metaboanalyst
+        "summary_metaboanalyst": summary_metaboanalyst["unpair"],
+        "summary_metaboanalyst_pair": summary_metaboanalyst["pair"]
     }
 
 
@@ -514,7 +516,7 @@ def extract_analytes_summary(analytes=None):
 
 
 def filter_analytes_coverage(
-    pairs=None,
+    pair=None,
     summary=None,
     group_one=None,
     group_two=None,
@@ -525,7 +527,7 @@ def filter_analytes_coverage(
     Filters analytes by coverage of measurements for samples.
 
     arguments:
-        pairs (bool): whether samples have dependent pairs
+        pair (bool): whether samples have dependent pairs
         summary (list<dict<str>>): information about measurements for analytes
         group_one (str): name of experimental group
         group_two (str): name of experimental group
@@ -540,7 +542,7 @@ def filter_analytes_coverage(
 
     """
 
-    if pairs:
+    if pair:
         # Filter analytes with adequate coverage of pairs of samples.
         # Determine pairs of samples.
         pairs_samples = determine_pairs_samples(
@@ -721,14 +723,17 @@ def enhance_analytes_references(
         # Include references to HMDB.
         record["references"]["hmdb"] = hmdb_keys
         # Enhance references to PubChem.
-        pubchem = []
+        # Give priority to PubChem identifier from Metabolomics Workbench by
+        # placing it first in the list.
+        if len(record["references"]["pubchem"]) > 0:
+            pubchem = [record["references"]["pubchem"]]
+        else:
+            pubchem = []
         for key in hmdb_keys:
             hmdb_entry = hmdb[key]
             hmdb_pubchem = hmdb_entry["reference_pubchem"]
             if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
                 pubchem.append(hmdb_pubchem)
-        if len(record["references"]["pubchem"]) > 0:
-            pubchem.append(record["references"]["pubchem"])
         pubchem_unique = utility.collect_unique_elements(pubchem)
         record["references"]["pubchem"] = pubchem_unique
         summary_novel.append(record)
@@ -860,6 +865,7 @@ def collect_entities_analytes(summary=None):
 
     entities = {}
     for record in summary:
+        # Prioritize the first identifier for PubChem.
         identifier = record["references"]["pubchem"][0]
         name = record["name"]
         analyte_identifier = record["identifier"]
@@ -1715,7 +1721,7 @@ def filter_measurements_significance(
 
 
 def prepare_report_metaboanalyst(
-    pairs=None,
+    pair=None,
     summary=None,
     group_one=None,
     group_two=None,
@@ -1726,7 +1732,61 @@ def prepare_report_metaboanalyst(
     Prepares a report for analysis in MetaboAnalyst.
 
     arguments:
-        pairs (bool): whether samples have dependent pairs
+        pair (bool): whether samples have dependent pairs
+        summary (list<dict<str>>): information about measurements for analytes
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    # Prepare metabolomic measurements for MetaboAnalyst.
+    summary_unpair = prepare_summary_metaboanalyst(
+        pair=False,
+        summary=summary,
+        group_one=group_one,
+        group_two=group_two,
+        samples=samples,
+        measurements=measurements
+    )
+    if pair:
+        summary_pair = prepare_summary_metaboanalyst(
+            pair=True,
+            summary=summary,
+            group_one=group_one,
+            group_two=group_two,
+            samples=samples,
+            measurements=measurements
+        )
+    else:
+        summary_pair = None
+    # Compile and return information.
+    return {
+        "unpair": summary_unpair,
+        "pair": summary_pair
+    }
+
+
+def prepare_summary_metaboanalyst(
+    pair=None,
+    summary=None,
+    group_one=None,
+    group_two=None,
+    samples=None,
+    measurements=None
+):
+    """
+    Prepares a report for analysis in MetaboAnalyst.
+
+    arguments:
+        pair (bool): whether samples have dependent pairs
         summary (list<dict<str>>): information about measurements for analytes
         group_one (str): name of experimental group
         group_two (str): name of experimental group
@@ -1751,7 +1811,7 @@ def prepare_report_metaboanalyst(
     records = []
     # Prepare record of labels to designate pairs and groups of samples.
     samples_labels = determine_samples_labels(
-        pairs=pairs,
+        pair=pair,
         group_one=group_one,
         group_two=group_two,
         samples=samples
@@ -1770,8 +1830,10 @@ def prepare_report_metaboanalyst(
                 identifier=analyte_identifier,
                 analytes=summary
             )
+            # Use PubChem identifier for analyte identifier.
             record_measurement = {
-                "sample": analyte["name"],
+                #"sample": analyte["name"],
+                "sample": analyte["references"]["pubchem"][0]
             }
             # Iterate on relevant samples.
             for sample in samples_labels.keys():
@@ -1784,11 +1846,12 @@ def prepare_report_metaboanalyst(
                 else:
                     record_measurement[sample] = str(0)
             records.append(record_measurement)
+    # Return information.
     return records
 
 
 def determine_samples_labels(
-    pairs=None,
+    pair=None,
     group_one=None,
     group_two=None,
     samples=None
@@ -1797,7 +1860,7 @@ def determine_samples_labels(
     Prepares a report for analysis in MetaboAnalyst.
 
     arguments:
-        pairs (bool): whether samples have dependent pairs
+        pair (bool): whether samples have dependent pairs
         group_one (str): name of experimental group
         group_two (str): name of experimental group
         samples (list<dict<str>>): information about samples from a study
@@ -1810,7 +1873,7 @@ def determine_samples_labels(
     """
 
     samples_labels = {}
-    if pairs:
+    if pair:
         # Determine pairs of samples.
         pairs_samples = determine_pairs_samples(
             group_one=group_one,
@@ -2013,7 +2076,10 @@ def write_product_study(study=None, path=None, information=None):
     # Specify directories and files.
     path_pickle = os.path.join(path, (study + ".pickle"))
     path_text = os.path.join(path, (study + ".tsv"))
-    path_metaboanalyst = os.path.join(path, (study + "_metaboanalyst.tsv"))
+    path_metaboanalyst = os.path.join(path, (study + "_metaboanalyst.txt"))
+    path_metaboanalyst_pair = os.path.join(path, (
+        study + "_metaboanalyst_pair.txt"
+    ))
     # Write information to file.
     with open(path_pickle, "wb") as file_product:
         pickle.dump(information[study]["summary"], file_product)
@@ -2023,12 +2089,24 @@ def write_product_study(study=None, path=None, information=None):
         names=information[study]["summary_text"][0].keys(),
         delimiter="\t"
     )
+    # Specify order of columns.
+    names = list(information[study]["summary_metaboanalyst"][0].keys())
+    names_minus = list(filter(lambda value: value != "sample", names))
+    names_sequence = ["sample"]
+    names_sequence.extend(names_minus)
     utility.write_file_table(
         information=information[study]["summary_metaboanalyst"],
         path_file=path_metaboanalyst,
-        names=information[study]["summary_metaboanalyst"][0].keys(),
+        names=names_sequence,
         delimiter="\t"
     )
+    if information[study]["summary_metaboanalyst_pair"] is not None:
+        utility.write_file_table(
+            information=information[study]["summary_metaboanalyst_pair"],
+            path_file=path_metaboanalyst_pair,
+            names=names_sequence,
+            delimiter="\t"
+        )
 
 
 ###############################################################################
@@ -2064,7 +2142,7 @@ def execute_procedure(directory=None):
     # Measurements from study two represent metabolites in visceral versus
     # subcutaneous adipose.
     study_one = curate_measurements_study(
-        pairs=True,
+        pair=True,
         group_numerator="visceral_fat",
         group_denominator="subcutaneous_fat",
         samples=source["study_one"]["samples"],
@@ -2077,7 +2155,7 @@ def execute_procedure(directory=None):
     # Measurements from study two represent metabolites in normal versus tumor
     # lung.
     study_two = curate_measurements_study(
-        pairs=True,
+        pair=True,
         group_numerator="tumor",
         group_denominator="normal",
         samples=source["study_two"]["samples"],
@@ -2088,7 +2166,7 @@ def execute_procedure(directory=None):
     )
     # Curate measurements from study three.
     study_three = curate_measurements_study(
-        pairs=False,
+        pair=False,
         group_numerator="ischemia",
         group_denominator="normal",
         samples=source["study_three_four"]["samples"],
@@ -2099,7 +2177,7 @@ def execute_procedure(directory=None):
     )
     # Curate measurements from study four.
     study_four = curate_measurements_study(
-        pairs=False,
+        pair=False,
         group_numerator="steatosis",
         group_denominator="normal",
         samples=source["study_three_four"]["samples"],
@@ -2110,7 +2188,7 @@ def execute_procedure(directory=None):
     )
     # Curate measurements from study five.
     study_five = curate_measurements_study(
-        pairs=True,
+        pair=True,
         group_numerator="after_exercise",
         group_denominator="before_exercise",
         samples=source["study_five"]["samples"],

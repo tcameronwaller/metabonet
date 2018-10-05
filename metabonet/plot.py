@@ -86,6 +86,7 @@ License:
 import os
 import pickle
 import copy
+import math
 
 # Relevant.
 import numpy
@@ -121,21 +122,64 @@ def read_source(directory=None):
     # Specify directories and files.
     path_conversion = os.path.join(directory, "conversion")
     path_analysis = os.path.join(directory, "analysis")
-    path_nodes_metabolites_completion = os.path.join(
-        path_analysis, "nodes_metabolites_completion.pickle"
+    path_measurement = os.path.join(directory, "measurement")
+    # Nodes.
+    path_nodes_compartments_yes_hubs_yes = os.path.join(
+        path_analysis, "nodes_metabolites_compartments-yes_hubs-yes.pickle"
     )
-    path_nodes_metabolites_simplification = os.path.join(
-        path_analysis, "nodes_metabolites_simplification.pickle"
+    path_nodes_compartments_yes_hubs_no = os.path.join(
+        path_analysis, "nodes_metabolites_compartments-yes_hubs-no.pickle"
+    )
+    path_nodes_compartments_no_hubs_yes = os.path.join(
+        path_analysis, "nodes_metabolites_compartments-no_hubs-yes.pickle"
+    )
+    path_nodes_compartments_no_hubs_no = os.path.join(
+        path_analysis, "nodes_metabolites_compartments-no_hubs-no.pickle"
+    )
+    # Measurements.
+    path_measurements_one = os.path.join(path_measurement, "study_one.pickle")
+    path_measurements_two = os.path.join(path_measurement, "study_two.pickle")
+    path_measurements_three = os.path.join(
+        path_measurement, "study_three.pickle"
+    )
+    path_measurements_four = os.path.join(
+        path_measurement, "study_four.pickle"
+    )
+    path_measurements_five = os.path.join(
+        path_measurement, "study_five.pickle"
     )
     # Read information from file.
-    with open(path_nodes_metabolites_completion, "rb") as file_source:
-        nodes_metabolites_completion = pickle.load(file_source)
-    with open(path_nodes_metabolites_simplification, "rb") as file_source:
-        nodes_metabolites_simplification = pickle.load(file_source)
+    # Nodes.
+    with open(path_nodes_compartments_yes_hubs_yes, "rb") as file_source:
+        nodes_compartments_yes_hubs_yes = pickle.load(file_source)
+    with open(path_nodes_compartments_yes_hubs_no, "rb") as file_source:
+        nodes_compartments_yes_hubs_no = pickle.load(file_source)
+    with open(path_nodes_compartments_no_hubs_yes, "rb") as file_source:
+        nodes_compartments_no_hubs_yes = pickle.load(file_source)
+    with open(path_nodes_compartments_no_hubs_no, "rb") as file_source:
+        nodes_compartments_no_hubs_no = pickle.load(file_source)
+    # Measurements.
+    with open(path_measurements_one, "rb") as file_source:
+        measurements_one = pickle.load(file_source)
+    with open(path_measurements_two, "rb") as file_source:
+        measurements_two = pickle.load(file_source)
+    with open(path_measurements_three, "rb") as file_source:
+        measurements_three = pickle.load(file_source)
+    with open(path_measurements_four, "rb") as file_source:
+        measurements_four = pickle.load(file_source)
+    with open(path_measurements_five, "rb") as file_source:
+        measurements_five = pickle.load(file_source)
     # Compile and return information.
     return {
-        "nodes_metabolites_completion": nodes_metabolites_completion,
-        "nodes_metabolites_simplification": nodes_metabolites_simplification
+        "nodes_compartments_yes_hubs_yes": nodes_compartments_yes_hubs_yes,
+        "nodes_compartments_yes_hubs_no": nodes_compartments_yes_hubs_no,
+        "nodes_compartments_no_hubs_yes": nodes_compartments_no_hubs_yes,
+        "nodes_compartments_no_hubs_no": nodes_compartments_no_hubs_no,
+        "measurements_one": measurements_one,
+        "measurements_two": measurements_two,
+        "measurements_three": measurements_three,
+        "measurements_four": measurements_four,
+        "measurements_five": measurements_five
     }
 
 
@@ -184,21 +228,57 @@ def define_font_properties():
     }
 
 
+def define_color_properties():
+    """
+    Defines color properties.
+
+    arguments:
+
+    raises:
+
+    returns:
+        (dict<tuple>): references to definitions of color properties
+
+    """
+
+    # Black.
+    black = (0.0, 0.0, 0.0, 1.0)
+    # White.
+    white = (1.0, 1.0, 1.0, 1.0)
+    white_faint = (1.0, 1.0, 1.0, 0.75)
+    # Blue.
+    blue = (0.0, 0.2, 0.5, 1.0)
+    blue_faint = (0.0, 0.2, 0.5, 0.75)
+    # Orange.
+    orange = (1.0, 0.6, 0.2, 1.0)
+    orange_faint = (1.0, 0.6, 0.2, 0.75)
+    # Compile and return references.
+    return {
+        "black": black,
+        "white": white,
+        "white_faint": white_faint,
+        "blue": blue,
+        "blue_faint": blue_faint,
+        "orange": orange,
+        "orange_faint": orange_faint
+    }
+
+
 def plot_degrees(
-    nodes_metabolites_completion=None,
-    nodes_metabolites_simplification=None,
-    fonts=None
+    nodes_hubs_yes=None,
+    nodes_hubs_no=None,
+    fonts=None,
+    colors=None
 ):
     """
     Creates a chart to represent distributions of degrees of metabolites'
     nodes.
 
     arguments:
-        nodes_metabolites_completion (dict<dict>): information about
-            metabolites' nodes
-        nodes_metabolites_simplification (dict<dict>): information about
-            metabolites' nodes
+        nodes_hubs_yes (dict<dict>): information about metabolites' nodes
+        nodes_hubs_no (dict<dict>): information about metabolites' nodes
         fonts (dict<object>): references to definitions of font properties
+        colors (dict<tuple>): references to definitions of color properties
 
     raises:
 
@@ -209,18 +289,19 @@ def plot_degrees(
 
     series_one = utility.collect_value_from_records(
         key="degree",
-        records=nodes_metabolites_completion.values()
+        records=nodes_hubs_yes.values()
     )
     series_two = utility.collect_value_from_records(
         key="degree",
-        records=nodes_metabolites_simplification.values()
+        records=nodes_hubs_no.values()
     )
     chart_degrees = plot_two_distributions_histograms(
         series_one=series_one,
         series_two=series_two,
-        name_one="Completion",
-        name_two="Simplification",
-        fonts=fonts
+        name_one="+ Hubs",
+        name_two="-- Hubs",
+        fonts=fonts,
+        colors=colors
     )
     # Return reference to figure.
     return chart_degrees
@@ -231,7 +312,8 @@ def plot_two_distributions_histograms(
     series_two=None,
     name_one=None,
     name_two=None,
-    fonts=None
+    fonts=None,
+    colors=None
 ):
     """
     Creates a histogram chart to represent frequency distributions of two
@@ -243,6 +325,7 @@ def plot_two_distributions_histograms(
         name_one (str): name of distribution
         name_two (str): name of distribution
         fonts (dict<object>): references to definitions of font properties
+        colors (dict<tuple>): references to definitions of color properties
 
     raises:
 
@@ -267,7 +350,7 @@ def plot_two_distributions_histograms(
         orientation="vertical",
         rwidth=0.35,
         log=True,
-        color=(0.0, 0.2, 0.5, 1.0),
+        color=colors["blue"],
         label=name_one,
         stacked=False
     )
@@ -279,7 +362,7 @@ def plot_two_distributions_histograms(
         orientation="vertical",
         rwidth=0.35,
         log=True,
-        color=(1.0, 0.6, 0.2, 1.0),
+        color=colors["orange"],
         label=name_two,
         stacked=False
     )
@@ -288,22 +371,22 @@ def plot_two_distributions_histograms(
         markerscale=2.5,
         markerfirst=True,
         prop=fonts["font_one"],
-        edgecolor=(0.0, 0.0, 0.0, 1.0)
+        edgecolor=colors["black"]
     )
     axes.set_xlabel(
         xlabel="Node Degree",
-        labelpad=25,
+        labelpad=20,
         alpha=1.0,
-        backgroundcolor=(1.0, 1.0, 1.0, 1.0),
-        color=(0.0, 0.0, 0.0, 1.0),
+        backgroundcolor=colors["white"],
+        color=colors["black"],
         fontproperties=fonts["font_one"]
     )
     axes.set_ylabel(
         ylabel="Count of Nodes",
-        labelpad=25,
+        labelpad=20,
         alpha=1.0,
-        backgroundcolor=(1.0, 1.0, 1.0, 1.0),
-        color=(0.0, 0.0, 0.0, 1.0),
+        backgroundcolor=colors["white"],
+        color=colors["black"],
         fontproperties=fonts["font_one"]
     )
     axes.tick_params(
@@ -312,159 +395,30 @@ def plot_two_distributions_histograms(
         direction="out",
         length=5.0,
         width=3.0,
-        color=(0.0, 0.0, 0.0, 1.0),
+        color=colors["black"],
         pad=5,
         labelsize=fonts["font_two"].get_size(),
-        labelcolor=(0.0, 0.0, 0.0, 1.0)
+        labelcolor=colors["black"]
     )
     return figure
 
 
-# TODO: this old version might be useful for word clouds?
-
-def prepare_metabolites_ranks_maybe_useful_for_word_clouds(
-    nodes_metabolites=None
-):
-    """
-    Prepares summary information about ranks of metabolites' nodes.
-
-    arguments:
-        nodes_metabolites (dict<dict>): information about metabolites' nodes
-
-    raises:
-
-    returns:
-        (dict<list<dict<str>>): summaries of metabolites' nodes' ranks
-
-    """
-
-    # TODO: do not need to split the ranks up... keep together...
-
-    # Filter records to include the nodes with the top 25 total ranks.
-    ranks_total = extract_sort_filter_ranks(
-        rank="rank",
-        filter_by="count",
-        count=26,
-        nodes_metabolites=nodes_metabolites
-    )
-    # Filter records to include all nodes with the top 25 total ranks.
-    ranks_total_identifiers = utility.collect_value_from_records(
-        key="identifier",
-        records=ranks_total
-    )
-    ranks_degree = extract_sort_filter_ranks(
-        rank="rank_centrality_degree",
-        filter_by="identifier",
-        identifiers=ranks_total_identifiers,
-        nodes_metabolites=nodes_metabolites
-    )
-    ranks_betweenness = extract_sort_filter_ranks(
-        rank="rank_centrality_betweenness",
-        filter_by="identifier",
-        identifiers=ranks_total_identifiers,
-        nodes_metabolites=nodes_metabolites
-    )
-    # Compile and return information.
-    return {
-        "total": ranks_total,
-        "degree": ranks_degree,
-        "betweenness": ranks_betweenness
-    }
-
-
-def extract_sort_filter_ranks(
-    rank=None,
-    filter_by=None,
-    count=None,
-    identifiers=None,
-    nodes_metabolites=None
-):
-    """
-    Extracts, sorts, and filters information about ranks of metabolites' nodes.
-
-    arguments:
-        rank (str): key of rank's value in each entry
-        filter_by (str): whether to filter records by count of ranks or by
-            identifiers
-        count (int): count of ranks to include in summary
-        identifiers (list<str>): identifiers of nodes to include in summary
-        nodes_metabolites (dict<dict>): information about metabolites' nodes
-
-    raises:
-
-    returns:
-        (list<dict<str>): summary of metabolites' nodes' ranks
-
-    """
-
-    # Extract relevant information.
-    ranks_raw = []
-    for node in nodes_metabolites.values():
-        identifier = node["identifier"]
-        name = node["name"]
-        rank_node = node[rank]
-        record = {
-            "identifier": identifier,
-            "name": name,
-            "rank": rank_node
-        }
-        ranks_raw.append(record)
-    # Sort information by rank.
-    ranks_sort = sorted(
-        ranks_raw,
-        key=lambda record: record["rank"],
-        reverse=False
-    )
-    # Filter information.
-    if filter_by == "count":
-        ranks_filter = list(filter(
-            lambda record: record["rank"] < count,
-            ranks_sort
-        ))
-    elif filter_by == "identifier":
-        ranks_filter = list(filter(
-            lambda record: record["identifier"] in identifiers,
-            ranks_sort
-        ))
-    return ranks_filter
-
-
-def determine_ranks_summary_extremes(ranks_summary=None):
-    """
-    Determines minimal and maximal values of all ranks in summary.
-
-    arguments:
-        ranks_summary (list<dict<str>): summary of metabolites' nodes' ranks
-
-    raises:
-
-    returns:
-        (tuple<int, int>): minimal and maximal ranks
-
-    """
-
-    ranks = []
-    for record in ranks_summary:
-        ranks.append(record["rank_total"])
-        ranks.append(record["rank_degree"])
-        ranks.append(record["rank_betweenness"])
-    minimum = min(ranks)
-    maximum = max(ranks)
-    return (minimum, maximum)
-
-
 def plot_ranks(
+    color=None,
     count=None,
     nodes_metabolites=None,
-    fonts=None
+    fonts=None,
+    colors=None
 ):
     """
     Creates a chart to represent ranks of metabolites' nodes.
 
     arguments:
+        color (int): specific color to use
         count (int): count of metabolites' nodes to include in summary
         nodes_metabolites (dict<dict>): information about metabolites' nodes
         fonts (dict<object>): references to definitions of font properties
+        colors (dict<tuple>): references to definitions of color properties
 
     raises:
 
@@ -478,8 +432,10 @@ def plot_ranks(
         nodes_metabolites=nodes_metabolites
     )
     chart_ranks = plot_three_ranks_parallel_coordinates(
+        color=color,
         ranks_summary=ranks_summary,
-        fonts=fonts
+        fonts=fonts,
+        colors=colors
     )
     # Return reference to figure.
     return chart_ranks
@@ -534,16 +490,20 @@ def prepare_ranks_summary(
 
 
 def plot_three_ranks_parallel_coordinates(
+    color=None,
     ranks_summary=None,
-    fonts=None
+    fonts=None,
+    colors=None
 ):
     """
     Creates a parallel coordinates chart to represent ranks of metabolites'
     nodes.
 
     arguments:
+        color (str): specific color to use
         ranks_summary (list<dict<str>): summary of metabolites' nodes' ranks
         fonts (dict<object>): references to definitions of font properties
+        colors (dict<tuple>): references to definitions of color properties
 
     raises:
 
@@ -557,7 +517,7 @@ def plot_three_ranks_parallel_coordinates(
         ranks_summary=ranks_summary
     )
     # Extract information for each axis.
-    categories = ["Degree Rank", "Total Rank", "Betweenness Rank"]
+    categories = ["Degree", "Total", "Betweenness"]
     # Create chart.
     figure = pyplot.figure(
         figsize=(11.811, 15.748),
@@ -567,10 +527,10 @@ def plot_three_ranks_parallel_coordinates(
     axes.invert_yaxis()
     axes.set_ylabel(
         ylabel="Node Ranks",
-        labelpad=25,
+        labelpad=20,
         alpha=1.0,
-        backgroundcolor=(1.0, 1.0, 1.0, 1.0),
-        color=(0.0, 0.0, 0.0, 1.0),
+        backgroundcolor=colors["white"],
+        color=colors["black"],
         fontproperties=fonts["font_one"]
     )
     axes.tick_params(
@@ -579,10 +539,10 @@ def plot_three_ranks_parallel_coordinates(
         direction="out",
         length=5.0,
         width=3.0,
-        color=(0.0, 0.0, 0.0, 1.0),
+        color=colors["black"],
         pad=5,
         labelsize=fonts["font_one"].get_size(),
-        labelcolor=(0.0, 0.0, 0.0, 1.0)
+        labelcolor=colors["black"]
     )
     for category in categories:
         axes.axvline(
@@ -590,7 +550,7 @@ def plot_three_ranks_parallel_coordinates(
             ymin=0,
             ymax=1,
             alpha=1.0,
-            color=(0.0, 0.0, 0.0, 1.0)
+            color=colors["black"]
         )
     # Create a plot for each value.
     for record in ranks_summary:
@@ -602,21 +562,45 @@ def plot_three_ranks_parallel_coordinates(
         axes.plot(
             categories,
             values,
-            color=(0.0, 0.2, 0.5, 0.75),
-            linewidth=1.0
+            color=colors[color],
+            linewidth=2.5
         )
         axes.text(
             categories[1],
             values[1],
             record["name"],
-            backgroundcolor=(1.0, 1.0, 1.0, 0.5),
-            color=(0.0, 0.0, 0.0, 1.0),
-            fontproperties=fonts["font_three"],
+            backgroundcolor=colors["white_faint"],
+            color=colors["black"],
+            fontproperties=fonts["font_two"],
             horizontalalignment="center",
             verticalalignment="center"
         )
     # Return reference to figure.
     return figure
+
+
+def determine_ranks_summary_extremes(ranks_summary=None):
+    """
+    Determines minimal and maximal values of all ranks in summary.
+
+    arguments:
+        ranks_summary (list<dict<str>): summary of metabolites' nodes' ranks
+
+    raises:
+
+    returns:
+        (tuple<int, int>): minimal and maximal ranks
+
+    """
+
+    ranks = []
+    for record in ranks_summary:
+        ranks.append(record["rank_total"])
+        ranks.append(record["rank_degree"])
+        ranks.append(record["rank_betweenness"])
+    minimum = min(ranks)
+    maximum = max(ranks)
+    return (minimum, maximum)
 
 
 def plot_names(
@@ -647,12 +631,12 @@ def plot_names(
         names_frequencies[name] = degree
     # Create word cloud.
     chart_names = wordcloud.WordCloud(
-        width=6000,#2000, 4000, 6000,
-        height=4500,#1500, 3000, 4500,
-        min_font_size=5,
-        max_font_size=500,#500
+        width=3000,#2000, 4000, 6000,
+        height=4000,#1500, 3000, 4500,
+        min_font_size=1,
+        max_font_size=300,#200, #300, 500
         max_words=count,
-        colormap="viridis",#"viridis", "plasma", "ocean", "gist_earth",
+        colormap="ocean",#"viridis", "plasma", "ocean", "gist_earth",
         background_color="white",
         prefer_horizontal=0.90,
         relative_scaling=0.75,
@@ -662,6 +646,181 @@ def plot_names(
     )
     # Return reference to figure.
     return chart_names
+
+
+def plot_volcano(
+    records=None,
+    threshold_p=None,
+    threshold_fold=None,
+    label=None,
+    fonts=None,
+    colors=None
+):
+    """
+    Creates a volcano chart to represent p-values and fold changes.
+
+    arguments:
+        records (list<dict): information about values
+        threshold_p (float): threshold by p-value
+        threshold_fold (float): threshold by fold change
+        label (bool): whether to plot labels for points within thresholds
+        fonts (dict<object>): references to definitions of font properties
+        colors (dict<tuple>): references to definitions of color properties
+
+    raises:
+
+    returns:
+        (object): chart object
+
+    """
+
+    # Separate records of values within and without thresholds.
+    records_threshold = filter_records_thresholds(
+        records=records,
+        threshold_p=threshold_p,
+        threshold_fold=threshold_fold
+    )
+    # Create chart.
+    figure = pyplot.figure(
+        figsize=(15.748, 11.811),
+        tight_layout=True
+    )
+    axes = pyplot.axes()
+    axes.set_xlabel(
+        xlabel="log2(fold)",
+        labelpad=20,
+        alpha=1.0,
+        backgroundcolor=colors["white"],
+        color=colors["black"],
+        fontproperties=fonts["font_one"]
+    )
+    axes.set_ylabel(
+        ylabel="-log10(p-value)",
+        labelpad=20,
+        alpha=1.0,
+        backgroundcolor=colors["white"],
+        color=colors["black"],
+        fontproperties=fonts["font_one"]
+    )
+    axes.tick_params(
+        axis="both",
+        which="both",
+        direction="out",
+        length=5.0,
+        width=3.0,
+        color=colors["black"],
+        pad=5,
+        labelsize=fonts["font_one"].get_size(),
+        labelcolor=colors["black"]
+    )
+    # Create lines for thresholds.
+    axes.axvline(
+        x=math.log(threshold_fold, 2),
+        ymin=0,
+        ymax=1,
+        alpha=1.0,
+        color=colors["black"],
+        linestyle="--",
+        linewidth=2.5,
+    )
+    axes.axvline(
+        x=(-1 * math.log(threshold_fold, 2)),
+        ymin=0,
+        ymax=1,
+        alpha=1.0,
+        color=colors["black"],
+        linestyle="--",
+        linewidth=2.5,
+    )
+    axes.axhline(
+        y=(-1 * math.log(threshold_p, 10)),
+        ymin=0,
+        ymax=1,
+        alpha=1.0,
+        color=colors["black"],
+        linestyle="--",
+        linewidth=2.5,
+    )
+    # Plot values external to thresholds.
+    for record in records_threshold["external"]:
+        p_value = record["p_value"]
+        p_value_log = (-1 * math.log(p_value, 10))
+        fold = record["fold"]
+        fold_log = math.log(threshold_fold, 2)
+        axes.plot(
+            fold_log,
+            p_value_log,
+            linestyle="",
+            marker="o",
+            markeredgecolor=colors["blue"],
+            markerfacecolor=colors["blue"]
+        )
+    # Plot values internal to thresholds.
+    for record in records_threshold["internal"]:
+        name = record["name"]
+        p_value = record["p_value"]
+        p_value_log = (-1 * math.log(p_value, 10))
+        fold = record["fold"]
+        fold_log = math.log(threshold_fold, 2)
+        axes.plot(
+            fold_log,
+            p_value_log,
+            linestyle="",
+            marker="o",
+            markeredgecolor=colors["orange"],
+            markerfacecolor=colors["orange"]
+        )
+        axes.text(
+            fold_log,
+            p_value_log,
+            name,
+            backgroundcolor=colors["white_faint"],
+            color=colors["black"],
+            fontproperties=fonts["font_three"],
+            horizontalalignment="center",
+            verticalalignment="center"
+        )
+    # Return reference to figure.
+    return figure
+
+
+def filter_records_thresholds(
+    records=None,
+    threshold_p=None,
+    threshold_fold=None
+):
+    """
+    Filters records by whether their values are within or without thresholds.
+
+    arguments:
+        records (list<dict): information about values
+        threshold_p (float): threshold by p-value
+        threshold_fold (float): threshold by fold change
+
+    raises:
+
+    returns:
+        (dict<list<dict>>): records within and without thresholds
+
+    """
+
+    # Collect records with values within or without thresholds.
+    records_internal = []
+    records_external = []
+    for record in records:
+        p_value = record["p_value"]
+        fold = record["fold"]
+        match_p = (p_value < threshold_p)
+        match_fold = (fold > threshold_fold) or (fold < (1 / threshold_fold))
+        if match_p and match_fold:
+            records_internal.append(record)
+        else:
+            records_external.append(record)
+    # Compile and return information.
+    return {
+        "internal": records_internal,
+        "external": records_external
+    }
 
 
 def write_product(directory=None, information=None):
@@ -679,48 +838,104 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "plot")
+    path = os.path.join(directory, "plot2")
     utility.confirm_path_directory(path)
-    path_degrees = os.path.join(path, "metabolite_degrees.svg")
-    path_ranks_completion = os.path.join(
-        path, "metabolite_ranks_completion.svg"
+    # Degree.
+    path_degree_compartments_yes = os.path.join(
+        path, "metabolite_degrees_compartments-yes.svg"
     )
-    path_ranks_simplification = os.path.join(
-        path, "metabolite_ranks_simplification.svg"
+    path_degree_compartments_no = os.path.join(
+        path, "metabolite_degrees_compartments-no.svg"
     )
-    path_names_completion = os.path.join(
-        path, "metabolite_names_completion.png"
+    # Rank.
+    path_rank_compartments_yes_hubs_yes = os.path.join(
+        path, "metabolite_ranks_compartments-yes_hubs-yes.svg"
     )
-    path_names_simplification = os.path.join(
-        path, "metabolite_names_simplification.png"
+    path_rank_compartments_yes_hubs_no = os.path.join(
+        path, "metabolite_ranks_compartments-yes_hubs-no.svg"
     )
+    path_rank_compartments_no_hubs_yes = os.path.join(
+        path, "metabolite_ranks_compartments-no_hubs-yes.svg"
+    )
+    path_rank_compartments_no_hubs_no = os.path.join(
+        path, "metabolite_ranks_compartments-no_hubs-no.svg"
+    )
+    # Name.
+    path_name_compartments_yes_hubs_yes = os.path.join(
+        path, "metabolite_names_compartments-yes_hubs-yes.png"
+    )
+    path_name_compartments_yes_hubs_no = os.path.join(
+        path, "metabolite_names_compartments-yes_hubs-no.png"
+    )
+    path_name_compartments_no_hubs_yes = os.path.join(
+        path, "metabolite_names_compartments-no_hubs-yes.png"
+    )
+    path_name_compartments_no_hubs_no = os.path.join(
+        path, "metabolite_names_compartments-no_hubs-no.png"
+    )
+    # Measurement.
+    path_measurement_one = os.path.join(path, "measurement_one.svg")
     # Write information to file.
-    information["chart_degrees"].savefig(
-        path_degrees,
+    information["degree_compartments_yes"].savefig(
+        path_degree_compartments_yes,
         format="svg",
         dpi=600,
         facecolor="w",
         edgecolor="w"
     )
-    information["chart_ranks_completion"].savefig(
-        path_ranks_completion,
+    information["degree_compartments_no"].savefig(
+        path_degree_compartments_no,
         format="svg",
         dpi=600,
         facecolor="w",
         edgecolor="w"
     )
-    information["chart_ranks_simplification"].savefig(
-        path_ranks_simplification,
+    information["rank_compartments_yes_hubs_yes"].savefig(
+        path_rank_compartments_yes_hubs_yes,
         format="svg",
         dpi=600,
         facecolor="w",
         edgecolor="w"
     )
-    information["chart_names_completion"].to_file(
-        path_names_completion
+    information["rank_compartments_yes_hubs_no"].savefig(
+        path_rank_compartments_yes_hubs_no,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w"
     )
-    information["chart_names_simplification"].to_file(
-        path_names_simplification
+    information["rank_compartments_no_hubs_yes"].savefig(
+        path_rank_compartments_no_hubs_yes,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w"
+    )
+    information["rank_compartments_no_hubs_no"].savefig(
+        path_rank_compartments_no_hubs_no,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w"
+    )
+    information["name_compartments_yes_hubs_yes"].to_file(
+        path_name_compartments_yes_hubs_yes
+    )
+    information["name_compartments_yes_hubs_no"].to_file(
+        path_name_compartments_yes_hubs_no
+    )
+    information["name_compartments_no_hubs_yes"].to_file(
+        path_name_compartments_no_hubs_yes
+    )
+    information["name_compartments_no_hubs_no"].to_file(
+        path_name_compartments_no_hubs_no
+    )
+    information["measurement_one"].savefig(
+        path_measurement_one,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w"
     )
 
 
@@ -747,43 +962,98 @@ def execute_procedure(directory=None):
     source = read_source(directory=directory)
     # Define font properties.
     fonts = define_font_properties()
-    # Plot distributions for nodes' degrees before and after simplification.
-    chart_degrees = plot_degrees(
-        nodes_metabolites_completion=source["nodes_metabolites_completion"],
-        nodes_metabolites_simplification=(
-            source["nodes_metabolites_simplification"]
-        ),
-        fonts=fonts
+    # Define colors.
+    colors = define_color_properties()
+    # Distributions of nodes' degrees.
+    chart_degree_compartments_yes = plot_degrees(
+        nodes_hubs_yes=source["nodes_compartments_yes_hubs_yes"],
+        nodes_hubs_no=source["nodes_compartments_yes_hubs_no"],
+        fonts=fonts,
+        colors=colors
     )
-    # Parallel coordinates chart for ranks of metabolites' nodes.
-    chart_ranks_completion = plot_ranks(
-        count=20,
-        nodes_metabolites=source["nodes_metabolites_completion"],
-        fonts=fonts
+    chart_degree_compartments_no = plot_degrees(
+        nodes_hubs_yes=source["nodes_compartments_no_hubs_yes"],
+        nodes_hubs_no=source["nodes_compartments_no_hubs_no"],
+        fonts=fonts,
+        colors=colors
     )
-    chart_ranks_simplification = plot_ranks(
-        count=20,
-        nodes_metabolites=source["nodes_metabolites_simplification"],
-        fonts=fonts
+    # Ranks of nodes.
+    chart_rank_compartments_yes_hubs_yes = plot_ranks(
+        color="blue",
+        count=10,
+        nodes_metabolites=source["nodes_compartments_yes_hubs_yes"],
+        fonts=fonts,
+        colors=colors
     )
-    # Word cloud.
-    chart_names_completion = plot_names(
+    chart_rank_compartments_yes_hubs_no = plot_ranks(
+        color="orange",
+        count=10,
+        nodes_metabolites=source["nodes_compartments_yes_hubs_no"],
+        fonts=fonts,
+        colors=colors
+    )
+    chart_rank_compartments_no_hubs_yes = plot_ranks(
+        color="blue",
+        count=10,
+        nodes_metabolites=source["nodes_compartments_no_hubs_yes"],
+        fonts=fonts,
+        colors=colors
+    )
+    chart_rank_compartments_no_hubs_no = plot_ranks(
+        color="orange",
+        count=10,
+        nodes_metabolites=source["nodes_compartments_no_hubs_no"],
+        fonts=fonts,
+        colors=colors
+    )
+    # Names of nodes.
+    chart_name_compartments_yes_hubs_yes = plot_names(
         count=3000,
-        nodes_metabolites=source["nodes_metabolites_completion"],
+        nodes_metabolites=source["nodes_compartments_yes_hubs_yes"],
         fonts=fonts
     )
-    chart_names_simplification = plot_names(
+    chart_name_compartments_yes_hubs_no = plot_names(
         count=3000,
-        nodes_metabolites=source["nodes_metabolites_simplification"],
+        nodes_metabolites=source["nodes_compartments_yes_hubs_no"],
         fonts=fonts
+    )
+    chart_name_compartments_no_hubs_yes = plot_names(
+        count=3000,
+        nodes_metabolites=source["nodes_compartments_no_hubs_yes"],
+        fonts=fonts
+    )
+    chart_name_compartments_no_hubs_no = plot_names(
+        count=3000,
+        nodes_metabolites=source["nodes_compartments_no_hubs_no"],
+        fonts=fonts
+    )
+    # Volcano plots for metabolomic measurements.
+    # source["measurements_one"]
+    # include threshold dashed lines for p-value and fold-change...
+    # points beyond thresholds should be orange... all others blue...
+    chart_measurement_one = plot_volcano(
+        records=source["measurements_one"],
+        threshold_p=0.01,
+        threshold_fold=2.0,
+        label=True,
+        fonts=fonts,
+        colors=colors
     )
     # Compile information.
     information = {
-        "chart_degrees": chart_degrees,
-        "chart_ranks_completion": chart_ranks_completion,
-        "chart_ranks_simplification": chart_ranks_simplification,
-        "chart_names_completion": chart_names_completion,
-        "chart_names_simplification": chart_names_simplification
+        "degree_compartments_yes": chart_degree_compartments_yes,
+        "degree_compartments_no": chart_degree_compartments_no,
+        "rank_compartments_yes_hubs_yes": (
+            chart_rank_compartments_yes_hubs_yes
+        ),
+        "rank_compartments_yes_hubs_no": chart_rank_compartments_yes_hubs_no,
+        "rank_compartments_no_hubs_yes": chart_rank_compartments_no_hubs_yes,
+        "rank_compartments_no_hubs_no": chart_rank_compartments_no_hubs_no,
+        "name_compartments_yes_hubs_yes": chart_name_compartments_yes_hubs_yes,
+        "name_compartments_yes_hubs_no": chart_name_compartments_yes_hubs_no,
+        "name_compartments_no_hubs_yes": chart_name_compartments_no_hubs_yes,
+        "name_compartments_no_hubs_no": chart_name_compartments_no_hubs_no,
+        "measurement_one": chart_measurement_one,
     }
     #Write product information to file.
     write_product(directory=directory, information=information)

@@ -179,6 +179,19 @@ def transfer_summary_midas(summary_hmdb=None, midas_original=None):
     return midas_novel
 
 
+def determine_reactant_product_neighbors():
+    # Possibly even iterate only on the reactions already known to involve the
+    # metabolite.
+    for reaction in reactions.values():
+        # Get reaction's reactants and products.
+        #reactants =
+        #products =
+        # Determine whether query metabolite matches any reactants of products.
+        # If query metabolite matches, then collect all reactants and products.
+        pass
+
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -236,7 +249,7 @@ def execute_procedure(directory=None):
 
     """
 
-    # TODO: read in MIDAS, hmdb summary, and information from 
+    # TODO: read in MIDAS, hmdb summary, and information from
 
     # Read source information from file.
     source = read_source(directory=directory)

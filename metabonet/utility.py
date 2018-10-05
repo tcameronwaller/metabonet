@@ -209,6 +209,7 @@ def write_file_table(
     Writes information to file
 
     arguments:
+        information (list<str>): information
         path_file (str): path to directory and file
         names (list<str>): names for values in each row of table
         delimiter (str): delimiter between values in the table
