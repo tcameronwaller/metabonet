@@ -150,14 +150,15 @@ def read_source(directory=None):
     )
     # Read information from file.
     # Nodes.
-    with open(path_nodes_one, "rb") as file_source:
-        nodes_one = pickle.load(file_source)
-    with open(path_nodes_two, "rb") as file_source:
-        nodes_two = pickle.load(file_source)
-    with open(path_nodes_three, "rb") as file_source:
-        nodes_three = pickle.load(file_source)
-    with open(path_nodes_four, "rb") as file_source:
-        nodes_four = pickle.load(file_source)
+    if False:
+        with open(path_nodes_one, "rb") as file_source:
+            nodes_one = pickle.load(file_source)
+        with open(path_nodes_two, "rb") as file_source:
+            nodes_two = pickle.load(file_source)
+        with open(path_nodes_three, "rb") as file_source:
+            nodes_three = pickle.load(file_source)
+        with open(path_nodes_four, "rb") as file_source:
+            nodes_four = pickle.load(file_source)
     # Measurements.
     with open(path_measurements_one, "rb") as file_source:
         measurements_one = pickle.load(file_source)
@@ -171,10 +172,10 @@ def read_source(directory=None):
         measurements_five = pickle.load(file_source)
     # Compile and return information.
     return {
-        "nodes_one": nodes_one,
-        "nodes_two": nodes_two,
-        "nodes_three": nodes_three,
-        "nodes_four": nodes_four,
+        #"nodes_one": nodes_one,
+        #"nodes_two": nodes_two,
+        #"nodes_three": nodes_three,
+        #"nodes_four": nodes_four,
         "measurements_one": measurements_one,
         "measurements_two": measurements_two,
         "measurements_three": measurements_three,
@@ -1147,39 +1148,40 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "plot2")
     utility.confirm_path_directory(path)
-    # Degree.
-    path_degree_one_two = os.path.join(
-        path, "metabolite_degrees_compartments-yes.svg"
-    )
-    path_degree_three_four = os.path.join(
-        path, "metabolite_degrees_compartments-no.svg"
-    )
-    # Rank.
-    path_rank_one = os.path.join(
-        path, "metabolite_ranks_compartments-yes_hubs-yes.svg"
-    )
-    path_rank_two = os.path.join(
-        path, "metabolite_ranks_compartments-yes_hubs-no.svg"
-    )
-    path_rank_three = os.path.join(
-        path, "metabolite_ranks_compartments-no_hubs-yes.svg"
-    )
-    path_rank_four = os.path.join(
-        path, "metabolite_ranks_compartments-no_hubs-no.svg"
-    )
-    # Name.
-    path_name_one = os.path.join(
-        path, "metabolite_names_compartments-yes_hubs-yes.png"
-    )
-    path_name_two = os.path.join(
-        path, "metabolite_names_compartments-yes_hubs-no.png"
-    )
-    path_name_three = os.path.join(
-        path, "metabolite_names_compartments-no_hubs-yes.png"
-    )
-    path_name_four = os.path.join(
-        path, "metabolite_names_compartments-no_hubs-no.png"
-    )
+    if False:
+        # Degree.
+        path_degree_one_two = os.path.join(
+            path, "metabolite_degrees_compartments-yes.svg"
+        )
+        path_degree_three_four = os.path.join(
+            path, "metabolite_degrees_compartments-no.svg"
+        )
+        # Rank.
+        path_rank_one = os.path.join(
+            path, "metabolite_ranks_compartments-yes_hubs-yes.svg"
+        )
+        path_rank_two = os.path.join(
+            path, "metabolite_ranks_compartments-yes_hubs-no.svg"
+        )
+        path_rank_three = os.path.join(
+            path, "metabolite_ranks_compartments-no_hubs-yes.svg"
+        )
+        path_rank_four = os.path.join(
+            path, "metabolite_ranks_compartments-no_hubs-no.svg"
+        )
+        # Name.
+        path_name_one = os.path.join(
+            path, "metabolite_names_compartments-yes_hubs-yes.png"
+        )
+        path_name_two = os.path.join(
+            path, "metabolite_names_compartments-yes_hubs-no.png"
+        )
+        path_name_three = os.path.join(
+            path, "metabolite_names_compartments-no_hubs-yes.png"
+        )
+        path_name_four = os.path.join(
+            path, "metabolite_names_compartments-no_hubs-no.png"
+        )
     # Measurement.
     path_measurement_one = os.path.join(path, "measurements_one.svg")
     path_measurement_two = os.path.join(path, "measurements_two.svg")
@@ -1308,25 +1310,26 @@ def execute_procedure(directory=None):
     fonts = define_font_properties()
     # Define colors.
     colors = define_color_properties()
-    # Distributions of nodes' degrees.
-    charts_degrees = plot_degrees(
-        nodes_one=source["nodes_one"],
-        nodes_two=source["nodes_two"],
-        nodes_three=source["nodes_three"],
-        nodes_four=source["nodes_four"],
-        fonts=fonts,
-        colors=colors
-    )
-    # Ranks of nodes.
-    charts_ranks = plot_ranks(
-        count=10,
-        nodes_one=source["nodes_one"],
-        nodes_two=source["nodes_two"],
-        nodes_three=source["nodes_three"],
-        nodes_four=source["nodes_four"],
-        fonts=fonts,
-        colors=colors
-    )
+    if False:
+        # Distributions of nodes' degrees.
+        charts_degrees = plot_degrees(
+            nodes_one=source["nodes_one"],
+            nodes_two=source["nodes_two"],
+            nodes_three=source["nodes_three"],
+            nodes_four=source["nodes_four"],
+            fonts=fonts,
+            colors=colors
+        )
+        # Ranks of nodes.
+        charts_ranks = plot_ranks(
+            count=10,
+            nodes_one=source["nodes_one"],
+            nodes_two=source["nodes_two"],
+            nodes_three=source["nodes_three"],
+            nodes_four=source["nodes_four"],
+            fonts=fonts,
+            colors=colors
+        )
     # Names of nodes.
     if False:
         charts_names = plot_names(
@@ -1352,8 +1355,8 @@ def execute_procedure(directory=None):
     )
     # Compile information.
     information = {
-        "charts_degrees": charts_degrees,
-        "charts_ranks": charts_ranks,
+        #"charts_degrees": charts_degrees,
+        #"charts_ranks": charts_ranks,
         #"charts_names": charts_names,
         "charts_measurements": charts_measurements
     }

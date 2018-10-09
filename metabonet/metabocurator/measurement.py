@@ -121,25 +121,26 @@ def read_source(directory=None):
         path=path_measurement,
         directory="metabolomics-workbench_pr000058_st000061"
     )
-    study_two = read_source_study(
-        path=path_measurement,
-        directory="metabolomics-workbench_pr000305_st000390"
-    )
-    study_three_four = read_source_study(
-        path=path_measurement,
-        directory="metabolomics-workbench_pr000322_st000412"
-    )
-    study_five = read_source_study(
-        path=path_measurement,
-        directory="metabolomics-workbench_pr000599_st000842"
-    )
+    if False:
+        study_two = read_source_study(
+            path=path_measurement,
+            directory="metabolomics-workbench_pr000305_st000390"
+        )
+        study_three_four = read_source_study(
+            path=path_measurement,
+            directory="metabolomics-workbench_pr000322_st000412"
+        )
+        study_five = read_source_study(
+            path=path_measurement,
+            directory="metabolomics-workbench_pr000599_st000842"
+        )
     # Compile and return information.
     return {
         "reference": reference,
         "study_one": study_one,
-        "study_two": study_two,
-        "study_three_four": study_three_four,
-        "study_five": study_five
+        #"study_two": study_two,
+        #"study_three_four": study_three_four,
+        #"study_five": study_five
     }
 
 
@@ -228,6 +229,8 @@ def read_source_study(path=None, directory=None):
     path_samples = os.path.join(path_study, "samples.tsv")
     path_analytes = os.path.join(path_study, "analytes.tsv")
     path_measurements = os.path.join(path_study, "measurements.tsv")
+    path_signals = os.path.join(path_study, "signals.tsv")
+    #path_translations = os.path.join(path_study, "translations.tsv")
     # Read information from file.
     samples = utility.read_file_table(
         path_file=path_samples,
@@ -244,11 +247,24 @@ def read_source_study(path=None, directory=None):
         names=None,
         delimiter="\t"
     )
+    signals = utility.read_file_table(
+        path_file=path_signals,
+        names=None,
+        delimiter="\t"
+    )
+    if False:
+        translations = utility.read_file_table(
+            path_file=path_translations,
+            names=None,
+            delimiter="\t"
+        )
     # Compile and return information.
     return {
         "samples": samples,
         "analytes": analytes,
-        "measurements": measurements
+        "measurements": measurements,
+        "signals": signals,
+        #"translations": translations
     }
 
 
@@ -360,6 +376,8 @@ def curate_measurements_study(
         analytes (list<dict<str>>): information about analytes from a study
         measurements (list<dict<str>>): information about measurements from a
             study
+        signals (list<dict<str>>): information about total signals for each
+            sample
         hmdb (dict<dict>): information about metabolites from Human Metabolome
             Database (HMDB)
         metabolites (dict<dict>): information about metabolites
@@ -407,6 +425,17 @@ def curate_measurements_study(
         summary=copy.deepcopy(summary_priority),
         metabolites=metabolites
     )
+
+
+    # Normalize analyte's measurements by total signal for each sample.
+    if False:
+        measurements_normal = normalize_measurements_samples_signals(
+            samples=samples,
+            summary=summary_metabolite,
+            measurements=measurements,
+            signals=signals
+        )
+
     # Determine fold changes.
     if pair:
         summary_fold = calculate_analytes_folds_pairs(
@@ -1073,6 +1102,18 @@ def filter_analytes_priority(
         if analyte in analytes:
             summary_novel.append(record)
     return summary_novel
+
+
+# TODO: need to implement!!!
+
+def normalize_measurements_samples_signals(
+    samples=None,
+    summary=None,
+    measurements=None,
+    signals=None
+):
+
+    pass
 
 
 def calculate_analytes_folds(
@@ -1988,6 +2029,262 @@ def prepare_report_analyte_metabolite_match(
     return report
 
 
+# Match and translate samples' identifiers for measurements and signals.
+
+
+def match_samples_measurements_signals(
+    analyte=None,
+    samples=None,
+    analytes=None,
+    measurements=None,
+    signals=None,
+    directory=None
+):
+    """
+    Matches sample identifiers between measurements and signals.
+
+    This curation procedure (metabocurator's measurement module) uses "named
+    metabolite data" for measurements and "all metabolite data" for signals to
+    normalize measurements.
+
+    In Metabolomics Workbench, some studies do not have same sample identifiers
+    for the "named metabolite data" as they do for the "all metabolite data".
+    This function is useful to match these sample identifiers.
+
+    arguments:
+        analyte (str): identifier of an analyte to use to match samples
+        samples (list<dict<str>>): information about samples from a study
+        analytes (list<dict<str>>): information about analytes from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+        signals (list<dict<str>>): information about total signals for each
+            sample
+        directory (str): path to directory for source and product files
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements and signals for all
+            samples
+
+    """
+
+    # Sort samples by measurement values for a few analytes.
+    # Compare sort sequences to match samples.
+    # Common analytes include "alanine", "citric acid", and "asparagine".
+
+    # Find measurements and signals for analyte.
+    measurements_analyte = find_analyte_measurements(
+        identifier=analyte,
+        measurements=measurements
+    )
+    signals_analyte = find_analyte_measurements(
+        identifier=analyte,
+        measurements=signals
+    )
+    # Determine identifiers of samples.
+    titles_measurements = list(measurements_analyte.keys())
+    samples_measurements = list(filter(
+        lambda value: value != "analyte",
+        titles_measurements
+    ))
+    titles_signals = list(signals_analyte.keys())
+    samples_signals = list(filter(
+        lambda value: value != "analyte",
+        titles_signals
+    ))
+    # Report sample identifiers.
+    if False:
+        print("measurements' samples: " + str(len(samples_measurements)))
+        print(samples_measurements)
+        print("signals' samples: " + str(len(samples_signals)))
+        print(samples_signals)
+    # Collect analyte measurements and signals for each sample.
+    records_measurements = []
+    for sample in samples_measurements:
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=measurements_analyte
+        )):
+            value = float(measurements_analyte[sample])
+        else:
+            value = 0
+        record = {
+            "sample": sample,
+            "value": value
+        }
+        records_measurements.append(record)
+    records_signals = []
+    for sample in samples_signals:
+        if (determine_measurements_validity(
+            samples=[sample],
+            measurements=signals_analyte
+        )):
+            value = float(signals_analyte[sample])
+        else:
+            value = 0
+        record = {
+            "sample": sample,
+            "value": value
+        }
+        records_signals.append(record)
+    # Sort records by values.
+    records_measurements.sort(
+        key=lambda record: record["value"],
+        reverse=False
+    )
+    records_signals.sort(
+        key=lambda record: record["value"],
+        reverse=False
+    )
+    # Specify directories and files.
+    path = os.path.join(directory, "measurement_temporary")
+    utility.confirm_path_directory(path)
+    path_measurements = os.path.join(path, "measurements.tsv")
+    path_signals = os.path.join(path, "signals.tsv")
+    # Write information to file.
+    utility.write_file_table(
+        information=records_measurements,
+        path_file=path_measurements,
+        names=records_measurements[0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=records_signals,
+        path_file=path_signals,
+        names=records_signals[0].keys(),
+        delimiter="\t"
+    )
+    pass
+
+
+def translate_samples_identifiers(
+    translations=None,
+    signals=None,
+    directory=None
+):
+    """
+    Translates samples' identifiers in signals to match measurements.
+
+    arguments:
+        translations (list<dict<str>>): identifiers of samples for measurements
+            and signals
+        signals (list<dict<str>>): information about total signals for each
+            sample
+        directory (str): path to directory for source and product files
+
+    raises:
+
+    returns:
+        (list<dict<str>>): identifiers of samples for signals
+
+    """
+
+    # Collect translations.
+    translations_reference = {}
+    for translation in translations:
+        identifier_measurement = translation["measurement"]
+        identifier_signal = translation["signal"]
+        translations_reference[identifier_signal] = identifier_measurement
+    # Translate samples' identifiers in signals.
+    signals_translation = []
+    for signal in signals:
+        record = {}
+        record["analyte"] = signal["analyte"]
+        titles = list(signal.keys())
+        samples = list(filter(lambda value: value != "analyte", titles))
+        for sample in samples:
+            if sample in translations_reference.keys():
+                sample_translation = translations_reference[sample]
+            else:
+                sample_translation = sample
+            record[sample_translation] = signal[sample]
+        signals_translation.append(record)
+    # Specify directories and files.
+    path = os.path.join(directory, "measurement_temporary")
+    utility.confirm_path_directory(path)
+    path_signals = os.path.join(path, "signals.tsv")
+    # Write information to file.
+    utility.write_file_table(
+        information=signals_translation,
+        path_file=path_signals,
+        names=signals_translation[0].keys(),
+        delimiter="\t"
+    )
+    pass
+
+
+def compare_samples_measurements_signals(
+    analyte=None,
+    measurements=None,
+    signals=None
+):
+    """
+    Compares values of measurements and signals for samples.
+
+    arguments:
+        analyte (str): identifier of an analyte to use to match samples
+        measurements (list<dict<str>>): information about measurements from a
+            study
+        signals (list<dict<str>>): information about total signals for each
+            sample
+
+    raises:
+
+    returns:
+
+    """
+
+    # Find measurements and signals for analyte.
+    measurements_analyte = find_analyte_measurements(
+        identifier=analyte,
+        measurements=measurements
+    )
+    signals_analyte = find_analyte_measurements(
+        identifier=analyte,
+        measurements=signals
+    )
+    # Determine identifiers of samples.
+    titles_measurements = list(measurements_analyte.keys())
+    samples_measurements = list(filter(
+        lambda value: value != "analyte",
+        titles_measurements
+    ))
+    titles_signals = list(signals_analyte.keys())
+    samples_signals = list(filter(
+        lambda value: value != "analyte",
+        titles_signals
+    ))
+    # Report samples' values of measurement and signal.
+    for sample in samples_measurements:
+        if sample in measurements_analyte.keys():
+            measurement = measurements_analyte[sample]
+        else:
+            measurement = "null"
+        if sample in signals_analyte.keys():
+            signal = signals_analyte[sample]
+        else:
+            signal = "null"
+        print("----------")
+        print("measurement: " + measurement)
+        print("signal:      " + signal)
+    tests = []
+    for sample in samples_measurements:
+        if sample in measurements_analyte.keys():
+            measurement = round(float(measurements_analyte[sample]), 0)
+        else:
+            measurement = 0
+        if sample in signals_analyte.keys():
+            signal = float(signals_analyte[sample])
+        else:
+            signal = 0
+        test = (measurement == signal)
+        tests.append(test)
+    print("all equal? : " + str(all(tests)))
+
+    pass
+
+
 def prepare_curation_report(
     summary=None
 ):
@@ -2099,12 +2396,14 @@ def write_product(directory=None, information=None):
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
     write_product_study(study="study_one", path=path, information=information)
-    write_product_study(study="study_two", path=path, information=information)
-    write_product_study(
-        study="study_three", path=path, information=information
-    )
-    write_product_study(study="study_four", path=path, information=information)
-    write_product_study(study="study_five", path=path, information=information)
+    if False:
+        write_product_study(study="study_two", path=path, information=information)
+        write_product_study(
+            study="study_three", path=path, information=information
+        )
+        write_product_study(study="study_four", path=path, information=information)
+        write_product_study(study="study_five", path=path, information=information)
+    pass
 
 
 def write_product_study(study=None, path=None, information=None):
@@ -2187,6 +2486,27 @@ def execute_procedure(directory=None):
 
     # Read source information from file.
     source = read_source(directory=directory)
+    # Curate samples' identifiers.
+    # "citric acid", "alanine", "asparagine", "pyruvic acid"
+    if False:
+        match_samples_measurements_signals(
+            analyte="citric acid",
+            samples=source["study_one"]["samples"],
+            analytes=source["study_one"]["analytes"],
+            measurements=source["study_one"]["measurements"],
+            signals=source["study_one"]["signals"],
+            directory=directory
+        )
+        translate_samples_identifiers(
+            translations=source["study_one"]["translations"],
+            signals=source["study_one"]["signals"],
+            directory=directory
+        )
+        compare_samples_measurements_signals(
+            analyte="pyruvic acid",
+            measurements=source["study_one"]["measurements"],
+            signals=source["study_one"]["signals"]
+        )
     # Curate measurements from study zero.
     # Measurements from study one represent metabolites in plasma before and
     # after exercise.
@@ -2194,72 +2514,77 @@ def execute_procedure(directory=None):
         study_zero = curate_measurements_study_zero(
             measurements=source["study_zero"]["measurements"]
         )
-    # Curate measurements from study one.
-    # Measurements from study two represent metabolites in visceral versus
-    # subcutaneous adipose.
-    study_one = curate_measurements_study(
-        pair=True,
-        group_numerator="visceral_fat",
-        group_denominator="subcutaneous_fat",
-        samples=source["study_one"]["samples"],
-        analytes=source["study_one"]["analytes"],
-        measurements=source["study_one"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study two.
-    # Measurements from study two represent metabolites in normal versus tumor
-    # lung.
-    study_two = curate_measurements_study(
-        pair=True,
-        group_numerator="tumor",
-        group_denominator="normal",
-        samples=source["study_two"]["samples"],
-        analytes=source["study_two"]["analytes"],
-        measurements=source["study_two"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study three.
-    study_three = curate_measurements_study(
-        pair=False,
-        group_numerator="ischemia",
-        group_denominator="normal",
-        samples=source["study_three_four"]["samples"],
-        analytes=source["study_three_four"]["analytes"],
-        measurements=source["study_three_four"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study four.
-    study_four = curate_measurements_study(
-        pair=False,
-        group_numerator="steatosis",
-        group_denominator="normal",
-        samples=source["study_three_four"]["samples"],
-        analytes=source["study_three_four"]["analytes"],
-        measurements=source["study_three_four"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Curate measurements from study five.
-    study_five = curate_measurements_study(
-        pair=True,
-        group_numerator="after_exercise",
-        group_denominator="before_exercise",
-        samples=source["study_five"]["samples"],
-        analytes=source["study_five"]["analytes"],
-        measurements=source["study_five"]["measurements"],
-        hmdb=source["reference"]["hmdb"],
-        metabolites=source["reference"]["metabolites"]
-    )
-    # Compile information.
-    information = {
-        "study_one": study_one,
-        "study_two": study_two,
-        "study_three": study_three,
-        "study_four": study_four,
-        "study_five": study_five
-    }
-    #Write product information to file
-    write_product(directory=directory, information=information)
+    #
+    # Analyze measurements from all studies without pairs of samples.
+    #
+    if False:
+        # Curate measurements from study one.
+        # Measurements from study two represent metabolites in visceral versus
+        # subcutaneous adipose.
+        study_one = curate_measurements_study(
+            pair=False,
+            group_numerator="visceral_fat",
+            group_denominator="subcutaneous_fat",
+            samples=source["study_one"]["samples"],
+            analytes=source["study_one"]["analytes"],
+            measurements=source["study_one"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study two.
+        # Measurements from study two represent metabolites in normal versus tumor
+        # lung.
+        study_two = curate_measurements_study(
+            pair=False,
+            group_numerator="tumor",
+            group_denominator="normal",
+            samples=source["study_two"]["samples"],
+            analytes=source["study_two"]["analytes"],
+            measurements=source["study_two"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study three.
+        study_three = curate_measurements_study(
+            pair=False,
+            group_numerator="ischemia",
+            group_denominator="normal",
+            samples=source["study_three_four"]["samples"],
+            analytes=source["study_three_four"]["analytes"],
+            measurements=source["study_three_four"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study four.
+        study_four = curate_measurements_study(
+            pair=False,
+            group_numerator="steatosis",
+            group_denominator="normal",
+            samples=source["study_three_four"]["samples"],
+            analytes=source["study_three_four"]["analytes"],
+            measurements=source["study_three_four"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Curate measurements from study five.
+        study_five = curate_measurements_study(
+            pair=False,
+            group_numerator="after_exercise",
+            group_denominator="before_exercise",
+            samples=source["study_five"]["samples"],
+            analytes=source["study_five"]["analytes"],
+            measurements=source["study_five"]["measurements"],
+            hmdb=source["reference"]["hmdb"],
+            metabolites=source["reference"]["metabolites"]
+        )
+        # Compile information.
+        information = {
+            "study_one": study_one,
+            #"study_two": study_two,
+            #"study_three": study_three,
+            #"study_four": study_four,
+            #"study_five": study_five
+        }
+        #Write product information to file
+        write_product(directory=directory, information=information)
+    pass

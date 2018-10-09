@@ -733,43 +733,37 @@ def prepare_curation_report(
     count_processes = len(processes)
     # Count reactions.
     count_reactions = len(reactions)
+    # Count metabolites.
+    count_metabolites = len(metabolites)
     # Count reactions with references to MetaNetX.
-    count_reactions_metanetx = count_entities_with_references(
+    count_one = count_entities_with_references(
         references=["metanetx"],
         entities=reactions
     )
-    proportion_reactions_metanetx = count_reactions_metanetx / count_reactions
-    percentage_reactions_metanetx = (
-        round((proportion_reactions_metanetx * 100), 2)
-    )
+    proportion_one = count_one / count_reactions
+    percentage_one = round((proportion_one * 100), 2)
     # Count reactions with references either to genes or enzyme commission.
-    count_gene_enzyme = count_entities_with_references(
+    count_two = count_entities_with_references(
         references=["gene", "enzyme"],
         entities=reactions
     )
-    proportion_gene_enzyme = count_gene_enzyme / count_reactions
-    percentage_gene_enzyme = round((proportion_gene_enzyme * 100), 2)
-    # Count metabolites.
-    count_metabolites = len(metabolites)
+    proportion_two = count_two / count_reactions
+    percentage_two = round((proportion_two * 100), 2)
     # Count metabolites with references to MetaNetX.
-    count_metabolites_metanetx = count_entities_with_references(
+    count_three = count_entities_with_references(
         references=["metanetx"],
         entities=metabolites
     )
-    proportion_metabolites_metanetx = (
-        count_metabolites_metanetx / count_metabolites
-    )
-    percentage_metabolites_metanetx = (
-        round((proportion_metabolites_metanetx * 100), 2)
-    )
+    proportion_three = count_three / count_metabolites
+    percentage_three = round((proportion_three * 100), 2)
     # Count metabolites with references to Human Metabolome Database (HMDB) and
     # PubChem.
-    count_hmdb_pubchem = count_entities_with_references(
+    count_four = count_entities_with_references(
         references=["hmdb", "pubchem"],
         entities=metabolites
     )
-    proportion_hmdb_pubchem = count_hmdb_pubchem / count_metabolites
-    percentage_hmdb_pubchem = round((proportion_hmdb_pubchem * 100), 2)
+    proportion_four = count_four / count_metabolites
+    percentage_four = round((proportion_four * 100), 2)
     # Compile information.
     report = textwrap.dedent("""\
 
@@ -781,10 +775,10 @@ def prepare_curation_report(
         reactions: {count_reactions}
         metabolites: {count_metabolites}
 
-        reactions in MetaNetX: {percentage_reactions_metanetx} %
-        reactions with gene or enzyme: {percentage_gene_enzyme} %
-        metabolites in MetaNetX: {percentage_metabolites_metanetx} %
-        metabolites with HMDB or PubChem: {percentage_hmdb_pubchem} %
+        reactions in MetaNetX: {count_one} ({percentage_one} %)
+        reactions with gene or enzyme: {count_two} ({percentage_two} %)
+        metabolites in MetaNetX: {count_three} ({percentage_three} %)
+        metabolites with HMDB or PubChem: {count_four} ({percentage_four} %)
 
         --------------------------------------------------
     """).format(
@@ -792,10 +786,14 @@ def prepare_curation_report(
         count_processes=count_processes,
         count_reactions=count_reactions,
         count_metabolites=count_metabolites,
-        percentage_reactions_metanetx=percentage_reactions_metanetx,
-        percentage_gene_enzyme=percentage_gene_enzyme,
-        percentage_metabolites_metanetx=percentage_metabolites_metanetx,
-        percentage_hmdb_pubchem=percentage_hmdb_pubchem
+        count_one=count_one,
+        percentage_one=percentage_one,
+        count_two=count_two,
+        percentage_two=percentage_two,
+        count_three=count_three,
+        percentage_three=percentage_three,
+        count_four=count_four,
+        percentage_four=percentage_four
     )
     # Return information.
     return report

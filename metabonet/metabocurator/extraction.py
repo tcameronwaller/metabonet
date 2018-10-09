@@ -329,7 +329,10 @@ def extract_subelement_value(element=None, tag=None, space=None, spaces=None):
         space=space,
         spaces=spaces
     )
-    return subelement.text
+    if subelement is not None:
+        return subelement.text
+    else:
+        return None
 
 
 def extract_subelement_values(element=None, tag=None, space=None, spaces=None):
