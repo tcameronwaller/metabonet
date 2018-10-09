@@ -502,7 +502,6 @@ def write_product(directory=None, information=None):
     )
 
 
-
 ###############################################################################
 # Procedure
 

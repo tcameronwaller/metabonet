@@ -1056,7 +1056,7 @@ def plot_volcano(
             p_value_log,
             linestyle="",
             marker="o",
-            markersize=10.0,
+            markersize=15.0,
             markeredgecolor=colors["blue"],
             markerfacecolor=colors["blue"]
         )
@@ -1072,7 +1072,7 @@ def plot_volcano(
             p_value_log,
             linestyle="",
             marker="o",
-            markersize=10.0,
+            markersize=15.0,
             markeredgecolor=colors["orange"],
             markerfacecolor=colors["orange"]
         )
@@ -1336,10 +1336,7 @@ def execute_procedure(directory=None):
             nodes_three=source["nodes_three"],
             nodes_four=source["nodes_four"],
         )
-    # Volcano plots for metabolomic measurements.
-    # source["measurements_one"]
-    # include threshold dashed lines for p-value and fold-change...
-    # points beyond thresholds should be orange... all others blue...
+    # Metabolomic measurements.
     charts_measurements = plot_measurements(
         records_one=source["measurements_one"],
         records_two=source["measurements_two"],

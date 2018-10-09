@@ -169,19 +169,39 @@ def execute_procedure(directory=None):
     utility.remove_file(os.path.join(path_measurement, "study_three.tsv"))
     utility.remove_file(os.path.join(path_measurement, "study_four.tsv"))
     utility.remove_file(os.path.join(path_measurement, "study_five.tsv"))
+    utility.remove_file(os.path.join(path_measurement, "study_one_report.tsv"))
+    utility.remove_file(os.path.join(path_measurement, "study_two_report.tsv"))
     utility.remove_file(os.path.join(
-        path_measurement, "study_one_metaboanalyst.tsv"
+        path_measurement, "study_three_report.tsv"
     ))
     utility.remove_file(os.path.join(
-        path_measurement, "study_two_metaboanalyst.tsv"
+        path_measurement, "study_four_report.tsv"
     ))
     utility.remove_file(os.path.join(
-        path_measurement, "study_three_metaboanalyst.tsv"
+        path_measurement, "study_five_report.tsv"
     ))
     utility.remove_file(os.path.join(
-        path_measurement, "study_four_metaboanalyst.tsv"
+        path_measurement, "study_one_metaboanalyst.txt"
     ))
     utility.remove_file(os.path.join(
-        path_measurement, "study_five_metaboanalyst.tsv"
+        path_measurement, "study_two_metaboanalyst.txt"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_three_metaboanalyst.txt"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_four_metaboanalyst.txt"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_five_metaboanalyst.txt"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_one_metaboanalyst_pair.txt"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_two_metaboanalyst_pair.txt"
+    ))
+    utility.remove_file(os.path.join(
+        path_measurement, "study_five_metaboanalyst_pair.txt"
     ))
     utility.remove_empty_directory(path_measurement)

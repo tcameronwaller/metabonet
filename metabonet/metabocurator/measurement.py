@@ -451,6 +451,11 @@ def curate_measurements_study(
     summary_match = filter_analytes_metabolites(
         summary=copy.deepcopy(summary_p)
     )
+    # Prepare report of matches of analytes to metabolites.
+    report_match = prepare_report_analyte_metabolite_match(
+        summary=summary_p,
+        metabolites=metabolites
+    )
     # Convert measurement information to table in text format.
     summary_text = convert_summary_text(summary=summary_match)
     # Convert information for analysis in MetaboAnalyst.
@@ -472,7 +477,8 @@ def curate_measurements_study(
         "summary": summary_match,
         "summary_text": summary_text,
         "summary_metaboanalyst": summary_metaboanalyst["unpair"],
-        "summary_metaboanalyst_pair": summary_metaboanalyst["pair"]
+        "summary_metaboanalyst_pair": summary_metaboanalyst["pair"],
+        "report_match": report_match
     }
 
 
@@ -1939,6 +1945,49 @@ def determine_measurements_validity(
     return all(checks)
 
 
+def prepare_report_analyte_metabolite_match(
+    summary=None,
+    metabolites=None
+):
+    """
+    Prepares a report of matches of analytes to metabolites.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+        metabolites (dict<dict>): information about metabolites
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about matches of analytes to metabolites
+
+    """
+
+    report = []
+    for record_summary in summary:
+        identifier_analyte = record_summary["identifier"]
+        name_analyte = record_summary["name"]
+        metabolites_analyte = record_summary["references"]["metabolite"]
+        match = (len(metabolites_analyte) > 0)
+        if match:
+            match_value = "True"
+            identifier_metabolite = metabolites_analyte[0]
+            name_metabolite = metabolites[identifier_metabolite]["name"]
+        else:
+            match_value = "False"
+            identifier_metabolite = "null"
+            name_metabolite = "null"
+        record = {
+            "identifier_analyte": identifier_analyte,
+            "name_analyte": name_analyte,
+            "match": match_value,
+            "identifier_metabolite": identifier_metabolite,
+            "name_metabolite": name_metabolite
+        }
+        report.append(record)
+    return report
+
+
 def prepare_curation_report(
     summary=None
 ):
@@ -2080,6 +2129,7 @@ def write_product_study(study=None, path=None, information=None):
     path_metaboanalyst_pair = os.path.join(path, (
         study + "_metaboanalyst_pair.txt"
     ))
+    path_report = os.path.join(path, (study + "_report.tsv"))
     # Write information to file.
     with open(path_pickle, "wb") as file_product:
         pickle.dump(information[study]["summary"], file_product)
@@ -2107,6 +2157,12 @@ def write_product_study(study=None, path=None, information=None):
             names=names_sequence,
             delimiter="\t"
         )
+    utility.write_file_table(
+        information=information[study]["report_match"],
+        path_file=path_report,
+        names=information[study]["report_match"][0].keys(),
+        delimiter="\t"
+    )
 
 
 ###############################################################################
