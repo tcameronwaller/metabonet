@@ -121,26 +121,25 @@ def read_source(directory=None):
         path=path_measurement,
         directory="metabolomics-workbench_pr000058_st000061"
     )
-    if False:
-        study_two = read_source_study(
-            path=path_measurement,
-            directory="metabolomics-workbench_pr000305_st000390"
-        )
-        study_three_four = read_source_study(
-            path=path_measurement,
-            directory="metabolomics-workbench_pr000322_st000412"
-        )
-        study_five = read_source_study(
-            path=path_measurement,
-            directory="metabolomics-workbench_pr000599_st000842"
-        )
+    study_two = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000305_st000390"
+    )
+    study_three_four = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000322_st000412"
+    )
+    study_five = read_source_study(
+        path=path_measurement,
+        directory="metabolomics-workbench_pr000599_st000842"
+    )
     # Compile and return information.
     return {
         "reference": reference,
         "study_one": study_one,
-        #"study_two": study_two,
-        #"study_three_four": study_three_four,
-        #"study_five": study_five
+        "study_two": study_two,
+        "study_three_four": study_three_four,
+        "study_five": study_five
     }
 
 
@@ -352,16 +351,115 @@ def extract_measurements_study_zero(records=None):
     return measurements
 
 
-# Curate summary of study.
+# Curation.
 
 
-def curate_measurements_study(
+def curate_study(
+    pair=None,
+    normalization=None,
+    group_numerator=None,
+    group_denominator=None,
+    samples=None,
+    analytes=None,
+    measurements=None,
+    signals=None,
+    hmdb=None,
+    metabolites=None
+):
+    """
+    Curates information about metabolomic measurements from a study.
+
+    arguments:
+        pair (bool): whether samples have dependent pairs
+        normalization (bool): whether to normalize measurements
+        group_numerator (str): name of experimental group for numerator
+        group_denominator (str): name of experimental group for denominator
+        samples (list<dict<str>>): information about samples from a study
+        analytes (list<dict<str>>): information about analytes from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+        signals (list<dict<str>>): information about total signals for each
+            sample
+        hmdb (dict<dict>): information about metabolites from Human Metabolome
+            Database (HMDB)
+        metabolites (dict<dict>): information about metabolites
+
+    raises:
+
+    returns:
+        (dict): information about measurements for analytes
+
+    """
+
+    # Curate analytes.
+    summary_analytes = curate_study_analytes(
+        pair=pair,
+        group_numerator=group_numerator,
+        group_denominator=group_denominator,
+        samples=samples,
+        analytes=analytes,
+        measurements=measurements,
+        signals=signals,
+        hmdb=hmdb,
+        metabolites=metabolites
+    )
+    # Curate and analyze measurements.
+    summary_measurements = curate_study_measurements(
+        summary=summary_analytes,
+        pair=pair,
+        normalization=normalization,
+        group_numerator=group_numerator,
+        group_denominator=group_denominator,
+        samples=samples,
+        analytes=analytes,
+        measurements=measurements,
+        signals=signals,
+        hmdb=hmdb,
+        metabolites=metabolites
+    )
+    # Filter for anlaytes that match metabolites.
+    summary_match = filter_analytes_metabolites(
+        summary=copy.deepcopy(summary_measurements)
+    )
+    # Prepare report of matches of analytes to metabolites.
+    report_match = prepare_report_analyte_metabolite_match(
+        summary=summary_measurements,
+        metabolites=metabolites
+    )
+    # Convert measurement information to table in text format.
+    summary_text = convert_summary_text(summary=summary_match)
+    # Convert information for analysis in MetaboAnalyst.
+    summary_metaboanalyst = prepare_report_metaboanalyst(
+        pair=pair,
+        summary=copy.deepcopy(summary_measurements),
+        group_one=group_numerator,
+        group_two=group_denominator,
+        samples=samples,
+        measurements=measurements
+    )
+    # Report.
+    print("analytes, measurements after curation...")
+    report = prepare_curation_report(summary=summary_measurements)
+    print(report)
+    # Compile and return information.
+    return {
+        "pair": pair,
+        "summary": summary_match,
+        "summary_text": summary_text,
+        "summary_metaboanalyst": summary_metaboanalyst["unpair"],
+        "summary_metaboanalyst_pair": summary_metaboanalyst["pair"],
+        "report_match": report_match
+    }
+
+
+def curate_study_analytes(
     pair=None,
     group_numerator=None,
     group_denominator=None,
     samples=None,
     analytes=None,
     measurements=None,
+    signals=None,
     hmdb=None,
     metabolites=None
 ):
@@ -385,7 +483,7 @@ def curate_measurements_study(
     raises:
 
     returns:
-        (dict): information about measurements for analytes
+        (list<dict<str>>): information about measurements for analytes
 
     """
 
@@ -403,7 +501,7 @@ def curate_measurements_study(
         measurements=measurements
     )
     # Enhance analyte references.
-    summary_reference = enhance_analytes_references(
+    summary_reference = enhance_analytes_references_names(
         summary=summary_coverage,
         hmdb=hmdb
     )
@@ -425,33 +523,77 @@ def curate_measurements_study(
         summary=copy.deepcopy(summary_priority),
         metabolites=metabolites
     )
+    # Return information.
+    return summary_metabolite
 
+
+def curate_study_measurements(
+    summary=None,
+    pair=None,
+    normalization=None,
+    group_numerator=None,
+    group_denominator=None,
+    samples=None,
+    analytes=None,
+    measurements=None,
+    signals=None,
+    hmdb=None,
+    metabolites=None
+):
+    """
+    Curates information about metabolomic measurements from a study.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+        pair (bool): whether samples have dependent pairs
+        normalization (bool): whether to normalize measurements
+        group_numerator (str): name of experimental group for numerator
+        group_denominator (str): name of experimental group for denominator
+        samples (list<dict<str>>): information about samples from a study
+        analytes (list<dict<str>>): information about analytes from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+        signals (list<dict<str>>): information about total signals for each
+            sample
+        hmdb (dict<dict>): information about metabolites from Human Metabolome
+            Database (HMDB)
+        metabolites (dict<dict>): information about metabolites
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
 
     # Normalize analyte's measurements by total signal for each sample.
-    if False:
-        measurements_normal = normalize_measurements_samples_signals(
+    if normalization:
+        measurements_normalization = normalize_measurements_samples_signals(
+            summary=summary,
+            group_one=group_numerator,
+            group_two=group_denominator,
             samples=samples,
-            summary=summary_metabolite,
             measurements=measurements,
             signals=signals
         )
-
+    else:
+        measurements_normalization = measurements
     # Determine fold changes.
     if pair:
         summary_fold = calculate_analytes_folds_pairs(
-            summary=summary_metabolite,
+            summary=summary,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
             samples=samples,
-            measurements=measurements
+            measurements=measurements_normalization
         )
     else:
         summary_fold = calculate_analytes_folds(
-            summary=summary_metabolite,
+            summary=summary,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
             samples=samples,
-            measurements=measurements
+            measurements=measurements_normalization
         )
     # Determine logarithms-base-2 of fold changes.
     summary_log = calculate_folds_logarithms(
@@ -461,57 +603,26 @@ def curate_measurements_study(
     # Compare pairs of samples in both groups.
     # Apply pair t-test for dependent sample populations.
     if pair:
-        summary_p = calculate_analytes_p_values_pairs(
+        summary_probability = calculate_analytes_p_values_pairs(
             summary=summary_log,
             group_one=group_numerator,
             group_two=group_denominator,
             samples=samples,
-            measurements=measurements
+            measurements=measurements_normalization
         )
     else:
-        summary_p = calculate_analytes_p_values(
+        summary_probability = calculate_analytes_p_values(
             summary=summary_log,
             group_one=group_numerator,
             group_two=group_denominator,
             samples=samples,
-            measurements=measurements
+            measurements=measurements_normalization
         )
-    # Filter for anlaytes that match metabolites.
-    summary_match = filter_analytes_metabolites(
-        summary=copy.deepcopy(summary_p)
-    )
-    # Prepare report of matches of analytes to metabolites.
-    report_match = prepare_report_analyte_metabolite_match(
-        summary=summary_p,
-        metabolites=metabolites
-    )
-    # Convert measurement information to table in text format.
-    summary_text = convert_summary_text(summary=summary_match)
-    # Convert information for analysis in MetaboAnalyst.
-    summary_metaboanalyst = prepare_report_metaboanalyst(
-        pair=pair,
-        summary=copy.deepcopy(summary_p),
-        group_one=group_numerator,
-        group_two=group_denominator,
-        samples=samples,
-        measurements=measurements
-    )
-    # Report.
-    print("analytes, measurements after curation...")
-    report = prepare_curation_report(summary=summary_p)
-    print(report)
-    # Compile and return information.
-    return {
-        "pair": pair,
-        "summary": summary_match,
-        "summary_text": summary_text,
-        "summary_metaboanalyst": summary_metaboanalyst["unpair"],
-        "summary_metaboanalyst_pair": summary_metaboanalyst["pair"],
-        "report_match": report_match
-    }
+    # Return information.
+    return summary_probability
 
 
-# General utility.
+# Curation of analytes.
 
 
 def extract_analytes_summary(analytes=None):
@@ -727,7 +838,7 @@ def determine_analyte_coverage_pairs(
     return len(coverages_true) > 1
 
 
-def enhance_analytes_references(
+def enhance_analytes_references_names(
     summary=None, hmdb=None
 ):
     """
@@ -757,6 +868,10 @@ def enhance_analytes_references(
         )
         # Include references to HMDB.
         record["references"]["hmdb"] = hmdb_keys
+        # Prioritize name from HMDB.
+        if len(hmdb_keys) > 0:
+            name = hmdb[hmdb_keys[0]]["name"]
+            record["name"] = name
         # Enhance references to PubChem.
         # Give priority to PubChem identifier from Metabolomics Workbench by
         # placing it first in the list.
@@ -1104,16 +1219,169 @@ def filter_analytes_priority(
     return summary_novel
 
 
-# TODO: need to implement!!!
+# Curation of measurements.
+
+
+# Normalization of measurements.
+
 
 def normalize_measurements_samples_signals(
-    samples=None,
     summary=None,
+    group_one=None,
+    group_two=None,
+    samples=None,
     measurements=None,
     signals=None
 ):
+    """
+    Normalizes measurements by total signal for each sample.
 
-    pass
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+        group_one (str): name of experimental group
+        group_two (str): name of experimental group
+        samples (list<dict<str>>): information about samples from a study
+        measurements (list<dict<str>>): information about measurements from a
+            study
+        signals (list<dict<str>>): information about total signals for each
+            sample
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements from a study
+
+    """
+
+    # Determine all relevant samples.
+    groups_samples = determine_groups_samples(
+        group_one=group_one,
+        group_two=group_two,
+        samples=samples
+    )
+    samples_relevant = groups_samples[group_one]
+    samples_relevant.extend(groups_samples[group_two])
+    # Calculate normalization factors for each sample.
+    samples_factors = calculate_normalization_factors(
+        report=False,
+        samples=samples_relevant,
+        signals=signals
+    )
+    # Normalize measurements.
+    # Multiply each measurement by the normalization factor for its sample.
+    measurements_normalization = normalize_measurements(
+        samples_factors=samples_factors,
+        measurements=measurements
+    )
+    # Return information.
+    return measurements_normalization
+
+
+def calculate_normalization_factors(
+    report=None,
+    samples=None,
+    signals=None
+):
+    """
+    Calculates normalization factors for each sample.
+
+    arguments:
+        report (bool): whether to print a report
+        samples (list<str>): identifiers of samples
+        signals (list<dict<str>>): information about total signals for each
+            sample
+
+    raises:
+
+    returns:
+        (dict<float>): normalization factors for each sample
+
+    """
+
+    # Calculate total signals for all relevant samples.
+    samples_totals = {}
+    for sample in samples:
+        # Collect all valid signals for the sample.
+        signals_sample = []
+        for signal in signals:
+            # Determine whether signal is valid.
+            if (determine_measurements_validity(
+                samples=[sample],
+                measurements=signal
+            )):
+                signal_sample = float(signal[sample])
+                signals_sample.append(signal_sample)
+        if len(signals_sample) > 0:
+            # Valid signals exist for the sample.
+            # Calculate total signal for sample.
+            total = math.fsum(signals_sample)
+            samples_totals[sample] = total
+    # Determine maximal total signal for all samples.
+    maximum = max(samples_totals.values())
+    # Calculate normalization factors for all relevant samples.
+    samples_factors = {}
+    samples_report = []
+    for sample in samples_totals.keys():
+        # Calculate normalization factor.
+        total = samples_totals[sample]
+        divisor = (total / maximum)
+        factor = 1 / divisor
+        samples_factors[sample] = factor
+        # Prepare report.
+        record = {
+            "sample": sample,
+            "total": total,
+            "maximum": maximum,
+            "divisor": divisor,
+            "factor": factor
+        }
+        samples_report.append(record)
+    if report:
+        print("sample normalization report")
+        print(samples_report)
+    # Return information.
+    return samples_factors
+
+
+def normalize_measurements(
+    samples_factors=None,
+    measurements=None
+):
+    """
+    Normalizes measurements.
+
+    arguments:
+        samples_factors (dict<float>): normalization factors for each sample
+        measurements (list<dict<str>>): information about measurements from a
+            study
+
+    raises:
+
+    returns:
+        (list<dict<str>>): normalization factors for each sample
+
+    """
+
+    # Iterate on measurements.
+    measurements_normalization = []
+    for measurement in measurements:
+        # Iterate on samples.
+        for sample in samples_factors.keys():
+            # Determine whether a valid measurement exists for the sample.
+            if (determine_measurements_validity(
+                samples=[sample],
+                measurements=measurement
+            )):
+                value_raw = float(measurement[sample])
+                factor = samples_factors[sample]
+                value_normalization = (value_raw * factor)
+                measurement[sample] = value_normalization
+        measurements_normalization.append(measurement)
+    # Return information.
+    return measurements_normalization
+
+
+# Analysis of measurements.
 
 
 def calculate_analytes_folds(
@@ -2517,74 +2785,83 @@ def execute_procedure(directory=None):
     #
     # Analyze measurements from all studies without pairs of samples.
     #
-    if False:
-        # Curate measurements from study one.
-        # Measurements from study two represent metabolites in visceral versus
-        # subcutaneous adipose.
-        study_one = curate_measurements_study(
-            pair=False,
-            group_numerator="visceral_fat",
-            group_denominator="subcutaneous_fat",
-            samples=source["study_one"]["samples"],
-            analytes=source["study_one"]["analytes"],
-            measurements=source["study_one"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study two.
-        # Measurements from study two represent metabolites in normal versus tumor
-        # lung.
-        study_two = curate_measurements_study(
-            pair=False,
-            group_numerator="tumor",
-            group_denominator="normal",
-            samples=source["study_two"]["samples"],
-            analytes=source["study_two"]["analytes"],
-            measurements=source["study_two"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study three.
-        study_three = curate_measurements_study(
-            pair=False,
-            group_numerator="ischemia",
-            group_denominator="normal",
-            samples=source["study_three_four"]["samples"],
-            analytes=source["study_three_four"]["analytes"],
-            measurements=source["study_three_four"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study four.
-        study_four = curate_measurements_study(
-            pair=False,
-            group_numerator="steatosis",
-            group_denominator="normal",
-            samples=source["study_three_four"]["samples"],
-            analytes=source["study_three_four"]["analytes"],
-            measurements=source["study_three_four"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Curate measurements from study five.
-        study_five = curate_measurements_study(
-            pair=False,
-            group_numerator="after_exercise",
-            group_denominator="before_exercise",
-            samples=source["study_five"]["samples"],
-            analytes=source["study_five"]["analytes"],
-            measurements=source["study_five"]["measurements"],
-            hmdb=source["reference"]["hmdb"],
-            metabolites=source["reference"]["metabolites"]
-        )
-        # Compile information.
-        information = {
-            "study_one": study_one,
-            #"study_two": study_two,
-            #"study_three": study_three,
-            #"study_four": study_four,
-            #"study_five": study_five
-        }
-        #Write product information to file
-        write_product(directory=directory, information=information)
+    # Curate measurements from study one.
+    # Measurements from study two represent metabolites in visceral versus
+    # subcutaneous adipose.
+    study_one = curate_study(
+        pair=False,
+        normalization=True,
+        group_numerator="visceral_fat",
+        group_denominator="subcutaneous_fat",
+        samples=source["study_one"]["samples"],
+        analytes=source["study_one"]["analytes"],
+        measurements=source["study_one"]["measurements"],
+        signals=source["study_one"]["signals"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study two.
+    # Measurements from study two represent metabolites in normal versus tumor
+    # lung.
+    study_two = curate_study(
+        pair=False,
+        normalization=True,
+        group_numerator="tumor",
+        group_denominator="normal",
+        samples=source["study_two"]["samples"],
+        analytes=source["study_two"]["analytes"],
+        measurements=source["study_two"]["measurements"],
+        signals=source["study_two"]["signals"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study three.
+    study_three = curate_study(
+        pair=False,
+        normalization=True,
+        group_numerator="ischemia",
+        group_denominator="normal",
+        samples=source["study_three_four"]["samples"],
+        analytes=source["study_three_four"]["analytes"],
+        measurements=source["study_three_four"]["measurements"],
+        signals=source["study_three_four"]["signals"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study four.
+    study_four = curate_study(
+        pair=False,
+        normalization=True,
+        group_numerator="steatosis",
+        group_denominator="normal",
+        samples=source["study_three_four"]["samples"],
+        analytes=source["study_three_four"]["analytes"],
+        measurements=source["study_three_four"]["measurements"],
+        signals=source["study_three_four"]["signals"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Curate measurements from study five.
+    study_five = curate_study(
+        pair=False,
+        normalization=True,
+        group_numerator="after_exercise",
+        group_denominator="before_exercise",
+        samples=source["study_five"]["samples"],
+        analytes=source["study_five"]["analytes"],
+        measurements=source["study_five"]["measurements"],
+        signals=source["study_five"]["signals"],
+        hmdb=source["reference"]["hmdb"],
+        metabolites=source["reference"]["metabolites"]
+    )
+    # Compile information.
+    information = {
+        "study_one": study_one,
+        "study_two": study_two,
+        "study_three": study_three,
+        "study_four": study_four,
+        "study_five": study_five
+    }
+    #Write product information to file
+    write_product(directory=directory, information=information)
     pass
