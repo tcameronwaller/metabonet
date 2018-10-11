@@ -222,8 +222,13 @@ def read_source(directory=None):
 
     # Specify directories and files.
     path_conversion = os.path.join(directory, "conversion")
+    path_source = os.path.join(directory, "source")
+    path_customization = os.path.join(path_source, "customization")
     path_networkx = os.path.join(
         path_conversion, "network_elements_networkx.pickle"
+    )
+    path_simplification_metabolites = os.path.join(
+        path_customization, "simplification_metabolites.tsv"
     )
     #path_network = os.path.join(directory, "network")
     #path_nodes_reactions = os.path.join(path_network, "nodes_reactions.pickle")
@@ -233,6 +238,11 @@ def read_source(directory=None):
     # Read information from file.
     with open(path_networkx, "rb") as file_source:
         information = pickle.load(file_source)
+    simplification_metabolites = utility.read_file_table(
+        path_file=path_simplification_metabolites,
+        names=None,
+        delimiter="\t"
+    )
     # Compile and return information.
     return {
         "nodes": information["nodes"],
@@ -245,6 +255,7 @@ def read_source(directory=None):
             information["nodes_metabolites_identifiers"]
         ),
         "nodes_metabolites": information["nodes_metabolites"],
+        "simplification_metabolites": simplification_metabolites
     }
 
 
@@ -1361,6 +1372,47 @@ def calculate_bipartite_network_centralization_separate(
     return centralization
 
 
+def report_metabolite_degrees(
+    metabolites_query=None,
+    metabolites_nodes=None
+):
+    """
+    Report total degrees of nodes that represent metabolites of interest.
+
+    arguments:
+        metabolites_query (list<dict<str>>): information about metabolites of
+            interest
+        metabolites_nodes (dict<dict>): information about network's nodes for
+            metabolites
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about metabolites of interest
+
+    """
+
+    metabolites_report = []
+    for record in metabolites_query:
+        record_metabolite = record["metabolite"]
+        # Collect degrees of all nodes that represent the metabolite.
+        nodes_degrees = []
+        for node in metabolites_nodes.values():
+            node_metabolite = node["entity"]
+            if (node_metabolite == record_metabolite):
+                node_degree = node["degree"]
+                nodes_degrees.append(node_degree)
+        if len(nodes_degrees) > 0:
+            # Calculate total degree of all of these nodes.
+            degree_total = sum(nodes_degrees)
+        else:
+            degree_total = 0
+        record["degree_total"] = degree_total
+        metabolites_report.append(record)
+    # Return information.
+    return metabolites_report
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -1383,6 +1435,9 @@ def write_product(directory=None, information=None):
     path_nodes_metabolites_text = os.path.join(path, "nodes_metabolites.tsv")
     path_network_reactions = os.path.join(path, "network_reactions.tsv")
     path_network_metabolites = os.path.join(path, "network_metabolites.tsv")
+    path_simplification_metabolites = os.path.join(
+        path, "simplification_metabolites.tsv"
+    )
     # Write information to file.
     with open(path_nodes_metabolites, "wb") as file_product:
         pickle.dump(information["nodes_metabolites"], file_product)
@@ -1408,6 +1463,18 @@ def write_product(directory=None, information=None):
         information=information["network_metabolites"],
         path_file=path_network_metabolites,
         names=information["network_metabolites"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["simplification_metabolites"],
+        path_file=path_simplification_metabolites,
+        #names=information["simplification_metabolites"][0].keys(),
+        names=[
+            "metabolite", "name", "compartment", "omission", "replication",
+            "default", "category",
+            "degree_total", "degree_general", "degree_compartmental",
+            "note"
+        ],
         delimiter="\t"
     )
 
@@ -1468,13 +1535,19 @@ def execute_procedure(directory=None):
             "reactions": entry
         }
     # Prepare reports.
+    # Report node degrees in metabolite simplifications.
+    simplification_metabolites = report_metabolite_degrees(
+        metabolites_query=source["simplification_metabolites"],
+        metabolites_nodes=report_nodes["metabolites"]
+    )
     # Compile information.
     information = {
         "nodes_metabolites": report_nodes["metabolites"],
         "nodes_reactions_text": list(report_nodes["reactions"].values()),
         "nodes_metabolites_text": list(report_nodes["metabolites"].values()),
         "network_reactions": [report_network["reactions"]],
-        "network_metabolites": [report_network["metabolites"]]
+        "network_metabolites": [report_network["metabolites"]],
+        "simplification_metabolites": simplification_metabolites
     }
     #Write product information to file.
     write_product(directory=directory, information=information)
