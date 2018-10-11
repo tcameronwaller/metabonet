@@ -898,8 +898,8 @@ def plot_measurements(
 
     chart_one = plot_volcano(
         records=records_one,
-        threshold_p=threshold_p,
-        threshold_fold=threshold_fold,
+        threshold_p=0.025,
+        threshold_fold=1.414,
         label=label,
         pad=pad,
         fonts=fonts,
@@ -907,8 +907,8 @@ def plot_measurements(
     )
     chart_two = plot_volcano(
         records=records_two,
-        threshold_p=threshold_p,
-        threshold_fold=threshold_fold,
+        threshold_p=0.025,
+        threshold_fold=1.414,
         label=label,
         pad=pad,
         fonts=fonts,
@@ -916,8 +916,8 @@ def plot_measurements(
     )
     chart_three = plot_volcano(
         records=records_three,
-        threshold_p=threshold_p,
-        threshold_fold=threshold_fold,
+        threshold_p=0.01,
+        threshold_fold=2.0,
         label=label,
         pad=pad,
         fonts=fonts,
@@ -925,8 +925,8 @@ def plot_measurements(
     )
     chart_four = plot_volcano(
         records=records_four,
-        threshold_p=threshold_p,
-        threshold_fold=threshold_fold,
+        threshold_p=0.01,
+        threshold_fold=2.0,
         label=label,
         pad=pad,
         fonts=fonts,
@@ -935,7 +935,7 @@ def plot_measurements(
     chart_five = plot_volcano(
         records=records_five,
         threshold_p=0.05,
-        threshold_fold=1.2,
+        threshold_fold=1.189,
         label=label,
         pad=pad,
         fonts=fonts,
@@ -1078,14 +1078,20 @@ def plot_volcano(
             markerfacecolor=colors["orange"]
         )
         if label:
+            if fold_log > 0:
+                position_horizontal = fold_log - pad
+                alignment_horizontal = "right"
+            else:
+                position_horizontal = fold_log + pad
+                alignment_horizontal = "left"
             axes.text(
-                (fold_log + pad),
+                position_horizontal,
                 (p_value_log),
                 name,
                 backgroundcolor=colors["white_faint"],
                 color=colors["black"],
                 fontproperties=fonts["properties"]["four"],
-                horizontalalignment="left",
+                horizontalalignment=alignment_horizontal,
                 verticalalignment="center"
             )
     # Return reference to figure.
@@ -1146,7 +1152,7 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "plot2")
+    path = os.path.join(directory, "plot")
     utility.confirm_path_directory(path)
     if False:
         # Degree.
@@ -1346,10 +1352,10 @@ def execute_procedure(directory=None):
         records_three=source["measurements_three"],
         records_four=source["measurements_four"],
         records_five=source["measurements_five"],
-        threshold_p=0.01,
-        threshold_fold=2.0,
+        threshold_p=0.01, # 0.05, 0.01
+        threshold_fold=1.414, # 1.2, 2.0
         label=True,
-        pad=0.07,
+        pad=0.1,
         fonts=fonts,
         colors=colors
     )

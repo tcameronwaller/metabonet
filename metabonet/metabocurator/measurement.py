@@ -501,7 +501,7 @@ def curate_study_analytes(
         measurements=measurements
     )
     # Enhance analyte references.
-    summary_reference = enhance_analytes_references_names(
+    summary_reference = enhance_analytes_references(
         summary=summary_coverage,
         hmdb=hmdb
     )
@@ -509,18 +509,16 @@ def curate_study_analytes(
     summary_reference_coverage = filter_analytes_reference(
         summary=summary_reference
     )
-    # Determine priority analytes.
-    summary_priority = determine_priority_redundant_analytes(
-        group_control=group_denominator,
-        samples=samples,
+    # Enhance analyte names.
+    summary_name = enhance_analytes_names(
         summary=summary_reference_coverage,
-        measurements=measurements
+        hmdb=hmdb
     )
     # Match analytes to metabolites.
     # Match by PubChem identifiers.
     summary_metabolite = match_analytes_to_metabolites(
         reference="pubchem",
-        summary=copy.deepcopy(summary_priority),
+        summary=copy.deepcopy(summary_name),
         metabolites=metabolites
     )
     # Return information.
@@ -578,10 +576,17 @@ def curate_study_measurements(
         )
     else:
         measurements_normalization = measurements
+    # Determine priority analytes.
+    summary_priority = determine_priority_redundant_analytes(
+        group_control=group_denominator,
+        samples=samples,
+        summary=summary,
+        measurements=measurements_normalization
+    )
     # Determine fold changes.
     if pair:
         summary_fold = calculate_analytes_folds_pairs(
-            summary=summary,
+            summary=summary_priority,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
             samples=samples,
@@ -589,7 +594,7 @@ def curate_study_measurements(
         )
     else:
         summary_fold = calculate_analytes_folds(
-            summary=summary,
+            summary=summary_priority,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
             samples=samples,
@@ -838,7 +843,7 @@ def determine_analyte_coverage_pairs(
     return len(coverages_true) > 1
 
 
-def enhance_analytes_references_names(
+def enhance_analytes_references(
     summary=None, hmdb=None
 ):
     """
@@ -859,32 +864,41 @@ def enhance_analytes_references_names(
 
     summary_novel = []
     for record in summary:
+        # Enhance references to PubChem.
+        # Give priority to PubChem identifier from Metabolomics Workbench by
+        # placing it first in the list.
+        if len(str(record["references"]["pubchem"])) > 0:
+            references_pubchem = [record["references"]["pubchem"]]
+        else:
+            references_pubchem = []
+        if len(references_pubchem) > 0:
+            # Find references to HMDB from references to PubChem.
+            references_hmdb = utility.filter_hmdb_entries_by_references(
+                reference="reference_pubchem",
+                identifiers=references_pubchem,
+                summary_hmdb=hmdb
+            )
+        else:
+            references_hmdb = []
+        # Find references to HMDB from names.
         name_one = record["identifier"]
         name_two = record["name"]
-        hmdb_keys = utility.match_hmdb_entries_by_identifiers_names(
+        hmdb_names = utility.match_hmdb_entries_by_identifiers_names(
             identifiers=[],
             names=[name_one, name_two],
             summary_hmdb=hmdb
         )
+        references_hmdb.extend(hmdb_names)
+        hmdb_unique = utility.collect_unique_elements(references_hmdb)
         # Include references to HMDB.
-        record["references"]["hmdb"] = hmdb_keys
-        # Prioritize name from HMDB.
-        if len(hmdb_keys) > 0:
-            name = hmdb[hmdb_keys[0]]["name"]
-            record["name"] = name
+        record["references"]["hmdb"] = hmdb_unique
         # Enhance references to PubChem.
-        # Give priority to PubChem identifier from Metabolomics Workbench by
-        # placing it first in the list.
-        if len(record["references"]["pubchem"]) > 0:
-            pubchem = [record["references"]["pubchem"]]
-        else:
-            pubchem = []
-        for key in hmdb_keys:
+        for key in hmdb_unique:
             hmdb_entry = hmdb[key]
             hmdb_pubchem = hmdb_entry["reference_pubchem"]
             if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
-                pubchem.append(hmdb_pubchem)
-        pubchem_unique = utility.collect_unique_elements(pubchem)
+                references_pubchem.append(hmdb_pubchem)
+        pubchem_unique = utility.collect_unique_elements(references_pubchem)
         record["references"]["pubchem"] = pubchem_unique
         summary_novel.append(record)
     return summary_novel
@@ -951,6 +965,37 @@ def filter_analytes_reference(
         pubchem = references["pubchem"]
         if len(pubchem) > 0:
             summary_novel.append(record)
+    return summary_novel
+
+
+def enhance_analytes_names(
+    summary=None, hmdb=None
+):
+    """
+    Enhances analytes' references to Human Metabolome Database (HMDB) and to
+    PubChem.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+        hmdb (dict<dict>): information about metabolites from Human Metabolome
+            Database (HMDB)
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    summary_novel = []
+    for record in summary:
+        # Determine whether record has a reference to HMDB.
+        if len(record["references"]["hmdb"]) > 0:
+            references_hmdb = record["references"]["hmdb"]
+            entry_hmdb = hmdb[references_hmdb[0]]
+            name = entry_hmdb["name"]
+            record["name"] = name
+        summary_novel.append(record)
     return summary_novel
 
 
@@ -1173,10 +1218,10 @@ def calculate_analytes_measurements_dispersions(
         # Collect values of measurements for analyte in control group samples.
         values = []
         for sample in group_samples:
-            if (
-                (sample in measurements_analyte.keys()) and
-                (len(measurements_analyte[sample]) > 0)
-            ):
+            if (determine_measurements_validity(
+                samples=[sample],
+                measurements=measurements_analyte
+            )):
                 value = float(measurements_analyte[sample])
                 values.append(value)
         # Calculate variance of values.
@@ -2664,13 +2709,12 @@ def write_product(directory=None, information=None):
     path = os.path.join(directory, "measurement")
     utility.confirm_path_directory(path)
     write_product_study(study="study_one", path=path, information=information)
-    if False:
-        write_product_study(study="study_two", path=path, information=information)
-        write_product_study(
-            study="study_three", path=path, information=information
-        )
-        write_product_study(study="study_four", path=path, information=information)
-        write_product_study(study="study_five", path=path, information=information)
+    write_product_study(study="study_two", path=path, information=information)
+    write_product_study(
+        study="study_three", path=path, information=information
+    )
+    write_product_study(study="study_four", path=path, information=information)
+    write_product_study(study="study_five", path=path, information=information)
     pass
 
 

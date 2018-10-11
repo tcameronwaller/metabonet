@@ -702,6 +702,36 @@ def filter_hmdb_entries_by_synonyms(
     return keys
 
 
+def filter_hmdb_entries_by_references(
+    reference=None, identifiers=None, summary_hmdb=None
+):
+    """
+    Filters entries from HMDB by their identifiers.
+
+    arguments:
+        reference (str): name of reference
+        identifiers (list<str>): identifiers by which to find entries in HMDB
+        summary_hmdb (dict<dict>): information about metabolites from Human
+            Metabolome Database (HMDB)
+
+    returns:
+        (list<str>): keys of entries in HMDB
+
+    raises:
+
+    """
+
+    keys = []
+    for key, record in summary_hmdb.items():
+        reference_entry = record[reference]
+        # Determine whether any of entry's references match the query.
+        match = reference_entry in identifiers
+        if match:
+            # The entry matches the metabolite's references.
+            keys.append(key)
+    return keys
+
+
 # Metabolic information.
 
 

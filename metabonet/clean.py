@@ -112,6 +112,7 @@ def execute_procedure(directory=None):
     path_conversion = os.path.join(directory, "conversion")
     path_measurement = os.path.join(directory, "measurement")
     path_analysis = os.path.join(directory, "analysis")
+    path_plot = os.path.join(directory, "plot")
     # Remove directories and files.
     # Candidacy.
     utility.remove_file(os.path.join(path_candidacy, "metabolites.pickle"))
@@ -145,3 +146,10 @@ def execute_procedure(directory=None):
     utility.remove_file(os.path.join(path_analysis, "network_reactions.tsv"))
     utility.remove_file(os.path.join(path_analysis, "network_metabolites.tsv"))
     utility.remove_empty_directory(path_analysis)
+    # Plot.
+    utility.remove_file(os.path.join(path_plot, "measurements_one.svg"))
+    utility.remove_file(os.path.join(path_plot, "measurements_two.svg"))
+    utility.remove_file(os.path.join(path_plot, "measurements_three.svg"))
+    utility.remove_file(os.path.join(path_plot, "measurements_four.svg"))
+    utility.remove_file(os.path.join(path_plot, "measurements_five.svg"))
+    utility.remove_empty_directory(path_plot)

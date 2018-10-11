@@ -831,18 +831,18 @@ def filter_reactions(reactions_original=None):
         reactions (dict<dict>): information about reactions
 
     returns:
-        (dict<dict>): information about reactions
+        (list<dict>): information about reactions
 
     raises:
 
     """
 
-    reactions_novel = {}
+    reactions_filter = []
     for reaction in reactions_original.values():
         match, record = filter_reaction(reaction=reaction)
         if match:
-            reactions_novel[reaction["identifier"]] = record
-    return reactions_novel
+            reactions_filter.append(record)
+    return reactions_filter
 
 
 def filter_reaction(reaction=None):
@@ -871,7 +871,9 @@ def filter_reaction(reaction=None):
     compartments = utility.collect_value_from_records(
         key="compartment", records=reaction["participants"]
     )
-    compartment = ("BOUNDARY" in compartments)
+    compartment_boundary = ("BOUNDARY" in compartments)
+    # Extracellular region is irrelevant.
+    compartment_exterior = ("MNXC2" in compartments)
     # Metabolite.
     # Biomass is irrelevant.
     metabolites = utility.collect_value_from_records(
@@ -882,7 +884,13 @@ def filter_reaction(reaction=None):
     # MetaNetX reaction MNXR01 is for a meaningless proton exchange.
     reference = "MNXR01" in reaction["references"]["metanetx"]
     # Determine whether reaction passes filters.
-    filter = name or compartment or metabolite or reference
+    filter = (
+        name or
+        compartment_boundary or
+        compartment_exterior or
+        metabolite or
+        reference
+    )
     # Prepare report.
     record = {
         "identifier_original": reaction["identifier"],
@@ -890,10 +898,6 @@ def filter_reaction(reaction=None):
         "name_original": reaction["name"],
         "name_novel": reaction["name"],
         "custom": False,
-        "name": name,
-        "compartment": compartment,
-        "metabolite": metabolite,
-        "reference": reference
     }
     # Return information.
     return (filter, record)
@@ -1010,7 +1014,7 @@ def execute_procedure(directory=None):
         "reactions": reactions_replication,
         "metabolites_report": metabolites_report,
         "reactions_report": reactions_report,
-        "reactions_filter": list(reactions_filter.values())
+        "reactions_filter": reactions_filter
     }
     #Write product information to file.
     write_product(directory=directory, information=information)
