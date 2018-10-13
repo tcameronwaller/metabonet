@@ -91,6 +91,7 @@ import scipy.stats
 
 # Packages and modules from local source
 
+import metabocurator.enhancement
 import utility
 
 ###############################################################################
@@ -501,6 +502,7 @@ def curate_study_analytes(
         measurements=measurements
     )
     # Enhance analyte references.
+    # Only enhance references to PubChem if none already exist.
     summary_reference = enhance_analytes_references(
         summary=summary_coverage,
         hmdb=hmdb
@@ -509,20 +511,20 @@ def curate_study_analytes(
     summary_reference_coverage = filter_analytes_reference(
         summary=summary_reference
     )
-    # Enhance analyte names.
-    summary_name = enhance_analytes_names(
-        summary=summary_reference_coverage,
-        hmdb=hmdb
-    )
     # Match analytes to metabolites.
     # Match by PubChem identifiers.
     summary_metabolite = match_analytes_to_metabolites(
         reference="pubchem",
-        summary=copy.deepcopy(summary_name),
+        summary=copy.deepcopy(summary_reference_coverage),
+        metabolites=metabolites
+    )
+    # Enhance analyte names.
+    summary_name = enhance_analytes_names(
+        summary=summary_metabolite,
         metabolites=metabolites
     )
     # Return information.
-    return summary_metabolite
+    return summary_name
 
 
 def curate_study_measurements(
@@ -585,7 +587,7 @@ def curate_study_measurements(
     )
     # Determine fold changes.
     if pair:
-        summary_fold = calculate_analytes_folds_pairs(
+        summary_fold_log = calculate_analytes_folds_logarithms_pairs(
             summary=summary_priority,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
@@ -600,16 +602,16 @@ def curate_study_measurements(
             samples=samples,
             measurements=measurements_normalization
         )
-    # Determine logarithms-base-2 of fold changes.
-    summary_log = calculate_folds_logarithms(
-        records=summary_fold
-    )
+        # Determine logarithms-base-2 of fold changes.
+        summary_fold_log = calculate_folds_logarithms(
+            records=summary_fold
+        )
     # Determine p-values.
     # Compare pairs of samples in both groups.
     # Apply pair t-test for dependent sample populations.
     if pair:
         summary_probability = calculate_analytes_p_values_pairs(
-            summary=summary_log,
+            summary=summary_fold_log,
             group_one=group_numerator,
             group_two=group_denominator,
             samples=samples,
@@ -617,7 +619,7 @@ def curate_study_measurements(
         )
     else:
         summary_probability = calculate_analytes_p_values(
-            summary=summary_log,
+            summary=summary_fold_log,
             group_one=group_numerator,
             group_two=group_denominator,
             samples=samples,
@@ -847,8 +849,7 @@ def enhance_analytes_references(
     summary=None, hmdb=None
 ):
     """
-    Enhances analytes' references to Human Metabolome Database (HMDB) and to
-    PubChem.
+    Enhances analytes' references to PubChem.
 
     arguments:
         summary (list<dict<str>>): information about measurements for analytes
@@ -862,6 +863,7 @@ def enhance_analytes_references(
 
     """
 
+    # Enhance references to PubChem.
     summary_novel = []
     for record in summary:
         # Enhance references to PubChem.
@@ -871,35 +873,29 @@ def enhance_analytes_references(
             references_pubchem = [record["references"]["pubchem"]]
         else:
             references_pubchem = []
-        if len(references_pubchem) > 0:
-            # Find references to HMDB from references to PubChem.
-            references_hmdb = utility.filter_hmdb_entries_by_references(
-                reference="reference_pubchem",
-                identifiers=references_pubchem,
+        if not (len(references_pubchem) > 0):
+            # Analyte does not have any references to PubChem.
+            # Find references to HMDB from analyte's names.
+            name_one = record["identifier"]
+            name_two = record["name"]
+            identifiers_hmdb = utility.match_hmdb_entries_by_identifiers_names(
+                identifiers=[],
+                names=[name_one, name_two],
                 summary_hmdb=hmdb
             )
-        else:
-            references_hmdb = []
-        # Find references to HMDB from names.
-        name_one = record["identifier"]
-        name_two = record["name"]
-        hmdb_names = utility.match_hmdb_entries_by_identifiers_names(
-            identifiers=[],
-            names=[name_one, name_two],
-            summary_hmdb=hmdb
-        )
-        references_hmdb.extend(hmdb_names)
-        hmdb_unique = utility.collect_unique_elements(references_hmdb)
-        # Include references to HMDB.
-        record["references"]["hmdb"] = hmdb_unique
-        # Enhance references to PubChem.
-        for key in hmdb_unique:
-            hmdb_entry = hmdb[key]
-            hmdb_pubchem = hmdb_entry["reference_pubchem"]
-            if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
-                references_pubchem.append(hmdb_pubchem)
-        pubchem_unique = utility.collect_unique_elements(references_pubchem)
-        record["references"]["pubchem"] = pubchem_unique
+            # Extract references to PubChem from HMDB.
+            if len(identifiers_hmdb) > 0:
+                # Extract references from entries in HMDB
+                for key in identifiers_hmdb:
+                    hmdb_entry = hmdb[key]
+                    hmdb_pubchem = hmdb_entry["reference_pubchem"]
+                    if (hmdb_pubchem is not None) and (len(hmdb_pubchem) > 0):
+                        references_pubchem.append(hmdb_pubchem)
+                references_pubchem = utility.collect_unique_elements(
+                    references_pubchem
+                )
+        # Include references.
+        record["references"]["pubchem"] = references_pubchem
         summary_novel.append(record)
     return summary_novel
 
@@ -969,16 +965,14 @@ def filter_analytes_reference(
 
 
 def enhance_analytes_names(
-    summary=None, hmdb=None
+    summary=None, metabolites=None
 ):
     """
-    Enhances analytes' references to Human Metabolome Database (HMDB) and to
-    PubChem.
+    Enhances analytes' names.
 
     arguments:
         summary (list<dict<str>>): information about measurements for analytes
-        hmdb (dict<dict>): information about metabolites from Human Metabolome
-            Database (HMDB)
+        metabolites (dict<dict>): information about metabolites
 
     raises:
 
@@ -989,11 +983,11 @@ def enhance_analytes_names(
 
     summary_novel = []
     for record in summary:
-        # Determine whether record has a reference to HMDB.
-        if len(record["references"]["hmdb"]) > 0:
-            references_hmdb = record["references"]["hmdb"]
-            entry_hmdb = hmdb[references_hmdb[0]]
-            name = entry_hmdb["name"]
+        # Determine whether record has a reference to a metabolite.
+        if len(record["references"]["metabolite"]) > 0:
+            identifier_metabolite = record["references"]["metabolite"][0]
+            metabolite = metabolites[identifier_metabolite]
+            name = metabolite["name"]
             record["name"] = name
         summary_novel.append(record)
     return summary_novel
@@ -1564,7 +1558,7 @@ def calculate_analyte_fold(
     return fold
 
 
-def calculate_analytes_folds_pairs(
+def calculate_analytes_folds_logarithms_pairs(
     summary=None,
     group_numerator=None,
     group_denominator=None,
@@ -1600,7 +1594,7 @@ def calculate_analytes_folds_pairs(
     summary_novel = []
     for record in summary:
         identifier = record["identifier"]
-        fold = calculate_analyte_fold_pairs(
+        fold, fold_log = calculate_analyte_fold_logarithm_pairs(
             identifier=identifier,
             group_numerator=group_numerator,
             group_denominator=group_denominator,
@@ -1608,6 +1602,7 @@ def calculate_analytes_folds_pairs(
             measurements=measurements
         )
         record["fold"] = fold
+        record["fold_log"] = fold_log
         summary_novel.append(record)
     return summary_novel
 
@@ -1662,7 +1657,7 @@ def determine_pairs_samples(
     return pairs_samples
 
 
-def calculate_analyte_fold_pairs(
+def calculate_analyte_fold_logarithm_pairs(
     identifier=None,
     group_numerator=None,
     group_denominator=None,
@@ -1683,7 +1678,7 @@ def calculate_analyte_fold_pairs(
     raises:
 
     returns:
-        (float): fold change
+        (float, float): mean fold change, mean logarithm fold change
 
     """
 
@@ -1706,8 +1701,16 @@ def calculate_analyte_fold_pairs(
             if (numerator > 0 and denominator > 0):
                 fold = numerator / denominator
                 folds.append(fold)
-    mean = statistics.mean(folds)
-    return mean
+    # Calculate mean of folds.
+    fold_mean = statistics.mean(folds)
+    # Calculate mean of logarithms of folds.
+    folds_log = []
+    for fold in folds:
+        fold_log = math.log(fold, 2)
+        folds_log.append(fold_log)
+    fold_log_mean = statistics.mean(folds_log)
+    # Return information.
+    return fold_mean, fold_log_mean
 
 
 def find_analyte_measurements(identifier=None, measurements=None):
@@ -1792,7 +1795,7 @@ def calculate_folds_logarithms(records=None):
     records_novel = []
     for record in records:
         fold = record["fold"]
-        record["log_fold"] = math.log(fold, 2)
+        record["fold_log"] = math.log(fold, 2)
         records_novel.append(record)
     return records_novel
 
@@ -2041,13 +2044,12 @@ def convert_summary_text(summary=None):
         record_text = {
             "identifier": record["identifier"],
             "name": record["name"],
-            "reference_hmdb": ";".join(record["references"]["hmdb"]),
             "reference_pubchem": ";".join(record["references"]["pubchem"]),
             "reference_metabolite": (
                 ";".join(record["references"]["metabolite"])
             ),
             "fold": record["fold"],
-            "log_fold": record["log_fold"],
+            "fold_log": record["fold_log"],
             "p_value": record["p_value"]
         }
         records_text.append(record_text)
@@ -2321,6 +2323,7 @@ def prepare_report_analyte_metabolite_match(
     for record_summary in summary:
         identifier_analyte = record_summary["identifier"]
         name_analyte = record_summary["name"]
+        pubchem = record_summary["references"]["pubchem"]
         metabolites_analyte = record_summary["references"]["metabolite"]
         match = (len(metabolites_analyte) > 0)
         if match:
@@ -2336,7 +2339,8 @@ def prepare_report_analyte_metabolite_match(
             "name_analyte": name_analyte,
             "match": match_value,
             "identifier_metabolite": identifier_metabolite,
-            "name_metabolite": name_metabolite
+            "name_metabolite": name_metabolite,
+            "reference_pubchem": pubchem
         }
         report.append(record)
     return report
@@ -2833,7 +2837,7 @@ def execute_procedure(directory=None):
     # Measurements from study two represent metabolites in visceral versus
     # subcutaneous adipose.
     study_one = curate_study(
-        pair=False,
+        pair=True,
         normalization=True,
         group_numerator="visceral_fat",
         group_denominator="subcutaneous_fat",
@@ -2848,7 +2852,7 @@ def execute_procedure(directory=None):
     # Measurements from study two represent metabolites in normal versus tumor
     # lung.
     study_two = curate_study(
-        pair=False,
+        pair=True,
         normalization=True,
         group_numerator="tumor",
         group_denominator="normal",
@@ -2887,7 +2891,7 @@ def execute_procedure(directory=None):
     )
     # Curate measurements from study five.
     study_five = curate_study(
-        pair=False,
+        pair=True,
         normalization=True,
         group_numerator="after_exercise",
         group_denominator="before_exercise",

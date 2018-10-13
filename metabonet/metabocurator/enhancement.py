@@ -194,6 +194,11 @@ def enhance_metabolite(
         summary_hmdb=summary_hmdb
     )
     metabolite_novel["references"] = references_novel
+    # Use name from HMDB.
+    if len(references_novel["hmdb"]) > 0:
+        identifier_hmdb = references_novel["hmdb"][0]
+        name = summary_hmdb[identifier_hmdb]["name"]
+        metabolite_novel["name"] = name
     return metabolite_novel
 
 

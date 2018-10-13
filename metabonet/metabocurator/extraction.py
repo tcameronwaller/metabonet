@@ -249,12 +249,21 @@ def extract_hmdb_record_summary(element=None, space=None, spaces=None):
     synonyms_values.append(name)
     synonyms = utility.collect_unique_elements(synonyms_values)
     # References.
-    reference_pubchem = extract_subelement_value(
+    pubchem_tentative = extract_subelement_value(
         element=element,
         tag="pubchem_compound_id",
         space=space,
         spaces=spaces
     )
+    # Multiple entries have references to identifier "0" for PubChem.
+    # This identifier is nonsense and erroneous.
+    if (
+        (pubchem_tentative is not None) and
+        (pubchem_tentative == "0")
+    ):
+        reference_pubchem = None
+    else:
+        reference_pubchem = pubchem_tentative
     reference_chebi = extract_subelement_value(
         element=element,
         tag="chebi_id",

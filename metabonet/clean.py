@@ -141,10 +141,16 @@ def execute_procedure(directory=None):
     utility.remove_file(os.path.join(path_measurement, "metabolites.tsv"))
     utility.remove_empty_directory(path_measurement)
     # Analysis.
+    utility.remove_file(os.path.join(
+        path_analysis, "nodes_metabolites.pickle"
+    ))
     utility.remove_file(os.path.join(path_analysis, "nodes_reactions.tsv"))
     utility.remove_file(os.path.join(path_analysis, "nodes_metabolites.tsv"))
     utility.remove_file(os.path.join(path_analysis, "network_reactions.tsv"))
     utility.remove_file(os.path.join(path_analysis, "network_metabolites.tsv"))
+    utility.remove_file(os.path.join(
+        path_analysis, "simplification_metabolites.tsv"
+    ))
     utility.remove_empty_directory(path_analysis)
     # Plot.
     utility.remove_file(os.path.join(path_plot, "measurements_one.svg"))

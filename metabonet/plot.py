@@ -1051,7 +1051,7 @@ def plot_volcano(
         p_value = record["p_value"]
         p_value_log = (-1 * math.log(p_value, 10))
         fold = record["fold"]
-        fold_log = math.log(fold, 2)
+        fold_log = record["fold_log"]
         axes.plot(
             fold_log,
             p_value_log,
@@ -1067,7 +1067,7 @@ def plot_volcano(
         p_value = record["p_value"]
         p_value_log = (-1 * math.log(p_value, 10))
         fold = record["fold"]
-        fold_log = math.log(fold, 2)
+        fold_log = record["fold_log"]
         axes.plot(
             fold_log,
             p_value_log,
@@ -1119,13 +1119,18 @@ def filter_records_thresholds(
     """
 
     # Collect records with values within or without thresholds.
+    threshold_fold_log = math.log(threshold_fold, 2)
     records_internal = []
     records_external = []
     for record in records:
         p_value = record["p_value"]
         fold = record["fold"]
+        fold_log = record["fold_log"]
         match_p = (p_value < threshold_p)
-        match_fold = (fold > threshold_fold) or (fold < (1 / threshold_fold))
+        match_fold = (
+            (fold_log > threshold_fold_log) or
+            (fold_log < (-1 * threshold_fold_log))
+        )
         if match_p and match_fold:
             records_internal.append(record)
         else:

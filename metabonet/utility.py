@@ -542,7 +542,7 @@ def filter_nonempty_elements(elements_original=None):
 
     elements_novel = []
     for element in elements_original:
-        if len(element) > 0:
+        if len(str(element)) > 0:
             elements_novel.append(element)
     return elements_novel
 
