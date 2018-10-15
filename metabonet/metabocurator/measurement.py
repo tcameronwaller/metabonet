@@ -983,6 +983,8 @@ def enhance_analytes_names(
 
     summary_novel = []
     for record in summary:
+        name_original = record["name"]
+        record["name_original"] = name_original
         # Determine whether record has a reference to a metabolite.
         if len(record["references"]["metabolite"]) > 0:
             identifier_metabolite = record["references"]["metabolite"][0]
@@ -2043,6 +2045,7 @@ def convert_summary_text(summary=None):
     for record in summary:
         record_text = {
             "identifier": record["identifier"],
+            "name_original": record["name_original"],
             "name": record["name"],
             "reference_pubchem": ";".join(record["references"]["pubchem"]),
             "reference_metabolite": (
@@ -2322,7 +2325,7 @@ def prepare_report_analyte_metabolite_match(
     report = []
     for record_summary in summary:
         identifier_analyte = record_summary["identifier"]
-        name_analyte = record_summary["name"]
+        name_analyte = record_summary["name_original"]
         pubchem = record_summary["references"]["pubchem"]
         metabolites_analyte = record_summary["references"]["metabolite"]
         match = (len(metabolites_analyte) > 0)

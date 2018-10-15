@@ -125,16 +125,16 @@ def read_source(directory=None):
     path_measurement = os.path.join(directory, "measurement")
     # Nodes.
     path_nodes_one = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-yes_hubs-yes.pickle"
+        path_analysis, "nodes_metabolites_compartments-true_hubs-true.pickle"
     )
     path_nodes_two = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-yes_hubs-no.pickle"
+        path_analysis, "nodes_metabolites_compartments-true_hubs-false.pickle"
     )
     path_nodes_three = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-no_hubs-yes.pickle"
+        path_analysis, "nodes_metabolites_compartments-false_hubs-true.pickle"
     )
     path_nodes_four = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-no_hubs-no.pickle"
+        path_analysis, "nodes_metabolites_compartments-false_hubs-false.pickle"
     )
     # Measurements.
     path_measurements_one = os.path.join(path_measurement, "study_one.pickle")
@@ -843,10 +843,10 @@ def plot_names_clouds(
         names_frequencies[name] = degree
     # Create word cloud.
     chart_names = wordcloud.WordCloud(
-        width=3000,#2000, 4000, 6000,
-        height=4000,#1500, 3000, 4500,
+        width=1500,#2000, 4000, 6000,
+        height=2000,#1500, 3000, 4500,
         min_font_size=1,
-        max_font_size=300,#200, #300, 500
+        max_font_size=150,#200, #300, 500
         max_words=count,
         colormap="ocean",#"viridis", "plasma", "ocean", "gist_earth",
         background_color="white",
@@ -1159,40 +1159,39 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "plot")
     utility.confirm_path_directory(path)
-    if False:
-        # Degree.
-        path_degree_one_two = os.path.join(
-            path, "metabolite_degrees_compartments-yes.svg"
-        )
-        path_degree_three_four = os.path.join(
-            path, "metabolite_degrees_compartments-no.svg"
-        )
-        # Rank.
-        path_rank_one = os.path.join(
-            path, "metabolite_ranks_compartments-yes_hubs-yes.svg"
-        )
-        path_rank_two = os.path.join(
-            path, "metabolite_ranks_compartments-yes_hubs-no.svg"
-        )
-        path_rank_three = os.path.join(
-            path, "metabolite_ranks_compartments-no_hubs-yes.svg"
-        )
-        path_rank_four = os.path.join(
-            path, "metabolite_ranks_compartments-no_hubs-no.svg"
-        )
-        # Name.
-        path_name_one = os.path.join(
-            path, "metabolite_names_compartments-yes_hubs-yes.png"
-        )
-        path_name_two = os.path.join(
-            path, "metabolite_names_compartments-yes_hubs-no.png"
-        )
-        path_name_three = os.path.join(
-            path, "metabolite_names_compartments-no_hubs-yes.png"
-        )
-        path_name_four = os.path.join(
-            path, "metabolite_names_compartments-no_hubs-no.png"
-        )
+    # Degree.
+    path_degree_one_two = os.path.join(
+        path, "metabolite_degrees_compartments-true.svg"
+    )
+    path_degree_three_four = os.path.join(
+        path, "metabolite_degrees_compartments-false.svg"
+    )
+    # Rank.
+    path_rank_one = os.path.join(
+        path, "metabolite_ranks_compartments-true_hubs-true.svg"
+    )
+    path_rank_two = os.path.join(
+        path, "metabolite_ranks_compartments-true_hubs-false.svg"
+    )
+    path_rank_three = os.path.join(
+        path, "metabolite_ranks_compartments-false_hubs-true.svg"
+    )
+    path_rank_four = os.path.join(
+        path, "metabolite_ranks_compartments-false_hubs-false.svg"
+    )
+    # Name.
+    path_name_one = os.path.join(
+        path, "metabolite_names_compartments-true_hubs-true.png"
+    )
+    path_name_two = os.path.join(
+        path, "metabolite_names_compartments-true_hubs-false.png"
+    )
+    path_name_three = os.path.join(
+        path, "metabolite_names_compartments-false_hubs-true.png"
+    )
+    path_name_four = os.path.join(
+        path, "metabolite_names_compartments-false_hubs-false.png"
+    )
     # Measurement.
     path_measurement_one = os.path.join(path, "measurements_one.svg")
     path_measurement_two = os.path.join(path, "measurements_two.svg")
@@ -1200,60 +1199,58 @@ def write_product(directory=None, information=None):
     path_measurement_four = os.path.join(path, "measurements_four.svg")
     path_measurement_five = os.path.join(path, "measurements_five.svg")
     # Write information to file.
-    if False:
-        information["charts_degrees"]["one_two"].savefig(
-            path_degree_one_two,
-            format="svg",
-            dpi=600,
-            facecolor="w",
-            edgecolor="w",
-            transparent=False
-        )
-        information["charts_degrees"]["three_four"].savefig(
-            path_degree_three_four,
-            format="svg",
-            dpi=600,
-            facecolor="w",
-            edgecolor="w",
-            transparent=False
-        )
-        information["charts_ranks"]["one"].savefig(
-            path_rank_one,
-            format="svg",
-            dpi=600,
-            facecolor="w",
-            edgecolor="w",
-            transparent=False
-        )
-        information["charts_ranks"]["two"].savefig(
-            path_rank_two,
-            format="svg",
-            dpi=600,
-            facecolor="w",
-            edgecolor="w",
-            transparent=False
-        )
-        information["charts_ranks"]["three"].savefig(
-            path_rank_three,
-            format="svg",
-            dpi=600,
-            facecolor="w",
-            edgecolor="w",
-            transparent=False
-        )
-        information["charts_ranks"]["four"].savefig(
-            path_rank_four,
-            format="svg",
-            dpi=600,
-            facecolor="w",
-            edgecolor="w",
-            transparent=False
-        )
-    if False:
-        information["charts_names"]["one"].to_file(path_name_one)
-        information["charts_names"]["two"].to_file(path_name_two)
-        information["charts_names"]["three"].to_file(path_name_three)
-        information["charts_names"]["four"].to_file(path_name_four)
+    information["charts_degrees"]["one_two"].savefig(
+        path_degree_one_two,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w",
+        transparent=False
+    )
+    information["charts_degrees"]["three_four"].savefig(
+        path_degree_three_four,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w",
+        transparent=False
+    )
+    information["charts_ranks"]["one"].savefig(
+        path_rank_one,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w",
+        transparent=False
+    )
+    information["charts_ranks"]["two"].savefig(
+        path_rank_two,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w",
+        transparent=False
+    )
+    information["charts_ranks"]["three"].savefig(
+        path_rank_three,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w",
+        transparent=False
+    )
+    information["charts_ranks"]["four"].savefig(
+        path_rank_four,
+        format="svg",
+        dpi=600,
+        facecolor="w",
+        edgecolor="w",
+        transparent=False
+    )
+    information["charts_names"]["one"].to_file(path_name_one)
+    information["charts_names"]["two"].to_file(path_name_two)
+    information["charts_names"]["three"].to_file(path_name_three)
+    information["charts_names"]["four"].to_file(path_name_four)
     information["charts_measurements"]["one"].savefig(
         path_measurement_one,
         format="svg",
@@ -1321,35 +1318,33 @@ def execute_procedure(directory=None):
     fonts = define_font_properties()
     # Define colors.
     colors = define_color_properties()
-    if False:
-        # Distributions of nodes' degrees.
-        charts_degrees = plot_degrees(
-            nodes_one=source["nodes_one"],
-            nodes_two=source["nodes_two"],
-            nodes_three=source["nodes_three"],
-            nodes_four=source["nodes_four"],
-            fonts=fonts,
-            colors=colors
-        )
-        # Ranks of nodes.
-        charts_ranks = plot_ranks(
-            count=10,
-            nodes_one=source["nodes_one"],
-            nodes_two=source["nodes_two"],
-            nodes_three=source["nodes_three"],
-            nodes_four=source["nodes_four"],
-            fonts=fonts,
-            colors=colors
-        )
+    # Distributions of nodes' degrees.
+    charts_degrees = plot_degrees(
+        nodes_one=source["nodes_one"],
+        nodes_two=source["nodes_two"],
+        nodes_three=source["nodes_three"],
+        nodes_four=source["nodes_four"],
+        fonts=fonts,
+        colors=colors
+    )
+    # Ranks of nodes.
+    charts_ranks = plot_ranks(
+        count=10,
+        nodes_one=source["nodes_one"],
+        nodes_two=source["nodes_two"],
+        nodes_three=source["nodes_three"],
+        nodes_four=source["nodes_four"],
+        fonts=fonts,
+        colors=colors
+    )
     # Names of nodes.
-    if False:
-        charts_names = plot_names(
-            count=3000,
-            nodes_one=source["nodes_one"],
-            nodes_two=source["nodes_two"],
-            nodes_three=source["nodes_three"],
-            nodes_four=source["nodes_four"],
-        )
+    charts_names = plot_names(
+        count=3000,
+        nodes_one=source["nodes_one"],
+        nodes_two=source["nodes_two"],
+        nodes_three=source["nodes_three"],
+        nodes_four=source["nodes_four"],
+    )
     # Metabolomic measurements.
     charts_measurements = plot_measurements(
         records_one=source["measurements_one"],
@@ -1366,9 +1361,9 @@ def execute_procedure(directory=None):
     )
     # Compile information.
     information = {
-        #"charts_degrees": charts_degrees,
-        #"charts_ranks": charts_ranks,
-        #"charts_names": charts_names,
+        "charts_degrees": charts_degrees,
+        "charts_ranks": charts_ranks,
+        "charts_names": charts_names,
         "charts_measurements": charts_measurements
     }
     #Write product information to file.
