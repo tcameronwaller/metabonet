@@ -150,15 +150,14 @@ def read_source(directory=None):
     )
     # Read information from file.
     # Nodes.
-    if False:
-        with open(path_nodes_one, "rb") as file_source:
-            nodes_one = pickle.load(file_source)
-        with open(path_nodes_two, "rb") as file_source:
-            nodes_two = pickle.load(file_source)
-        with open(path_nodes_three, "rb") as file_source:
-            nodes_three = pickle.load(file_source)
-        with open(path_nodes_four, "rb") as file_source:
-            nodes_four = pickle.load(file_source)
+    with open(path_nodes_one, "rb") as file_source:
+        nodes_one = pickle.load(file_source)
+    with open(path_nodes_two, "rb") as file_source:
+        nodes_two = pickle.load(file_source)
+    with open(path_nodes_three, "rb") as file_source:
+        nodes_three = pickle.load(file_source)
+    with open(path_nodes_four, "rb") as file_source:
+        nodes_four = pickle.load(file_source)
     # Measurements.
     with open(path_measurements_one, "rb") as file_source:
         measurements_one = pickle.load(file_source)
@@ -172,10 +171,10 @@ def read_source(directory=None):
         measurements_five = pickle.load(file_source)
     # Compile and return information.
     return {
-        #"nodes_one": nodes_one,
-        #"nodes_two": nodes_two,
-        #"nodes_three": nodes_three,
-        #"nodes_four": nodes_four,
+        "nodes_one": nodes_one,
+        "nodes_two": nodes_two,
+        "nodes_three": nodes_three,
+        "nodes_four": nodes_four,
         "measurements_one": measurements_one,
         "measurements_two": measurements_two,
         "measurements_three": measurements_three,
@@ -802,11 +801,11 @@ def plot_names(
     )
     chart_three = plot_names_clouds(
         count=count,
-        nodes=nodes_four
+        nodes=nodes_three
     )
-    chart_five = plot_names_clouds(
+    chart_four = plot_names_clouds(
         count=count,
-        nodes=nodes_five
+        nodes=nodes_four
     )
     # Compile and return information.
     return {
@@ -837,7 +836,7 @@ def plot_names_clouds(
 
     # Determine frequencies of names.
     names_frequencies = {}
-    for record in nodes_metabolites.values():
+    for record in nodes.values():
         name = record["name"]
         degree = record["degree"]
         names_frequencies[name] = degree

@@ -782,8 +782,8 @@ def determine_reaction_relevant_participants(
             simplification_metabolites=simplification_metabolites
         )
         metabolite_relevance = (
-            not simplification_match["omission"] and
-            not simplification_match["replication"]
+            (not simplification_match["omission"]) and
+            (not simplification_match["replication"])
         )
         # Determine whether participant is relevant.
         if metabolite_relevance and compartment_relevance:
@@ -1371,17 +1371,17 @@ def determine_reaction_candidate_participants(
         )
         # Determine candidacy of participant's metabolite.
         metabolite = participant["metabolite"]
-        simplification = determine_metabolite_simplification(
+        simplification_match = determine_metabolite_simplification(
             metabolite_identifier=metabolite,
             compartment_identifier=compartment,
             simplification=simplification,
             simplification_metabolites=simplification_metabolites
         )
-        participant["replication"] = simplification["replication"]
+        participant["replication"] = simplification_match["replication"]
         # Designate identifier for candidate metabolites for participant.
         metabolite_candidacy = determine_candidate_metabolite_identifier(
             compartmentalization=compartmentalization,
-            replication=simplification["replication"],
+            replication=simplification_match["replication"],
             metabolite_identifier=metabolite,
             compartment_identifier=compartment,
             reaction_candidacy_identifier=reaction_candidacy_identifier
@@ -1390,7 +1390,7 @@ def determine_reaction_candidate_participants(
         # Determine whether participant is a candidate.
         # Metabolites with designation for simplification by replication are
         # still candidates.
-        if compartment_relevance and not simplification["omission"]:
+        if compartment_relevance and not simplification_match["omission"]:
             participants_novel.append(participant)
     return participants_novel
 
