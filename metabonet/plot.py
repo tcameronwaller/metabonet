@@ -432,7 +432,7 @@ def plot_two_distributions_histograms(
     """
 
     # Determine histogram bins.
-    hist, bin_edges = numpy.histogram(series_one, bins=50)
+    hist, bin_edges = numpy.histogram(series_one, bins=100)
     # Create chart.
     figure = pyplot.figure(
         figsize=(15.748, 11.811),
