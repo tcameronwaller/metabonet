@@ -122,6 +122,9 @@ def read_source(directory=None):
     path_metabolites_curation = os.path.join(
         path_customization, "curation_metabolites.tsv"
     )
+    path_reactions_interest = os.path.join(
+        path_customization, "interest_reactions.tsv"
+    )
     path = os.path.join(directory, "enhancement")
     path_compartments = os.path.join(path, "compartments.pickle")
     path_processes = os.path.join(path, "processes.pickle")
@@ -156,6 +159,11 @@ def read_source(directory=None):
         names=None,
         delimiter="\t"
     )
+    reactions_interest = utility.read_file_table(
+        path_file=path_reactions_interest,
+        names=None,
+        delimiter="\t"
+    )
     # Compile and return information.
     return {
         "compartments": compartments,
@@ -166,6 +174,7 @@ def read_source(directory=None):
         "processes_curation": processes_curation,
         "reactions_curation": reactions_curation,
         "metabolites_curation": metabolites_curation,
+        "reactions_interest": reactions_interest
     }
 
 
@@ -289,6 +298,7 @@ def curate_processes(
             if identifier_original in processes_novel:
                 # Remove process.
                 del processes_novel[identifier_original]
+                # TODO: also remove the process from any reactions' processes
                 # Removal of a process does not justify removal of any
                 # reactions that participate in that process.
         else:
@@ -310,6 +320,7 @@ def curate_processes(
                                 processes
                             )
                             reaction["processes"] = processes_unique
+                            reactions_novel[reaction["identifier"]] = reaction
             if not match_names:
                 # Change name.
                 if identifier_novel in processes_novel:
@@ -548,7 +559,8 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
         elif not match_names:
             # Change name.
             if identifier_original in reactions_novel:
-                reactions_novel[identifier_original]["name"] = name_novel
+                # TODO: temporarily append asterisk to check curation...
+                reactions_novel[identifier_original]["name"] = "*" + name_novel
         # Filter references to replicate reactions.
         # Ensure that all references to reactions are valid.
         reactions_replicates = filter_reaction_replicates(
@@ -584,6 +596,53 @@ def filter_reaction_replicates(reactions_original=None):
     return reactions_novel
 
 
+def access_reactions_summary(
+    reactions_interest=None,
+    reactions=None,
+    directory=None
+):
+    """
+    Accesses summary information about reactions of interest.
+
+    arguments:
+        reactions_interest (list<dict<str>>): identifiers of reactions of
+            interest
+        reactions (dict<dict>): information about reactions
+        directory (str): path to directory for source and product files
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements and signals for all
+            samples
+
+    """
+
+    # Collect information about reactions of interest.
+    identifiers = utility.collect_value_from_records(
+        key="identifier",
+        records=reactions_interest
+    )
+    identifiers_unique = utility.collect_unique_elements(identifiers)
+    reactions_summary = []
+    for identifier in identifiers_unique:
+        reaction = reactions[identifier]
+        name = reaction["name"]
+        metanetx = ";".join(reaction["references"]["metanetx"])
+        gene = ";".join(reaction["references"]["gene"])
+        enzyme = ";".join(reaction["references"]["enzyme"])
+        record_product = {
+            "identifier": identifier,
+            "name": name,
+            "metanetx": metanetx,
+            "gene": gene,
+            "enzyme": enzyme
+        }
+        reactions_summary.append(record_product)
+    # Return information.
+    return reactions_summary
+
+
 def write_product(directory=None, information=None):
     """
     Writes product information to file
@@ -604,6 +663,7 @@ def write_product(directory=None, information=None):
     path_compartments = os.path.join(path, "compartments.pickle")
     path_processes = os.path.join(path, "processes.pickle")
     path_reactions = os.path.join(path, "reactions.pickle")
+    path_reactions_summary = os.path.join(path, "reactions_summary.tsv")
     path_metabolites = os.path.join(path, "metabolites.pickle")
     path_metabolites_report = os.path.join(path, "metabolites.tsv")
     path_reactions_report = os.path.join(path, "reactions.tsv")
@@ -626,6 +686,12 @@ def write_product(directory=None, information=None):
         information=information["reactions_report"],
         path_file=path_reactions_report,
         names=information["reactions_report"][0].keys(),
+        delimiter="\t"
+    )
+    utility.write_file_table(
+        information=information["reactions_summary"],
+        path_file=path_reactions_summary,
+        names=information["reactions_summary"][0].keys(),
         delimiter="\t"
     )
 
@@ -676,6 +742,14 @@ def execute_procedure(directory=None):
         reactions_curation=source["reactions_curation"],
         reactions_original=metabolites_reactions["reactions"]
     )
+    # Extract information for curation of reactions.
+    # This summary is primarily useful for preparing information for custom
+    # curation of reactions.
+    reactions_summary = access_reactions_summary(
+        reactions_interest=source["reactions_interest"],
+        reactions=reactions,
+        directory=directory
+    )
     # Prepare reports of information for review.
     metabolites_report = metabocurator.conversion.convert_metabolites_text(
         metabolites=metabolites_reactions["metabolites"]
@@ -689,6 +763,7 @@ def execute_procedure(directory=None):
         "processes": processes_reactions["processes"],
         "metabolites": metabolites_reactions["metabolites"],
         "reactions": reactions,
+        "reactions_summary": reactions_summary,
         "metabolites_report": metabolites_report,
         "reactions_report": reactions_report,
     }
