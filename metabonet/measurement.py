@@ -318,7 +318,8 @@ def determine_metabolite_study_measurements(
             record = {
                 "fold": analyte["fold"],
                 "fold_log": analyte["fold_log"],
-                "p_value": analyte["p_value"]
+                "p_value": analyte["p_value"],
+                "p_value_log": analyte["p_value_log"]
             }
             measurements.append(record)
     # Determine whether any measurements match the metabolite.
@@ -327,7 +328,8 @@ def determine_metabolite_study_measurements(
         record = {
             "fold": "",
             "fold_log": "",
-            "p_value": ""
+            "p_value": "",
+            "p_value_log": ""
         }
         measurements.append(record)
     return measurements[0]
