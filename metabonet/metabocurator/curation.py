@@ -559,8 +559,7 @@ def curate_reactions(reactions_curation=None, reactions_original=None):
         elif not match_names:
             # Change name.
             if identifier_original in reactions_novel:
-                # TODO: temporarily append asterisk to check curation...
-                reactions_novel[identifier_original]["name"] = "*" + name_novel
+                reactions_novel[identifier_original]["name"] = name_novel
         # Filter references to replicate reactions.
         # Ensure that all references to reactions are valid.
         reactions_replicates = filter_reaction_replicates(
