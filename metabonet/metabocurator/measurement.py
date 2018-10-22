@@ -2644,6 +2644,8 @@ def prepare_curation_report(
     )
     proportion_metabolite = count_metab / count_analytes
     percent_metabolite = round((proportion_metabolite * 100), 2)
+    # Determine minimal and maximal base-2 logarithm fold changes.
+    minimum, maximum = determine_fold_logarithm_extremes(summary=summary)
     # Compile information.
     report = textwrap.dedent("""\
 
@@ -2656,6 +2658,9 @@ def prepare_curation_report(
         measurements with PubChem: {count_pubchem} ({percentage_pubchem} %)
         measurements with HMDB: {count_hmdb} ({percentage_hmdb} %)
 
+        minimal log-2 fold change: {minimum}
+        maximal log-2 fold change: {maximum}
+
         --------------------------------------------------
     """).format(
         count_analytes=count_analytes,
@@ -2664,7 +2669,9 @@ def prepare_curation_report(
         count_pubchem=count_pubchem,
         percentage_pubchem=percentage_pubchem,
         count_metab=count_metab,
-        percent_metabolite=percent_metabolite
+        percent_metabolite=percent_metabolite,
+        minimum=minimum,
+        maximum=maximum
     )
     # Return information.
     return report
@@ -2695,6 +2702,31 @@ def count_records_with_references(references=None, records=None):
         if any(matches):
             count += 1
     return count
+
+
+def determine_fold_logarithm_extremes(
+    summary=None
+):
+    """
+    Determines minimal and maximal values of base-2 logarithms of fold changes.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+
+    raises:
+
+    returns:
+        (tuple<float, float>): minimal and maximal values of base-2 logarithms
+            of fold changes
+
+    """
+
+    values = utility.collect_value_from_records(
+        key="fold_log", records=summary
+    )
+    maximum = max(values)
+    minimum = min(values)
+    return (minimum, maximum)
 
 
 def write_product(directory=None, information=None):
