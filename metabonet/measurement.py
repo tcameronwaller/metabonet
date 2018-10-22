@@ -393,18 +393,23 @@ def convert_metabolites_text(metabolites=None):
             "measurement_one_fold": study_one["fold"],
             "measurement_one_fold_log": study_one["fold_log"],
             "measurement_one_p_value": study_one["p_value"],
+            "measurement_one_p_value_log": study_one["p_value_log"],
             "measurement_two_fold": study_two["fold"],
             "measurement_two_fold_log": study_two["fold_log"],
             "measurement_two_p_value": study_two["p_value"],
+            "measurement_two_p_value_log": study_two["p_value_log"],
             "measurement_three_fold": study_three["fold"],
             "measurement_three_fold_log": study_three["fold_log"],
             "measurement_three_p_value": study_three["p_value"],
+            "measurement_three_p_value_log": study_three["p_value_log"],
             "measurement_four_fold": study_four["fold"],
             "measurement_four_fold_log": study_four["fold_log"],
             "measurement_four_p_value": study_four["p_value"],
+            "measurement_four_p_value_log": study_four["p_value_log"],
             "measurement_five_fold": study_five["fold"],
             "measurement_five_fold_log": study_five["fold_log"],
             "measurement_five_p_value": study_five["p_value"],
+            "measurement_five_p_value_log": study_five["p_value_log"],
         }
         records.append(record)
     records.sort(

@@ -625,8 +625,12 @@ def curate_study_measurements(
             samples=samples,
             measurements=measurements_normalization
         )
+    # Determine base-10 logarithms of p-values.
+    summary_probability_log = calculate_p_values_logarithms(
+        records=summary_probability
+    )
     # Return information.
-    return summary_probability
+    return summary_probability_log
 
 
 # Curation of analytes.
@@ -2003,6 +2007,28 @@ def calculate_analyte_p_value_pairs(
     return p_value
 
 
+def calculate_p_values_logarithms(records=None):
+    """
+    Calculates base-10 logarithms of p-values in records.
+
+    arguments:
+        records (list<dict>): information about measurements of analytes
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    records_novel = []
+    for record in records:
+        p_value = record["p_value"]
+        record["p_value_log"] = math.log(p_value, 10)
+        records_novel.append(record)
+    return records_novel
+
+
 def filter_analytes_metabolites(
     summary=None
 ):
@@ -2053,7 +2079,8 @@ def convert_summary_text(summary=None):
             ),
             "fold": record["fold"],
             "fold_log": record["fold_log"],
-            "p_value": record["p_value"]
+            "p_value": record["p_value"],
+            "p_value_log": record["p_value_log"]
         }
         records_text.append(record_text)
     return records_text
@@ -2646,6 +2673,8 @@ def prepare_curation_report(
     percent_metabolite = round((proportion_metabolite * 100), 2)
     # Determine minimal and maximal base-2 logarithm fold changes.
     minimum, maximum = determine_fold_logarithm_extremes(summary=summary)
+    # Determine minimal base-10 logarithm p-value.
+    minimum_p_value_log = determine_p_value_logarithm_minimum(summary=summary)
     # Compile information.
     report = textwrap.dedent("""\
 
@@ -2660,6 +2689,7 @@ def prepare_curation_report(
 
         minimal log-2 fold change: {minimum}
         maximal log-2 fold change: {maximum}
+        minimal log-10 p-value: {minimum_p_value_log}
 
         --------------------------------------------------
     """).format(
@@ -2671,7 +2701,8 @@ def prepare_curation_report(
         count_metab=count_metab,
         percent_metabolite=percent_metabolite,
         minimum=minimum,
-        maximum=maximum
+        maximum=maximum,
+        minimum_p_value_log=minimum_p_value_log
     )
     # Return information.
     return report
@@ -2727,6 +2758,29 @@ def determine_fold_logarithm_extremes(
     maximum = max(values)
     minimum = min(values)
     return (minimum, maximum)
+
+
+def determine_p_value_logarithm_minimum(
+    summary=None
+):
+    """
+    Determines minimal value of base-10 logarithm of p-values.
+
+    arguments:
+        summary (list<dict<str>>): information about measurements for analytes
+
+    raises:
+
+    returns:
+        (float): minimal value of base-10 logarithm of p-value
+
+    """
+
+    values = utility.collect_value_from_records(
+        key="p_value_log", records=summary
+    )
+    minimum = min(values)
+    return minimum
 
 
 def write_product(directory=None, information=None):
