@@ -432,11 +432,13 @@ def curate_study(
     # Convert information for analysis in MetaboAnalyst.
     summary_metaboanalyst = prepare_report_metaboanalyst(
         pair=pair,
+        normalization=normalization,
         summary=copy.deepcopy(summary_measurements),
         group_one=group_numerator,
         group_two=group_denominator,
         samples=samples,
-        measurements=measurements
+        measurements=measurements,
+        signals=signals
     )
     # Report.
     print("analytes, measurements after curation...")
@@ -629,8 +631,13 @@ def curate_study_measurements(
     summary_probability_log = calculate_p_values_logarithms(
         records=summary_probability
     )
+    # Determine significance (arbitrary p-value threshold).
+    summary_significance = determine_measurements_significance(
+        records=summary_probability_log,
+        threshold_p=0.05
+    )
     # Return information.
-    return summary_probability_log
+    return summary_significance
 
 
 # Curation of analytes.
@@ -1710,6 +1717,10 @@ def calculate_analyte_fold_logarithm_pairs(
     # Calculate mean of folds.
     fold_mean = statistics.mean(folds)
     # Calculate mean of logarithms of folds.
+    # As logarithms are not distributive, it is necessary to calculate
+    # logarithms before calculation of the mean.
+    # This calculation can make the logarithm fold seem inconsistent with the
+    # mean fold.
     folds_log = []
     for fold in folds:
         fold_log = math.log(fold, 2)
@@ -2029,6 +2040,36 @@ def calculate_p_values_logarithms(records=None):
     return records_novel
 
 
+def determine_measurements_significance(
+    records=None,
+    threshold_p=None
+):
+    """
+    Calculates base-10 logarithms of p-values in records.
+
+    arguments:
+        records (list<dict>): information about measurements of analytes
+        threshold_p (float): threshold by p-value
+
+    raises:
+
+    returns:
+        (list<dict<str>>): information about measurements for analytes
+
+    """
+
+    records_novel = []
+    for record in records:
+        p_value = record["p_value"]
+        if p_value < threshold_p:
+            significance = True
+        else:
+            significance = False
+        record["significance"] = significance
+        records_novel.append(record)
+    return records_novel
+
+
 def filter_analytes_metabolites(
     summary=None
 ):
@@ -2069,6 +2110,11 @@ def convert_summary_text(summary=None):
 
     records_text = []
     for record in summary:
+        significance = record["significance"]
+        if significance:
+            significance_text = "True"
+        else:
+            significance_text = "False"
         record_text = {
             "identifier": record["identifier"],
             "name_original": record["name_original"],
@@ -2080,7 +2126,8 @@ def convert_summary_text(summary=None):
             "fold": record["fold"],
             "fold_log": record["fold_log"],
             "p_value": record["p_value"],
-            "p_value_log": record["p_value_log"]
+            "p_value_log": record["p_value_log"],
+            "significance": significance_text
         }
         records_text.append(record_text)
     return records_text
@@ -2114,23 +2161,28 @@ def filter_measurements_significance(
 
 def prepare_report_metaboanalyst(
     pair=None,
+    normalization=None,
     summary=None,
     group_one=None,
     group_two=None,
     samples=None,
-    measurements=None
+    measurements=None,
+    signals=None
 ):
     """
     Prepares a report for analysis in MetaboAnalyst.
 
     arguments:
         pair (bool): whether samples have dependent pairs
+        normalization (bool): whether to normalize measurements
         summary (list<dict<str>>): information about measurements for analytes
         group_one (str): name of experimental group
         group_two (str): name of experimental group
         samples (list<dict<str>>): information about samples from a study
         measurements (list<dict<str>>): information about measurements from a
             study
+        signals (list<dict<str>>): information about total signals for each
+            sample
 
     raises:
 
@@ -2142,20 +2194,24 @@ def prepare_report_metaboanalyst(
     # Prepare metabolomic measurements for MetaboAnalyst.
     summary_unpair = prepare_summary_metaboanalyst(
         pair=False,
+        normalization=normalization,
         summary=summary,
         group_one=group_one,
         group_two=group_two,
         samples=samples,
-        measurements=measurements
+        measurements=measurements,
+        signals=signals
     )
     if pair:
         summary_pair = prepare_summary_metaboanalyst(
             pair=True,
+            normalization=normalization,
             summary=summary,
             group_one=group_one,
             group_two=group_two,
             samples=samples,
-            measurements=measurements
+            measurements=measurements,
+            signals=signals
         )
     else:
         summary_pair = None
@@ -2168,23 +2224,28 @@ def prepare_report_metaboanalyst(
 
 def prepare_summary_metaboanalyst(
     pair=None,
+    normalization=None,
     summary=None,
     group_one=None,
     group_two=None,
     samples=None,
-    measurements=None
+    measurements=None,
+    signals=None
 ):
     """
     Prepares a report for analysis in MetaboAnalyst.
 
     arguments:
         pair (bool): whether samples have dependent pairs
+        normalization (bool): whether to normalize measurements
         summary (list<dict<str>>): information about measurements for analytes
         group_one (str): name of experimental group
         group_two (str): name of experimental group
         samples (list<dict<str>>): information about samples from a study
         measurements (list<dict<str>>): information about measurements from a
             study
+        signals (list<dict<str>>): information about total signals for each
+            sample
 
     raises:
 
@@ -2211,8 +2272,20 @@ def prepare_summary_metaboanalyst(
     record_label = copy.deepcopy(samples_labels)
     record_label["sample"] = "label"
     records.append(record_label)
+    # Normalize analyte's measurements by total signal for each sample.
+    if normalization:
+        measurements_normalization = normalize_measurements_samples_signals(
+            summary=summary,
+            group_one=group_one,
+            group_two=group_two,
+            samples=samples,
+            measurements=measurements,
+            signals=signals
+        )
+    else:
+        measurements_normalization = measurements
     # Prepare records to match measurements to samples.
-    for measurement in measurements:
+    for measurement in measurements_normalization:
         # Determine whether the measurement's analyte satisfies criteria for
         # inclusion in analysis.
         analyte_identifier = measurement["analyte"]

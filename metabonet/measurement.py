@@ -315,11 +315,17 @@ def determine_metabolite_study_measurements(
         metabolites = analyte["references"]["metabolite"]
         if metabolite in metabolites:
             # Analyte matches metabolite.
+            significance = analyte["significance"]
+            if significance:
+                significance_text = "True"
+            else:
+                significance_text = "False"
             record = {
                 "fold": analyte["fold"],
                 "fold_log": analyte["fold_log"],
                 "p_value": analyte["p_value"],
-                "p_value_log": analyte["p_value_log"]
+                "p_value_log": analyte["p_value_log"],
+                "significance": significance_text
             }
             measurements.append(record)
     # Determine whether any measurements match the metabolite.
@@ -329,7 +335,8 @@ def determine_metabolite_study_measurements(
             "fold": "",
             "fold_log": "",
             "p_value": "",
-            "p_value_log": ""
+            "p_value_log": "",
+            "significance": ""
         }
         measurements.append(record)
     return measurements[0]
@@ -392,26 +399,31 @@ def convert_metabolites_text(metabolites=None):
             "reactions_candidacy_count": (
                 metabolite["reactions_candidacy_count"]
             ),
-            "measurement_one_fold": study_one["fold"],
-            "measurement_one_fold_log": study_one["fold_log"],
-            "measurement_one_p_value": study_one["p_value"],
-            "measurement_one_p_value_log": study_one["p_value_log"],
-            "measurement_two_fold": study_two["fold"],
-            "measurement_two_fold_log": study_two["fold_log"],
-            "measurement_two_p_value": study_two["p_value"],
-            "measurement_two_p_value_log": study_two["p_value_log"],
-            "measurement_three_fold": study_three["fold"],
-            "measurement_three_fold_log": study_three["fold_log"],
-            "measurement_three_p_value": study_three["p_value"],
-            "measurement_three_p_value_log": study_three["p_value_log"],
-            "measurement_four_fold": study_four["fold"],
-            "measurement_four_fold_log": study_four["fold_log"],
-            "measurement_four_p_value": study_four["p_value"],
-            "measurement_four_p_value_log": study_four["p_value_log"],
-            "measurement_five_fold": study_five["fold"],
-            "measurement_five_fold_log": study_five["fold_log"],
-            "measurement_five_p_value": study_five["p_value"],
-            "measurement_five_p_value_log": study_five["p_value_log"],
+            "study_one_fold": study_one["fold"],
+            "study_one_fold_log": study_one["fold_log"],
+            "study_one_p_value": study_one["p_value"],
+            "study_one_p_value_log": study_one["p_value_log"],
+            "study_one_significance": study_one["significance"],
+            "study_two_fold": study_two["fold"],
+            "study_two_fold_log": study_two["fold_log"],
+            "study_two_p_value": study_two["p_value"],
+            "study_two_p_value_log": study_two["p_value_log"],
+            "study_two_significance": study_two["significance"],
+            "study_three_fold": study_three["fold"],
+            "study_three_fold_log": study_three["fold_log"],
+            "study_three_p_value": study_three["p_value"],
+            "study_three_p_value_log": study_three["p_value_log"],
+            "study_three_significance": study_three["significance"],
+            "study_four_fold": study_four["fold"],
+            "study_four_fold_log": study_four["fold_log"],
+            "study_four_p_value": study_four["p_value"],
+            "study_four_p_value_log": study_four["p_value_log"],
+            "study_four_significance": study_four["significance"],
+            "study_five_fold": study_five["fold"],
+            "study_five_fold_log": study_five["fold_log"],
+            "study_five_p_value": study_five["p_value"],
+            "study_five_p_value_log": study_five["p_value_log"],
+            "study_five_significance": study_five["significance"],
         }
         records.append(record)
     records.sort(
