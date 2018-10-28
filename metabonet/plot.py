@@ -120,7 +120,6 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_conversion = os.path.join(directory, "conversion")
     path_analysis = os.path.join(directory, "analysis")
     path_measurement = os.path.join(directory, "measurement")
     # Nodes.
@@ -432,7 +431,7 @@ def plot_two_distributions_histograms(
     """
 
     # Determine histogram bins.
-    hist, bin_edges = numpy.histogram(series_one, bins=100)
+    hist, bin_edges = numpy.histogram(series_one, bins=150)
     # Create chart.
     figure = pyplot.figure(
         figsize=(15.748, 11.811),
@@ -838,19 +837,23 @@ def plot_names_clouds(
     names_frequencies = {}
     for record in nodes.values():
         name = record["name"]
-        degree = record["degree"]
-        names_frequencies[name] = degree
+        # TODO: I can't just use "rank" here because highest rank is 1...
+        # TODO: I need a representation of rank that is true to the
+        # TODO: distribution of degree and betweenness centrality...
+        # TODO: Or I can just use degree for now.
+        frequency = record["degree"]
+        names_frequencies[name] = frequency
     # Create word cloud.
     chart_names = wordcloud.WordCloud(
-        width=1500,#2000, 4000, 6000,
-        height=2000,#1500, 3000, 4500,
+        width=3000,#1500, 3000, 4500,
+        height=4000,#2000, 4000, 6000,
         min_font_size=1,
-        max_font_size=150,#200, #300, 500
+        max_font_size=250,#150, 200, 300, 500
         max_words=count,
         colormap="ocean",#"viridis", "plasma", "ocean", "gist_earth",
         background_color="white",
         prefer_horizontal=0.90,
-        relative_scaling=0.75,
+        relative_scaling=1.0,#1.0, 0.75, 0.50
         stopwords=[""],
     ).generate_from_frequencies(
         names_frequencies
@@ -1201,7 +1204,7 @@ def write_product(directory=None, information=None):
     information["charts_degrees"]["one_two"].savefig(
         path_degree_one_two,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1209,7 +1212,7 @@ def write_product(directory=None, information=None):
     information["charts_degrees"]["three_four"].savefig(
         path_degree_three_four,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1217,7 +1220,7 @@ def write_product(directory=None, information=None):
     information["charts_ranks"]["one"].savefig(
         path_rank_one,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1225,7 +1228,7 @@ def write_product(directory=None, information=None):
     information["charts_ranks"]["two"].savefig(
         path_rank_two,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1233,7 +1236,7 @@ def write_product(directory=None, information=None):
     information["charts_ranks"]["three"].savefig(
         path_rank_three,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1241,7 +1244,7 @@ def write_product(directory=None, information=None):
     information["charts_ranks"]["four"].savefig(
         path_rank_four,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1253,7 +1256,7 @@ def write_product(directory=None, information=None):
     information["charts_measurements"]["one"].savefig(
         path_measurement_one,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1261,7 +1264,7 @@ def write_product(directory=None, information=None):
     information["charts_measurements"]["two"].savefig(
         path_measurement_two,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1269,7 +1272,7 @@ def write_product(directory=None, information=None):
     information["charts_measurements"]["three"].savefig(
         path_measurement_three,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1277,7 +1280,7 @@ def write_product(directory=None, information=None):
     information["charts_measurements"]["four"].savefig(
         path_measurement_four,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1285,7 +1288,7 @@ def write_product(directory=None, information=None):
     information["charts_measurements"]["five"].savefig(
         path_measurement_five,
         format="svg",
-        dpi=600,
+        #dpi=600,
         facecolor="w",
         edgecolor="w",
         transparent=False
@@ -1338,7 +1341,7 @@ def execute_procedure(directory=None):
     )
     # Names of nodes.
     charts_names = plot_names(
-        count=3000,
+        count=5000,
         nodes_one=source["nodes_one"],
         nodes_two=source["nodes_two"],
         nodes_three=source["nodes_three"],

@@ -1516,15 +1516,13 @@ def execute_procedure(directory=None):
         nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
         nodes_metabolites=source["nodes_metabolites"]
     )
-    # TODO: omit network analysis for efficiency.
+    # Analyze entire network.
+    report_network = analyze_bipartite_network(
+        network=network,
+        nodes_reactions=source["nodes_reactions_identifiers"],
+        nodes_metabolites=source["nodes_metabolites_identifiers"]
+    )
     if False:
-        # Analyze entire network.
-        report_network = analyze_bipartite_network(
-            network=network,
-            nodes_reactions=source["nodes_reactions_identifiers"],
-            nodes_metabolites=source["nodes_metabolites_identifiers"]
-        )
-    else:
         entry = {
             "blah": 1,
             "foo": 2,
