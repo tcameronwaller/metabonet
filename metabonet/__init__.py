@@ -27,11 +27,3 @@ Modules:
 # Relevant.
 
 # Custom.
-import metabocurator
-import interface
-import candidacy
-import network
-import conversion
-import clean
-import utility
-import test
