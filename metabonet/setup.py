@@ -109,7 +109,7 @@ def execute_procedure():
         license="https://www.gnu.org/licenses/gpl.html",
         entry_points={
             "console_scripts": [
-                "metabonet = metabonet.interface.py:execute_procedure"
+                "metabonet = interface:execute_procedure"
             ]
         }
     )
