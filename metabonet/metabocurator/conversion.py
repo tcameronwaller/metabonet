@@ -88,7 +88,7 @@ import json
 
 # Packages and modules from local source
 
-import utility
+import metabonet.utility as utility
 
 ###############################################################################
 # Functionality

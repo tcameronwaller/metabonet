@@ -90,7 +90,7 @@ import copy
 # Relevant
 
 # Custom
-import utility
+import metabonet.utility as utility
 
 #dir()
 #importlib.reload()

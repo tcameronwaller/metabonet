@@ -86,8 +86,8 @@ import copy
 # Packages and modules from third parties
 
 # Packages and modules from local source
-import utility
-import metabocurator.collection
+import metabonet.utility as utility
+import metabonet.metabocurator.collection as metabocurator.collection
 
 ###############################################################################
 # Functionality

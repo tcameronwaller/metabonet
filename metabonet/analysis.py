@@ -94,7 +94,7 @@ import networkx as ntx
 import numpy
 
 # Custom
-import utility
+import metabonet.utility as utility
 
 #dir()
 #importlib.reload()

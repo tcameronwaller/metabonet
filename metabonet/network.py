@@ -91,9 +91,9 @@ import copy
 import networkx as ntx
 
 # Custom
-import utility
-import conversion
-import analysis
+import metabonet.utility as utility
+import metabonet.conversion as conversion
+import metabonet.analysis as analysis
 
 #dir()
 #importlib.reload()

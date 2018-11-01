@@ -96,7 +96,7 @@ import matplotlib.pyplot as pyplot
 import wordcloud
 
 # Custom
-import utility
+import metabonet.utility as utility
 
 #dir()
 #importlib.reload()

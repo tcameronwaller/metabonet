@@ -90,7 +90,7 @@ import xml.etree.ElementTree as et
 
 # Packages and modules from local source
 
-import utility
+import metabonet.utility as utility
 
 ###############################################################################
 # Functionality

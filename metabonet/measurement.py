@@ -88,8 +88,7 @@ import math
 
 # Packages and modules from local source
 
-import utility
-import metabocurator.enhancement
+import metabonet.utility as utility
 
 ###############################################################################
 # Functionality

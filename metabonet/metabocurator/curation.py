@@ -83,8 +83,8 @@ import pickle
 # Relevant
 
 # Custom
-import utility
-import metabocurator.conversion
+import metabonet.utility as utility
+import metabonet.metabocurator.conversion as metabocurator.conversion
 
 #dir()
 #importlib.reload()

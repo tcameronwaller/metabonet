@@ -91,8 +91,8 @@ import scipy.stats
 
 # Packages and modules from local source
 
-import metabocurator.enhancement
-import utility
+import metabonet.metabocurator.enhancement as metabocurator.enhancement
+import metabonet.utility as utility
 
 ###############################################################################
 # Functionality
