@@ -76,7 +76,7 @@ import textwrap
 # Relevant.
 
 # Custom.
-import metabocurator
+import metabonet.metabocurator
 import candidacy
 import network
 import conversion
