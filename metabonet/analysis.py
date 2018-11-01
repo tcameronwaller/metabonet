@@ -86,9 +86,12 @@ License:
 import os
 import pickle
 import copy
+import statistics
+import random
 
 # Relevant
 import networkx as ntx
+import numpy
 
 # Custom
 import utility
@@ -809,6 +812,16 @@ def analyze_bipartite_network_group(
 
     """
 
+    # Determine whether bipartite sets are accurate.
+    if False:
+        bipartite_cis = ntx.algorithms.bipartite.basic.is_bipartite_node_set(
+            network, nodes_cis
+        )
+        bipartite_trans = ntx.algorithms.bipartite.basic.is_bipartite_node_set(
+            network, nodes_trans
+        )
+        if not (bipartite_cis and bipartite_trans):
+            print("Error! ... Bipartite node sets are inaccurate!")
     # Scale.
     scale = determine_network_scale(network=network, nodes=nodes_cis)
     # Connectivity.
@@ -830,8 +843,15 @@ def analyze_bipartite_network_group(
     cluster_coefficient = ntx.algorithms.bipartite.cluster.average_clustering(
         network, nodes=nodes_cis, mode="dot"
     )
+    # Small-world.
+    small_world = calculate_bipartite_network_small_world_coefficient(
+        network=network,
+        nodes_cis=nodes_cis,
+        nodes_trans=nodes_trans
+    )
     # Modularity.
     # NetworkX might lack this functionality.
+    # This algorithm might be irrelevant for bipartite network.
     if False:
         modules = (
             ntx.algorithms.community.modularity_max.greedy_modularity_communities(
@@ -858,7 +878,9 @@ def analyze_bipartite_network_group(
         "centralization_closeness": centralization["closeness"],
         "centralization_betweenness": centralization["betweenness"],
         "cluster_coefficient": cluster_coefficient,
-        #"modules_orders": modules_orders
+        #"modules_orders": modules_orders,
+        "path": small_world["path"],
+        "small_world": small_world["small_world"]
     }
     return collection
 
@@ -1372,6 +1394,303 @@ def calculate_bipartite_network_centralization_separate(
     return centralization
 
 
+def calculate_bipartite_network_small_world_coefficient(
+    network=None,
+    nodes_cis=None,
+    nodes_trans=None
+):
+    """
+    Calculate the small-world coefficient of a bipartite network.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
+
+    raises:
+
+    returns:
+        (float): small-world coefficient of network
+
+    """
+
+    # Calculate relevant properties of the real network.
+    real = calculate_bipartite_network_small_world_properties(
+        network=network,
+        nodes_cis=nodes_cis,
+        nodes_trans=nodes_trans
+    )
+    # Generate and analyze random bipartite networks.
+    # Initiate random generator.
+    random.seed(a=3141593)
+    reference = {
+        "clusters": [],
+        "paths": []
+    }
+    for index in range(10):
+        # Generate random bipartite network with comparable orders of bipartite
+        # sets and size.
+        simulation = generate_random_bipartite_network(
+            order_cis=len(nodes_cis),
+            order_trans=len(nodes_trans),
+            size=network.size()
+        )
+        # Calculate relevant properties of the network.
+        properties = calculate_bipartite_network_small_world_properties(
+            network=simulation["network"],
+            nodes_cis=simulation["nodes_cis"],
+            nodes_trans=simulation["nodes_trans"]
+        )
+        reference["clusters"].append(properties["cluster"])
+        reference["paths"].append(properties["path"])
+    reference["cluster"] = statistics.mean(reference["clusters"])
+    reference["path"] = statistics.mean(reference["paths"])
+    # Calculate the small-world coefficient, sigma.
+    # networkx.algorithms.smallworld.sigma
+    dividend = real["cluster"] / reference["cluster"]
+    divisor = real["path"] / reference["path"]
+    small_world = dividend / divisor
+    # Compile and return information.
+    return {
+        "cluster": real["cluster"],
+        "path": real["path"],
+        "small_world": small_world
+    }
+
+
+def calculate_bipartite_network_small_world_properties(
+    network=None,
+    nodes_cis=None,
+    nodes_trans=None
+):
+    """
+    Calculate the small-world properties of a bipartite network.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
+
+    raises:
+
+    returns:
+        (dict<float>): properties of network relevant to small-world
+            coefficient
+
+    """
+
+    # Calculate network's average cluster coefficient for focal bipartite set
+    # of nodes.
+    cluster_coefficient = ntx.algorithms.bipartite.cluster.average_clustering(
+        network, nodes=nodes_cis, mode="dot"
+    )
+    # Calculate network's average length of shortest paths between pairs from
+    # the focal bipartite set of nodes.
+    path = calculate_mean_path_length_bipartite_network(
+        network=network, nodes_cis=nodes_cis, nodes_trans=nodes_trans
+    )
+    # Compile and return information.
+    return {
+        "cluster": cluster_coefficient,
+        "path": path
+    }
+
+
+def calculate_mean_path_length_bipartite_network(
+    network=None,
+    nodes_cis=None,
+    nodes_trans=None
+):
+    """
+    Calculate the mean length of paths between all pairs of nodes in a single
+    bipartite set.
+
+    arguments:
+        network (object): instance of network in NetworkX
+        nodes_cis (list<str>): identifiers of nodes in the bipartite set of
+            current primary relevance
+        nodes_trans (list<str>): identifiers of nodes in the bipartite set of
+            current secondary relevance
+
+    raises:
+
+    returns:
+        (float): mean path length
+
+    """
+
+    # networkx.algorithms.shortest_paths.generic.average_shortest_path_length
+
+    # Determine lengths of shortest paths between all pairs of nodes.
+    call = ntx.algorithms.shortest_paths.unweighted
+    lengths = dict(call.all_pairs_shortest_path_length(network))
+    # Filter lengths of paths for pairs of nodes in focal bipartite set.
+    values = []
+    for source in lengths.keys():
+        if source in nodes_cis:
+            # Source belongs to focal bipartite set.
+            for target in lengths[source].keys():
+                if target in nodes_cis:
+                    # Target belongs to focal bipartite set.
+                    # Path is relevant.
+                    # Include the path's length in the collection.
+                    values.append(lengths[source][target])
+    # Calculate mean of paths' lengths.
+    dividend = sum(values)
+    divisor = (len(nodes_cis) * (len(nodes_cis) - 1))
+    # Check count of paths.
+    # The theoretical maximal count of paths = (count) * (count - 1) where
+    # count is the count of nodes in the focal bipartite set.
+    # The actual count of paths is likely to be less than the theoretical
+    # maximum since in a directional network paths might not exist between some
+    # pairs of nodes.
+    if len(values) > divisor:
+        print("potential error... more paths than possible!")
+    path_mean = dividend / divisor
+    # Return information.
+    return path_mean
+
+
+def generate_random_bipartite_network(
+    order_cis=None,
+    order_trans=None,
+    size=None
+):
+    """
+    Generates a random bipartite network.
+
+    arguments:
+        order_cis (int): count of nodes in cis bipartite set
+        order_trans (int): count of nodes in trans bipartite set
+        size (int): count of links
+
+    raises:
+
+    returns:
+        (dict): information about network
+
+    """
+
+    # Generate random bipartite network with comparable orders of bipartite
+    # sets and size.
+    # ntx.algorithms.bipartite.generators.gnmk_random_graph()
+    # The generator for random bipartite network in NetworkX always creates
+    # directional links from nodes in top bipartite set to nodes in bottom
+    # bipartite set.
+    # The product networks are not random and are non-navigable between nodes of
+    # the same bipartite set.
+    network_elements = generate_random_bipartite_network_elements(
+        order_cis=order_cis,
+        order_trans=order_trans,
+        size=size
+    )
+    # Convert network elements for NetworkX.
+    nodes_networkx = []
+    for node in network_elements["nodes_cis"]:
+        node_networkx = (node["identifier"], node)
+        nodes_networkx.append(node_networkx)
+    for node in network_elements["nodes_trans"]:
+        node_networkx = (node["identifier"], node)
+        nodes_networkx.append(node_networkx)
+    links_networkx = []
+    for link in network_elements["links"]:
+        link_networkx = (link["source"], link["target"], link)
+        links_networkx.append(link_networkx)
+    # Instantiate network in NetworkX.
+    network = instantiate_networkx(
+        nodes=nodes_networkx,
+        links=links_networkx
+    )
+    # Return information.
+    return {
+        "network": network,
+        "nodes_cis": network_elements["nodes_cis_identifiers"],
+        "nodes_trans": network_elements["nodes_trans_identifiers"]
+    }
+
+
+def generate_random_bipartite_network_elements(
+    order_cis=None,
+    order_trans=None,
+    size=None
+):
+    """
+    Generates elements for a random bipartite network.
+
+    arguments:
+        order_cis (int): count of nodes in cis bipartite set
+        order_trans (int): count of nodes in trans bipartite set
+        size (int): count of links
+
+    raises:
+
+    returns:
+        (dict): information about network's elements
+
+    """
+
+    # Create nodes.
+    nodes_cis = []
+    nodes_cis_identifiers = []
+    for index in range(order_cis):
+        identifier = ("cis_" + str(index))
+        record = {
+            "identifier": identifier,
+            "type": "cis"
+        }
+        nodes_cis.append(record)
+        nodes_cis_identifiers.append(identifier)
+    nodes_trans = []
+    nodes_trans_identifiers = []
+    for index in range(order_trans):
+        identifier = ("trans_" + str(index))
+        record = {
+            "identifier": identifier,
+            "type": "cis"
+        }
+        nodes_trans.append(record)
+        nodes_trans_identifiers.append(identifier)
+    nodes_identifiers = nodes_cis_identifiers + nodes_trans_identifiers
+    # Create links.
+    count = 0
+    links = {}
+    while count < size:
+        # Select source node at random.
+        source = random.choice(nodes_identifiers)
+        # Determine to which bipartite set the source belongs.
+        # Select target node at random from other bipartite set.
+        if source in nodes_cis_identifiers:
+            target = random.choice(nodes_trans_identifiers)
+        elif source in nodes_trans_identifiers:
+            target = random.choice(nodes_cis_identifiers)
+        # Determine link identifier.
+        identifier = source + "_-_" + target
+        if identifier in links.keys():
+            continue
+        else:
+            links[identifier] = {
+                "identifier": identifier,
+                "source": source,
+                "target": target
+            }
+            count += 1
+    # Compile and return information.
+    return {
+        "nodes_cis": nodes_cis,
+        "nodes_cis_identifiers": nodes_cis_identifiers,
+        "nodes_trans": nodes_trans,
+        "nodes_trans_identifiers": nodes_trans_identifiers,
+        "links": list(links.values())
+    }
+
+
+# Generate report.
+
+
 def report_metabolite_degrees(
     metabolites_query=None,
     metabolites_nodes=None
@@ -1508,14 +1827,6 @@ def execute_procedure(directory=None):
     # Network is bipartite.
     # Store references to separate groups of nodes for reactions and
     # metabolites.
-    # Analyze network's individual nodes.
-    report_nodes = analyze_bipartite_network_nodes(
-        network=network,
-        nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
-        nodes_reactions=source["nodes_reactions"],
-        nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
-        nodes_metabolites=source["nodes_metabolites"]
-    )
     # Analyze entire network.
     report_network = analyze_bipartite_network(
         network=network,
@@ -1532,6 +1843,14 @@ def execute_procedure(directory=None):
             "metabolites": entry,
             "reactions": entry
         }
+    # Analyze network's individual nodes.
+    report_nodes = analyze_bipartite_network_nodes(
+        network=network,
+        nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
+        nodes_reactions=source["nodes_reactions"],
+        nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
+        nodes_metabolites=source["nodes_metabolites"]
+    )
     # Prepare reports.
     # Report node degrees in metabolite simplifications.
     simplification_metabolites = report_metabolite_degrees(
@@ -1540,11 +1859,11 @@ def execute_procedure(directory=None):
     )
     # Compile information.
     information = {
+        "network_reactions": [report_network["reactions"]],
+        "network_metabolites": [report_network["metabolites"]],
         "nodes_metabolites": report_nodes["metabolites"],
         "nodes_reactions_text": list(report_nodes["reactions"].values()),
         "nodes_metabolites_text": list(report_nodes["metabolites"].values()),
-        "network_reactions": [report_network["reactions"]],
-        "network_metabolites": [report_network["metabolites"]],
         "simplification_metabolites": simplification_metabolites
     }
     #Write product information to file.
