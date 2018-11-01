@@ -105,7 +105,10 @@ def execute_procedure():
         author="T. Cameron Waller",
         author_email="tcameronwaller@gmail.com",
         url="https://github.com/tcameronwaller/metabonet",
-        packages=setuptools.find_packages(),
+        packages=[
+            "metabonet", "metabonet.metabocurator"
+        ],#setuptools.find_packages(),
+        #package_dir={"":"metabonet"},
         license="https://www.gnu.org/licenses/gpl.html",
         entry_points={
             "console_scripts": [
