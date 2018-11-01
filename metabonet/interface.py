@@ -76,15 +76,15 @@ import textwrap
 # Relevant.
 
 # Custom.
-import metabonet.metabocurator
-import candidacy
-import network
-import conversion
-import measurement
-import analysis
-import plot
-import utility
-import clean
+import metabonet.metabocurator as metabocurator
+import metabonet.candidacy as candidacy
+import metabonet.network as network
+import metabonet.conversion as conversion
+import metabonet.measurement as measurement
+import metabonet.analysis as analysis
+import metabonet.plot as plot
+import metabonet.utility as utility
+import metabonet.clean as clean
 
 #dir()
 #importlib.reload()
