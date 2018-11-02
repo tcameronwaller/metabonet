@@ -88,12 +88,12 @@ $ cp ~/Downloads/metabonet-master/customization/ /dock/source/
 ### Metabolomic Measurements
 
 MetaboNet curates and analyzes metabolomic measurements. The original data sets
-come from [Metabolomics Workbench][10]. The user has 2 options to prepare these
-data sets for use in MetaboNet.
+come from [Metabolomics Workbench][10], a [repository][11] for data from metabolomic
+studies. The user has 2 options to prepare these data sets for use in MetaboNet.
 
 #### 1. Access and prepare metabolomic measurements
 
-1. Locate specific project and study on [Metabolomics Workbench][10].
+1. Locate specific project and study on [Metabolomics Workbench][11].
 2. Copy information about samples.
 -Click on study's tab "Show all samples".
 -Copy information from sample table.
@@ -107,6 +107,13 @@ data sets for use in MetaboNet.
 5. Copy information about signals.
 -Click on study's tab "Download all metabolite data".
 -Save file as "signals.tsv".
+6. Correct errors.
+Project PR000305, Study ST000390
+analytes.tsv
+"ascorbic acid", "Vitamin C", change PubChem identifier from 5785 to 54670067.
+Project PR000322, Study ST000412
+analytes.tsv
+"putrescine", "Putrescine", change PubChem identifier from 1049 to 1045.
 
 #### 2. Copy measurement files to "dock" directory
 
@@ -116,29 +123,139 @@ $ cp ~/Downloads/metabonet-master/measurement/ /dock/source/
 
 ## Curate Metabolic Model and Metabolomic Measurements
 
+MetaboNet's "model" routine includes multiple procedures to curate the
+metabolic model and to curate metabolomic measurements. This curation prepares
+to define custom metabolic networks and integrate measurements with these
+networks.
+
 ### Reconcile Metabolic Model for Import to MetaNetX
 
-Reconcile information in metabolic model for integration with MetaNetX.
+Execute the "reconciliation" procedure of the "model" routine in MetaboNet.
 
-$ python3 interface.py model -d /root/ -r
+```bash
+$ metabonet model -d /dock/ -r
+```
 
-Import metabolic model to MetaNetX.
+[MetaNetX][12] is a [repository][13] of metabolic models with tools to curate
+these models.
 
-https://www.metanetx.org/
-https://www.metanetx.org/cgi-bin/mnxweb/import_mnet
+1. Import the following file to [MetaNetX][13].
+```bash
+/dock/reconciliation/recon2m2_reconciliation.xml
+```
+2. Save "Mapping summary" as the following file. This summary is useful for
+review and also includes useful information to curate names of metabolites.
+Import category "chemical compounds mapped to the MNXref namespace with
+different ID and different description" is of particular interest for curation
+of information about metabolites.
+```bash
+/dock/reconciliation/metanetx_import_report.tsv
+```
+3. Save files from MetaNetX to the following directories and files.
+```bash
+compartments.tsv -> /dock/reconciliation/recon2m2_metanetx_compartments.tsv
+enzymes.tsv -> /dock/reconciliation/recon2m2_metanetx_genes.tsv
+chemicals.tsv -> /dock/reconciliation/recon2m2_metanetx_metabolites.tsv
+reactions.tsv -> /dock/reconciliation/recon2m2_metanetx_reactions.tsv
+```
 
-/root/reconciliation/recon2m2_reconciliation.xml
+### Curate Metabolic Model
 
-Save "Mapping summary" as "metanetx_import_report.tsv".
+Execute the "collection", "extraction", "enhancement", "curation", and
+"conversion" procedures of the "model" routine in MetaboNet.
 
-Save files from MetaNetX.
+```bash
+$ metabonet model -d /dock/ -ceauv
+```
 
-compartments.tsv -> /root/reconciliation/recon2m2_metanetx_compartments.tsv
-enzymes.tsv -> /root/reconciliation/recon2m2_metanetx_genes.tsv
-chemicals.tsv -> /root/reconciliation/recon2m2_metanetx_metabolites.tsv
-reactions.tsv -> /root/reconciliation/recon2m2_metanetx_reactions.tsv
+A file of special use for automatic curation of reactions follows.
 
-Import category "chemical compounds mapped to the MNXref namespace with different ID and different description" is of interest to use for curation of information about metabolites.
+```bash
+/dock/enhancement/reactions_filter.tsv
+```
+
+Customize curation by editing the following files of parameters.
+
+```bash
+/dock/source/customization/curation_compartments.tsv
+/dock/source/customization/curation_processes.tsv
+/dock/source/customization/curation_reactions.tsv
+/dock/source/customization/curation_metabolites.tsv
+```
+
+### Curate Metabolomic Measurements
+
+Execute the "measurement" procedure of the "model" routine in MetaboNet.
+
+```bash
+$ metabonet model -d /dock/ -m
+```
+
+Review the following files to check the matches between analytes and
+metabolites. Discrepancies might justify modifications to curation of
+metabolites.
+
+```bash
+/root/measurement/study_one_report.tsv
+/root/measurement/study_two_report.tsv
+/root/measurement/study_three_report.tsv
+/root/measurement/study_four_report.tsv
+/root/measurement/study_five_report.tsv
+```
+
+## Define Custom Metabolic Networks
+
+Customize definition of metabolic networks by editing the following files of
+parameters.
+
+```bash
+/dock/source/customization/filtration_compartments.tsv
+/dock/source/customization/filtration_processes.tsv
+/dock/source/customization/simplification_reactions.tsv
+/dock/source/customization/simplification_metabolites.tsv
+```
+
+Execute the "candidacy", "network", and "conversion" procedures of the
+"network" routine in MetaboNet.
+
+compartments true, hubs true
+```bash
+$ metabonet network -d /dock/ -yc -np -v
+```
+
+compartments true, hubs false
+```bash
+$ metabonet network -d /dock/ -ycs -np -v
+```
+
+compartments false, hubs true
+```bash
+$ metabonet network -d /dock/ -y -np -v
+```
+
+compartments false, hubs false
+```bash
+$ metabonet network -d /dock/ -ys -np -v
+```
+
+## Analyze Metabolic Networks
+
+Execute the "analysis" procedure of the "network" routine in MetaboNet.
+
+```bash
+$ metabonet network -d /dock/ -a
+```
+
+Run time of "analysis" procedure can be 0.5-2.0 hours depending on the network.
+
+## Visualize Metabolic Networks
+
+```bash
+/dock/conversion/network_elements_cytoscape.json
+```
+
+## Integrate Metabolomic Measurements in Metabolic Network
+
 
 
 
@@ -215,4 +332,7 @@ $ python3 interface.py clean -help
 [7]: [https://www.ncbi.nlm.nih.gov/pubmed/29140435]
 [8]: [http://www.hmdb.ca/]
 [9]: [http://www.hmdb.ca/downloads]
-[10]: [http://www.metabolomicsworkbench.org/]
+[10]: [https://www.ncbi.nlm.nih.gov/pubmed/26467476]
+[11]: [http://www.metabolomicsworkbench.org/]
+[12]: [https://www.ncbi.nlm.nih.gov/pubmed/26527720]
+[13]: [https://www.metanetx.org/]
