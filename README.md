@@ -114,6 +114,8 @@ analytes.tsv
 Project PR000322, Study ST000412
 analytes.tsv
 "putrescine", "Putrescine", change PubChem identifier from 1049 to 1045.
+Remove record for "maltose", "Maltose", PubChem 439186.
+That record is redundant with the record for "cellobiose", PubChem 6255.
 
 #### 2. Copy measurement files to "dock" directory
 
