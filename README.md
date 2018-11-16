@@ -17,6 +17,7 @@ $ wget https://github.com/tcameronwaller/metabonet/archive/master.zip
 $ unzip master.zip
 $ cd metabonet-master/
 $ ls
+dock LICENSE metabonet README.md setup.py
 ```
 
 Install MetaboNet to default directory for third-party Python packages.

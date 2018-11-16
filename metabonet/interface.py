@@ -76,15 +76,14 @@ import textwrap
 # Relevant.
 
 # Custom.
-import metabonet.metabocurator as metabocurator
-import metabocurator.clean
-import metabocurator.collection
-import metabocurator.conversion
-import metabocurator.curation
-import metabocurator.enhancement
-import metabocurator.extraction
-import metabocurator.measurement
-import metabocurator.reconciliation
+import metabonet.metabocurator.clean as metabocurator.clean
+import metabonet.metabocurator.collection as metabocurator.collection
+import metabonet.metabocurator.conversion as metabocurator.conversion
+import metabonet.metabocurator.curation as metabocurator.curation
+import metabonet.metabocurator.enhancement as metabocurator.enhancement
+import metabonet.metabocurator.extraction as metabocurator.extraction
+import metabonet.metabocurator.measurement as metabocurator.measurement
+import metabonet.metabocurator.reconciliation as metabocurator.reconciliation
 import metabonet.analysis
 import metabonet.candidacy
 import metabonet.clean
