@@ -42,6 +42,9 @@ Procedures in MetaboNet utilize a central directory in which to organize both
 source and product files. These instructions refer to this directory by the
 name "dock". This directory can be anywhere the user wants.
 
+A template "dock" directory with default files is accessible within the
+MetaboNet repository.
+
 ## Set Up Source Information Within Dock
 
 ### Metabolic Information

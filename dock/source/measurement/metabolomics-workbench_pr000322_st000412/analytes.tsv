@@ -1,0 +1,155 @@
+identifier	name	reference_metabolomics_workbench	reference_pubchem	reference_kegg
+1,5-anhydroglucitol	1,5-Anhydrosorbitol	ME136668	64960	C07326
+1-monopalmitin	MG(16:0/0:0/0:0)	ME136670	14900	C01885
+1-monostearin	MG(18:0/0:0/0:0)	ME136669	24699	D01947
+2,4-hexadienedioic acid NIST	-	ME136664	5280518	C02480
+2,5-dihydroxypyrazine NIST	-	ME136671	23368901	-
+2-hydroxybutanoic acid	Alpha-hydoxy butyric acid	ME136667	440864	C05984
+2-hydroxyglutaric acid	2-hydroxyglutaric acid	ME136666	43	C02630
+2-ketoisocaproic acid	Ketoleucine	ME136665	70	C00233
+3-aminoisobutyric acid	3-amino-isobutanoic acid	ME136663	64956	C05145
+3-hydroxybutyric acid	beta-hydroxybutyric acid	ME136662	92135	C01089
+3-phosphoglycerate	3-Phosphoglyceric acid	ME136661	724	C00597
+4-hydroxyhippuric acid NIST	-	ME136660	151012	-
+adenine	Adenine	ME136659	190	C00147
+adenosine	Adenosine	ME136658	60961	C00212
+adenosine-5-monophosphate	AMP	ME136657	6083	C00020
+adipic acid	Adipic acid	ME136656	196	C06104
+alanine	Alanine	ME136655	5950	C00041
+alpha-ketoglutarate	Oxoglutaric acid	ME136654	51	C00026
+aminomalonate	Aminomalonic acid	ME136653	100714	C00872
+arachidic acid	Arachidic acid	ME136652	10467	C06425
+arachidonic acid	Arachidonic acid	ME136651	444899	C00219
+ascorbic acid	Vitamin C	ME136650	54670067	C00072
+asparagine	Asparagine	ME136649	6267	C00152
+aspartic acid	Aspartic acid	ME136648	5960	C00049
+behenic acid	Behenic acid	ME136647	8215	C08281
+benzoic acid	Benzoic acid	ME136646	243	C00180
+beta-alanine	Beta-Alanine	ME136645	239	C00099
+beta-glycerolphosphate	Beta-Glycerophosphoric acid	ME136644	2526	C02979
+bisphosphoglycerol NIST	-	ME136643	102018	-
+capric acid	Capric acid	ME136642	2969	C01571
+cellobiose	Maltose	ME136641	6255	C01971
+cholestan-3-ol	-	ME136640	66066	C12978
+cholesterol	Cholesterol	ME136639	5997	C00187
+citric acid	Citric acid	ME136638	311	C00158
+creatinine	Creatinine	ME136637	588	C00791
+cysteine	Cysteine	ME136636	5862	C00097
+cysteine-glycine	Cys-Gly	ME136635	439498	C01419
+cystine	Cystine	ME136634	595	C01420
+cytidine-5-monophosphate	CMP	ME136633	-	-
+dehydroabietic acid	Dehydroabietic acid	ME136632	94391	C12078
+dehydroascorbic acid	Dehydroascorbic acid	ME136631	440667	C05422
+dodecanoic acid, isopropanol ester NIST	-	ME136630	-	-
+dodecanol	Dodecanol	ME136629	8193	C02277
+epsilon-caprolactam	Epsilon-caprolactam	ME136628	7768	C06593
+erythritol	Erythritol	ME136627	222285	C00503
+erythronic acid lactone	Erythrono-1,4-lactone	ME136626	5325915	C02341
+ethanolamine	Ethanolamine	ME136625	700	C00189
+fructose	Fructose	ME136624	439709	C02336
+fructose-6-phosphate	Fructose-6-phosphate	ME136623	440641	C05345
+fumaric acid	Fumaric acid	ME136622	444972	C00122
+galactonic acid	Galactonic acid	ME136621	128869	C00880
+gluconic acid	Gluconic acid	ME136620	6857417	C00800
+gluconic acid lactone	Gluconolactone	ME136619	7027	C00198
+glucose	Glucose	ME136618	64689	C00221
+glucose-1-phosphate	Glucose-1-phosphate	ME136617	65533	C00103
+glucose-6-phosphate	Glucose-6-phosphate	ME136616	5958	C00092
+glutamic acid	Glutamic acid	ME136615	33032	C00025
+glutamine	Glutamine	ME136614	5961	C00064
+glutaric acid	Glutaric acid	ME136613	743	C00489
+glyceric acid	Glyceric acid	ME136612	439194	C00258
+glycerol	Glycerol	ME136611	753	C00116
+glycerol-alpha-phosphate	Glycerol 3-phosphate	ME136610	754	C03189
+glycine	Glycine	ME136609	750	C00037
+glycolic acid	Glycolic acid	ME136608	757	C00160
+guanosine	Guanosine	ME136607	6802	C00387
+heptadecanoic acid	Margaric acid	ME136606	10465	-
+hexitol	Sorbitol	ME136605	453	C00392
+hexose-6-phosphate	Hexose-6-phosphate	ME136604	208	C02965
+hexuronic acid	Hexuronic acid	ME136603	152867	-
+histidine	Histidine	ME136602	6274	C00135
+hydroxycarbamate NIST	Hydroxycarbamic acid	ME136601	16639161	-
+hydroxylamine	Hydroxylamine	ME136600	787	C00192
+hypoxanthine	Hypoxanthine	ME136599	790	C00262
+inosine	Inosine	ME136598	6021	C00294
+inosine-5'-monophosphate	IMP	ME136597	8582	C00130
+inositol-4-monophosphate	Inositol-4-monophosphate	ME136596	440043	C03546
+isoleucine	Isoleucine	ME136595	6306	C00407
+isomaltose	Isomaltose	ME136594	439193	C00252
+isothreonic acid	D-Threonic acid	ME136593	151152	C00639
+lactamide	Lactamide	ME136592	94220	-
+lactic acid	Lactic acid	ME136591	612	C01432
+lactobionic acid	Lactobionic acid	ME136590	7314	C04247
+lactulose	Lactulose	ME136589	11333	C07064
+lauric acid	Lauric acid	ME136588	3893	C02679
+leucine	Leucine	ME136587	6106	C00123
+levoglucosan	Glucosan	ME136586	2724705	-
+linoleic acid	Linoleic acid	ME136585	5280450	C01595
+lysine	Lysine	ME136584	5962	C00047
+lyxitol	L-Arabitol	ME136583	439255	C00532
+malic acid	Malic acid	ME136582	525	C00711
+maltotriose	Maltotriose	ME136580	439586	C01835
+mannose	Mannose	ME136579	18950	C00159
+methanolphosphate	Methanolphosphate	ME136578	13130	-
+methionine	Methionine	ME136577	6137	C00073
+myo-inositol	Myo-inositol	ME136576	892	C00137
+myristic acid	Myristic acid	ME136575	11005	C06424
+N-acetylaspartic acid	N-Acetylaspartic acid	ME136573	65065	C01042
+N-acetyl-D-hexosamine	-	ME136574	24139	C03878
+N-acetylglutamate	N-acetylglutamic acid	ME136572	70914	C00624
+N-acetylmannosamine	N-Acetylmannosamine	ME136571	439281	C00645
+nicotinamide	Niacinamide	ME136569	936	C00153
+N-methylalanine	N-methylalanine	ME136570	5288725	C02721
+octadecanol	Stearyl alcohol	ME136568	8221	-
+octanol NIST	-	ME136567	-	-
+oleamide NIST	Oleamide	ME136566	5283387	C19670
+oleic acid	Oleic acid	ME136565	445639	C00712
+ornithine	Ornithine	ME136564	6262	C00077
+oxalic acid	Oxalic acid	ME136563	971	C00209
+oxoproline	Pyroglutamic acid	ME136562	7405	C01879
+palmitic acid	Palmitic acid	ME136560	985	C00249
+palmitoleic acid	Palmitoleic acid	ME136559	445638	C08362
+pantothenic acid	Pantothenic acid	ME136558	6613	C12276
+p-cresol	P-Cresol	ME136561	2879	C01468
+pelargonic acid	Pelargonic acid	ME136557	8158	C01601
+phenylalanine	Phenylalanine	ME136556	6140	C00079
+phenylethylamine	Phenylethylamine	ME136555	1001	C05332
+phosphate	Phosphoric acid	ME136554	1004	C00009
+phosphoethanolamine	Phosphoethanolamine	ME136553	1015	C00346
+pipecolinic acid	Pipecolic acid	ME136552	736316	-
+proline	Proline	ME136551	145742	C00148
+putrescine	Putrescine	ME136550	1045	C00138
+pyrophosphate	Pyrophosphate	ME136549	1023	C00013
+raffinose	Raffinose	ME136548	439242	C00492
+ribitol	Xylitol	ME136547	827	C00474
+ribose	Ribose	ME136546	5779	C00121
+ribose-5-phosphate	Ribose-5-phosphate	ME136545	439167	C00117
+ribulose-5-phosphate	Ribulose-5-phosphate	ME136544	439184	C00199
+saccharic acid	Glucaric acid	ME136543	33037	C00818
+serine	Serine	ME136542	5951	C00065
+squalene	Squalene	ME136541	638072	C00751
+stearic acid	Stearic acid	ME136540	5281	C01530
+succinic acid	Succinic acid	ME136539	1110	C00042
+sucrose	Sucrose	ME136538	5988	C00089
+tagatose	Fructose	ME136537	439312	C00795
+taurine	Taurine	ME136536	1123	C00245
+threonic acid	D-Threonic acid	ME136535	5460407	C01620
+threonine	Threonine	ME136534	6288	C00188
+tocopherol alpha-	Retinal	ME136533	638015	C00376
+tocopherol gamma-	Gamma-tocopherol	ME136532	92729	C02483
+tryptophan	Tryptophan	ME136531	6305	C00078
+tyrosine	Tyrosine	ME136530	6057	C00082
+UDP GlcNAc	UDP-N-acetylglucosamine	ME136529	445675	C00043
+UDP-glucuronic acid	UDP-glucuronic acid	ME136528	17473	C00167
+UDP-N-acetylglucosamine	UDP-N-acetylglucosamine	ME136527	445675	C00043
+uracil	Uracil	ME136526	1174	C00106
+urea	Urea	ME136525	1176	C00086
+uric acid	Uric acid	ME136524	1175	C00366
+uridine	Uridine	ME136523	6029	C00299
+uridine-5-monophosphate	UMP	ME136522	6030	C00105
+valine	Valine	ME136521	6287	C00183
+xanthine	Xanthine	ME136520	1188	C00385
+xanthosine	Xanthosine	ME136519	64959	C01762
+xylitol	Xylitol	ME136518	6912	C00379
+xylulose NIST	Xylulose	ME136517	439205	C00312

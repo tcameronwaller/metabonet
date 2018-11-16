@@ -1,0 +1,745 @@
+Supplemental Table 1. Plasma metabolome before (PRE) and after (POST) a 4-d, 51-km cross-country ski march.						
+Super Pathway	Sub Pathway	Biochemical Name	HMDB ID	POST/PRE1	P-value2	Q-value3
+Amino Acid	Alanine and Aspartate Metabolism	alanine	HMDB00161	0.62	2.27E-05	8.01E-05
+Amino Acid	Alanine and Aspartate Metabolism	asparagine	HMDB00168	0.99	0.762	0.820
+Amino Acid	Alanine and Aspartate Metabolism	aspartate	HMDB00191	0.82	0.019	0.033
+Amino Acid	Alanine and Aspartate Metabolism	N-acetylalanine	HMDB00766	1.10	8.00E-04	0.002
+Amino Acid	Alanine and Aspartate Metabolism	N-acetylaspartate (NAA)	HMDB00812	0.92	0.010	0.018
+Amino Acid	Creatine Metabolism	creatine	HMDB00064	0.67	7.63E-05	2.34E-04
+Amino Acid	Creatine Metabolism	creatinine	HMDB00562	1.01	0.271	0.341
+Amino Acid	Creatine Metabolism	guanidinoacetate	HMDB00128	0.79	4.20E-06	1.71E-05
+Amino Acid	Glutamate Metabolism	4-hydroxyglutamate	HMDB01344	0.68	1.00E-04	2.85E-04
+Amino Acid	Glutamate Metabolism	beta-citrylglutamate		1.40	0.006	0.011
+Amino Acid	Glutamate Metabolism	carboxyethyl-GABA	HMDB02201	1.25	7.00E-04	0.002
+Amino Acid	Glutamate Metabolism	glutamate	HMDB00148	0.71	9.00E-04	0.002
+Amino Acid	Glutamate Metabolism	glutamine	HMDB00641	0.99	0.484	0.563
+Amino Acid	Glutamate Metabolism	N-acetyl-aspartyl-glutamate (NAAG)	HMDB01067	1.03	0.479	0.558
+Amino Acid	Glutamate Metabolism	N-acetylglutamate	HMDB01138	0.97	0.620	0.687
+Amino Acid	Glutamate Metabolism	N-acetylglutamine	HMDB06029	0.89	0.273	0.342
+Amino Acid	Glutamate Metabolism	pyroglutamine*		0.92	0.143	0.198
+Amino Acid	Glutamate Metabolism	S-1-pyrroline-5-carboxylate	HMDB01301	0.94	0.194	0.255
+Amino Acid	Glutathione Metabolism	5-oxoproline	HMDB00267	1.01	0.778	0.833
+Amino Acid	Glutathione Metabolism	cys-gly, oxidized		0.83	5.00E-04	0.001
+Amino Acid	Glutathione Metabolism	cysteine-glutathione disulfide	HMDB00656	0.79	0.216	0.278
+Amino Acid	Glutathione Metabolism	cysteinylglycine	HMDB00078	0.81	0.017	0.030
+Amino Acid	Glycine, Serine and Threonine Metabolism	2-methylserine		0.72	2.00E-04	5.34E-04
+Amino Acid	Glycine, Serine and Threonine Metabolism	betaine	HMDB00043	0.96	0.417	0.496
+Amino Acid	Glycine, Serine and Threonine Metabolism	dimethylglycine	HMDB00092	1.17	0.021	0.035
+Amino Acid	Glycine, Serine and Threonine Metabolism	glycine	HMDB00123	0.97	0.412	0.491
+Amino Acid	Glycine, Serine and Threonine Metabolism	N-acetylglycine	HMDB00532	1.88	3.49E-07	1.82E-06
+Amino Acid	Glycine, Serine and Threonine Metabolism	N-acetylserine	HMDB02931	1.06	0.020	0.034
+Amino Acid	Glycine, Serine and Threonine Metabolism	N-acetylthreonine		0.88	0.003	0.006
+Amino Acid	Glycine, Serine and Threonine Metabolism	sarcosine	HMDB00271	0.96	0.454	0.533
+Amino Acid	Glycine, Serine and Threonine Metabolism	serine	HMDB00187	0.97	0.834	0.873
+Amino Acid	Glycine, Serine and Threonine Metabolism	threonine	HMDB00167	0.81	7.00E-04	0.002
+Amino Acid	Guanidino and Acetamido Metabolism	4-guanidinobutanoate	HMDB03464	0.75	1.27E-05	4.66E-05
+Amino Acid	Guanidino and Acetamido Metabolism	guanidinosuccinate	HMDB03157	1.71	6.30E-06	2.43E-05
+Amino Acid	Histidine Metabolism	1-methylhistidine	HMDB00001	1.11	0.042	0.066
+Amino Acid	Histidine Metabolism	1-methylimidazoleacetate	HMDB02820	1.12	0.039	0.063
+Amino Acid	Histidine Metabolism	3-methylhistidine	HMDB00479	0.34	3.50E-07	1.82E-06
+Amino Acid	Histidine Metabolism	histidine	HMDB00177	0.91	2.00E-04	5.34E-04
+Amino Acid	Histidine Metabolism	hydantoin-5-propionic acid	HMDB01212	1.66	3.65E-07	1.88E-06
+Amino Acid	Histidine Metabolism	imidazole lactate	HMDB02320	0.95	0.348	0.426
+Amino Acid	Histidine Metabolism	imidazole propionate	HMDB02271	1.30	0.024	0.041
+Amino Acid	Histidine Metabolism	N-acetyl-1-methylhistidine*		0.67	5.17E-05	1.66E-04
+Amino Acid	Histidine Metabolism	N-acetyl-3-methylhistidine*		0.32	1.06E-08	1.02E-07
+Amino Acid	Histidine Metabolism	N-acetylhistidine	HMDB32055	0.91	0.082	0.120
+Amino Acid	Histidine Metabolism	trans-urocanate	HMDB00301	0.81	0.202	0.265
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	2-hydroxy-3-methylvalerate	HMDB00317	1.46	9.88E-06	3.69E-05
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	2-methylbutyrylcarnitine (C5)	HMDB00378	1.45	3.95E-05	1.30E-04
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	2-methylbutyrylglycine	HMDB00339	1.24	0.582	0.655
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	3-hydroxy-2-ethylpropionate	HMDB00396	2.63	6.46E-10	1.06E-08
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	3-hydroxyisobutyrate	HMDB00336	1.88	0.020	0.035
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	3-methyl-2-oxobutyrate	HMDB00019	1.06	0.323	0.401
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	3-methyl-2-oxovalerate	HMDB03736	1.30	5.29E-06	2.11E-05
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	3-methylglutaconate	HMDB00522	1.49	2.36E-06	1.01E-05
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	4-methyl-2-oxopentanoate	HMDB00695	1.18	7.00E-04	0.002
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	alpha-hydroxyisocaproate	HMDB00746	1.43	6.03E-06	2.35E-05
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	alpha-hydroxyisovalerate	HMDB00407	1.24	4.00E-04	9.96E-04
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	beta-hydroxyisovalerate	HMDB00754	0.94	0.257	0.325
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	ethylmalonate	HMDB00622	2.07	3.58E-11	1.22E-09
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	isobutyrylcarnitine (C4)	HMDB00736	0.95	0.880	0.912
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	isobutyrylglycine	HMDB00730	0.86	0.047	0.072
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	isoleucine	HMDB00172	1.12	0.019	0.033
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	isovalerate	HMDB00718	1.10	0.175	0.234
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	isovalerylcarnitine (C5)	HMDB00688	0.91	0.203	0.265
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	isovalerylglycine	HMDB00678	0.92	0.361	0.439
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	leucine	HMDB00687	1.06	0.177	0.235
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	methylsuccinate	HMDB01844	1.63	6.53E-08	4.37E-07
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	N-acetylisoleucine		1.06	0.518	0.595
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	N-acetylleucine	HMDB11756	0.99	0.946	0.971
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	N-acetylvaline	HMDB11757	1.04	0.464	0.542
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	tiglylcarnitine (C5:1-DC)	HMDB02366	1.87	6.12E-09	6.63E-08
+Amino Acid	Leucine, Isoleucine and Valine Metabolism	valine	HMDB00883	0.95	0.161	0.219
+Amino Acid	Lysine Metabolism	2-aminoadipate	HMDB00510	1.01	0.364	0.442
+Amino Acid	Lysine Metabolism	3-methylglutarylcarnitine (2)	HMDB00552	0.79	0.004	0.008
+Amino Acid	Lysine Metabolism	5-(galactosylhydroxy)-L-lysine		1.19	0.127	0.178
+Amino Acid	Lysine Metabolism	5-hydroxylysine	HMDB00450	0.98	0.521	0.595
+Amino Acid	Lysine Metabolism	6-oxopiperidine-2-carboxylate		1.00	0.457	0.536
+Amino Acid	Lysine Metabolism	glutarate (pentanedioate)	HMDB00661	1.01	0.358	0.436
+Amino Acid	Lysine Metabolism	glutarylcarnitine (C5-DC)	HMDB13130	0.91	0.006	0.012
+Amino Acid	Lysine Metabolism	lysine	HMDB00182	0.86	8.55E-05	2.60E-04
+Amino Acid	Lysine Metabolism	N6,N6,N6-trimethyllysine	HMDB01325	0.84	0.009	0.017
+Amino Acid	Lysine Metabolism	N6-acetyllysine	HMDB00206	0.94	0.273	0.343
+Amino Acid	Lysine Metabolism	N-acetyl-cadaverine		1.22	0.806	0.852
+Amino Acid	Lysine Metabolism	pipecolate	HMDB00070	0.81	3.00E-04	7.65E-04
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	2-aminobutyrate	HMDB00650	1.46	4.14E-07	2.09E-06
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	2-hydroxybutyrate/2-hydroxyisobutyrate		3.23	6.77E-12	4.99E-10
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	alpha-ketobutyrate	HMDB00005	3.14	2.01E-08	1.70E-07
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	cystathionine	HMDB00099	0.74	0.122	0.172
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	cysteine	HMDB00574	0.93	0.063	0.094
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	cysteine s-sulfate	HMDB00731	0.87	0.008	0.015
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	cysteine sulfinic acid	HMDB00996	0.92	0.717	0.781
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	cystine	HMDB00192	1.02	0.680	0.746
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	hypotaurine	HMDB00965	1.19	0.327	0.404
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	methionine	HMDB00696	0.99	0.826	0.868
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	methionine sulfone		1.26	1.73E-07	9.93E-07
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	methionine sulfoxide	HMDB02005	0.90	0.007	0.014
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	N-acetylmethionine	HMDB11745	1.06	0.155	0.211
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	N-acetyltaurine		1.11	0.056	0.084
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	N-formylmethionine	HMDB01015	1.11	0.007	0.014
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	N-methyltaurine		0.36	1.00E-04	2.85E-04
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	S-methylcysteine	HMDB02108	0.82	0.003	0.007
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	S-methylcysteine sulfoxide		0.83	0.382	0.462
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	S-methylmethionine		0.35	3.49E-05	1.16E-04
+Amino Acid	Methionine, Cysteine, SAM and Taurine Metabolism	taurine	HMDB00251	0.98	0.866	0.901
+Amino Acid	Phenylalanine and Tyrosine Metabolism	2-hydroxyphenylacetate	HMDB00669	1.25	0.023	0.038
+Amino Acid	Phenylalanine and Tyrosine Metabolism	3-(3-hydroxyphenyl)propionate	HMDB00375	0.76	0.334	0.410
+Amino Acid	Phenylalanine and Tyrosine Metabolism	3-(3-hydroxyphenyl)propionate sulfate		0.76	0.422	0.500
+Amino Acid	Phenylalanine and Tyrosine Metabolism	3-(4-hydroxyphenyl)lactate	HMDB00755	1.40	5.97E-06	2.34E-05
+Amino Acid	Phenylalanine and Tyrosine Metabolism	3-methoxytyrosine	HMDB01434	1.17	2.00E-04	5.34E-04
+Amino Acid	Phenylalanine and Tyrosine Metabolism	3-phenylpropionate (hydrocinnamate)	HMDB00764	1.08	0.763	0.820
+Amino Acid	Phenylalanine and Tyrosine Metabolism	4-hydroxyphenylacetate	HMDB00020	0.94	0.773	0.831
+Amino Acid	Phenylalanine and Tyrosine Metabolism	4-hydroxyphenylpyruvate	HMDB00707	1.13	0.329	0.406
+Amino Acid	Phenylalanine and Tyrosine Metabolism	5-bromotryptophan		0.74	6.78E-05	2.12E-04
+Amino Acid	Phenylalanine and Tyrosine Metabolism	dopamine 3-O-sulfate	HMDB06275	0.89	0.278	0.348
+Amino Acid	Phenylalanine and Tyrosine Metabolism	gentisate	HMDB00152	0.42	6.63E-06	2.54E-05
+Amino Acid	Phenylalanine and Tyrosine Metabolism	homovanillate (HVA)	HMDB00118	1.08	0.339	0.416
+Amino Acid	Phenylalanine and Tyrosine Metabolism	N-acetylphenylalanine	HMDB00512	0.87	0.022	0.038
+Amino Acid	Phenylalanine and Tyrosine Metabolism	N-acetyltyrosine	HMDB00866	0.76	0.005	0.010
+Amino Acid	Phenylalanine and Tyrosine Metabolism	N-formylphenylalanine		0.75	0.056	0.085
+Amino Acid	Phenylalanine and Tyrosine Metabolism	o-cresol sulfate		2.64	0.623	0.690
+Amino Acid	Phenylalanine and Tyrosine Metabolism	p-cresol sulfate	HMDB11635	1.48	0.001	0.003
+Amino Acid	Phenylalanine and Tyrosine Metabolism	p-cresol-glucuronide*	HMDB11686	1.79	7.00E-04	0.002
+Amino Acid	Phenylalanine and Tyrosine Metabolism	phenol sulfate	HMDB60015	1.02	0.434	0.513
+Amino Acid	Phenylalanine and Tyrosine Metabolism	phenylacetate	HMDB00209	1.44	0.007	0.014
+Amino Acid	Phenylalanine and Tyrosine Metabolism	phenylalanine	HMDB00159	1.00	0.966	0.982
+Amino Acid	Phenylalanine and Tyrosine Metabolism	phenyllactate (PLA)	HMDB00779	1.42	5.75E-07	2.84E-06
+Amino Acid	Phenylalanine and Tyrosine Metabolism	phenylpyruvate	HMDB00205	0.87	0.003	0.006
+Amino Acid	Phenylalanine and Tyrosine Metabolism	thyroxine	HMDB01918	0.95	0.111	0.158
+Amino Acid	Phenylalanine and Tyrosine Metabolism	tyrosine	HMDB00158	0.93	0.040	0.063
+Amino Acid	Phenylalanine and Tyrosine Metabolism	vanillactate	HMDB00913	1.42	5.00E-04	0.001
+Amino Acid	Phenylalanine and Tyrosine Metabolism	vanillic alcohol sulfate		2.29	0.015	0.027
+Amino Acid	Phenylalanine and Tyrosine Metabolism	vanillylmandelate (VMA)	HMDB00291	1.42	1.10E-06	5.07E-06
+Amino Acid	Polyamine Metabolism	4-acetamidobutanoate	HMDB03681	1.18	0.005	0.009
+Amino Acid	Polyamine Metabolism	5-methylthioadenosine (MTA)	HMDB01173	1.04	0.540	0.616
+Amino Acid	Polyamine Metabolism	acisoga		0.95	0.520	0.595
+Amino Acid	Polyamine Metabolism	N-acetylputrescine	HMDB02064	1.06	0.094	0.136
+Amino Acid	Polyamine Metabolism	spermidine	HMDB01257	0.64	4.00E-04	9.96E-04
+Amino Acid	Tryptophan Metabolism	3-indoxyl sulfate	HMDB00682	0.86	0.125	0.175
+Amino Acid	Tryptophan Metabolism	5-hydroxyindole sulfate		1.17	0.118	0.167
+Amino Acid	Tryptophan Metabolism	7-hydroxyindole sulfate		1.30	0.059	0.089
+Amino Acid	Tryptophan Metabolism	C-glycosyltryptophan		1.03	0.221	0.285
+Amino Acid	Tryptophan Metabolism	indoleacetate	HMDB00197	1.25	0.002	0.004
+Amino Acid	Tryptophan Metabolism	indoleacetylglutamine	HMDB13240	0.47	3.41E-05	1.15E-04
+Amino Acid	Tryptophan Metabolism	indolebutyrate	HMDB02096	1.97	3.33E-05	1.12E-04
+Amino Acid	Tryptophan Metabolism	indolelactate	HMDB00671	1.08	0.397	0.473
+Amino Acid	Tryptophan Metabolism	indolepropionate	HMDB02302	0.54	5.14E-06	2.06E-05
+Amino Acid	Tryptophan Metabolism	kynurenate	HMDB00715	1.25	0.006	0.011
+Amino Acid	Tryptophan Metabolism	kynurenine	HMDB00684	0.88	0.007	0.014
+Amino Acid	Tryptophan Metabolism	N-acetylkynurenine (2)		0.79	0.042	0.066
+Amino Acid	Tryptophan Metabolism	N-acetyltryptophan	HMDB13713	0.51	2.88E-10	6.25E-09
+Amino Acid	Tryptophan Metabolism	N-formylanthranilic acid	HMDB04089	1.18	0.096	0.138
+Amino Acid	Tryptophan Metabolism	picolinate	HMDB02243	1.81	8.41E-08	5.44E-07
+Amino Acid	Tryptophan Metabolism	serotonin	HMDB00259	1.99	0.169	0.227
+Amino Acid	Tryptophan Metabolism	thioproline		1.07	0.491	0.568
+Amino Acid	Tryptophan Metabolism	tryptophan	HMDB00929	0.78	2.51E-06	1.07E-05
+Amino Acid	Tryptophan Metabolism	tryptophan betaine	HMDB61115	1.36	0.034	0.056
+Amino Acid	Tryptophan Metabolism	xanthurenate	HMDB00881	1.30	0.044	0.069
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	2-oxoarginine*	HMDB04225	0.43	8.59E-12	5.28E-10
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	arginine	HMDB00517	0.80	3.18E-06	1.32E-05
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	citrulline	HMDB00904	0.98	0.808	0.853
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	dimethylarginine (SDMA + ADMA)	HMDB01539	0.99	0.908	0.939
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	homoarginine	HMDB00670	0.71	2.97E-08	2.26E-07
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	homocitrulline	HMDB00679	1.11	0.205	0.267
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	N-acetylarginine	HMDB04620	0.53	4.69E-10	8.65E-09
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	N-acetylproline		0.86	0.021	0.035
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	N-alpha-acetylornithine	HMDB03357	0.76	0.023	0.039
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	N-delta-acetylornithine		0.96	0.172	0.231
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	N-methylproline		0.25	1.10E-08	1.04E-07
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	N-monomethylarginine	HMDB29416	0.91	0.188	0.248
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	ornithine	HMDB03374	0.69	1.69E-09	2.55E-08
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	pro-hydroxy-pro	HMDB06695	0.94	0.111	0.158
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	proline	HMDB00162	0.82	3.00E-04	7.65E-04
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	trans-4-hydroxyproline	HMDB00725	0.70	3.00E-04	7.65E-04
+Amino Acid	Urea cycle; Arginine and Proline Metabolism	urea	HMDB00294	1.56	1.98E-07	1.10E-06
+Carbohydrate	Aminosugar Metabolism	erythronate*	HMDB00613	0.97	0.091	0.132
+Carbohydrate	Aminosugar Metabolism	glucuronate	HMDB00127	1.33	3.02E-09	3.78E-08
+Carbohydrate	Aminosugar Metabolism	N-acetylglucosamine/N-acetylgalactosamine		1.10	0.163	0.221
+Carbohydrate	Aminosugar Metabolism	N-acetylglucosaminylasparagine	HMDB00489	0.93	0.658	0.725
+Carbohydrate	Aminosugar Metabolism	N-acetylneuraminate	HMDB00230	1.20	0.002	0.005
+Carbohydrate	Disaccharides and Oligosaccharides	sucrose	HMDB00258	1.39	0.152	0.208
+Carbohydrate	Fructose, Mannose and Galactose Metabolism	fructose	HMDB00660	0.91	0.151	0.207
+Carbohydrate	Fructose, Mannose and Galactose Metabolism	galactitol (dulcitol)	HMDB00107	0.77	3.25E-05	1.11E-04
+Carbohydrate	Fructose, Mannose and Galactose Metabolism	galactonate	HMDB00565	0.69	0.032	0.053
+Carbohydrate	Fructose, Mannose and Galactose Metabolism	mannitol/sorbitol	HMDB00247	0.49	2.28E-08	1.89E-07
+Carbohydrate	Fructose, Mannose and Galactose Metabolism	mannose	HMDB00169	1.06	0.040	0.064
+Carbohydrate	Glycogen Metabolism	maltose	HMDB00163	1.39	0.076	0.111
+Carbohydrate	Glycolysis, Gluconeogenesis, and Pyruvate Metabolism	1,5-anhydroglucitol (1,5-AG)	HMDB02712	1.00	0.491	0.568
+Carbohydrate	Glycolysis, Gluconeogenesis, and Pyruvate Metabolism	3-phosphoglycerate	HMDB00807	1.28	0.782	0.834
+Carbohydrate	Glycolysis, Gluconeogenesis, and Pyruvate Metabolism	glucose	HMDB00122	0.95	0.006	0.012
+Carbohydrate	Glycolysis, Gluconeogenesis, and Pyruvate Metabolism	glycerate	HMDB00139	0.83	1.00E-04	2.85E-04
+Carbohydrate	Glycolysis, Gluconeogenesis, and Pyruvate Metabolism	lactate	HMDB00190	0.68	8.86E-05	2.69E-04
+Carbohydrate	Glycolysis, Gluconeogenesis, and Pyruvate Metabolism	pyruvate	HMDB00243	0.83	0.004	0.009
+Carbohydrate	Pentose Metabolism	arabinose	HMDB00646	1.02	0.869	0.903
+Carbohydrate	Pentose Metabolism	arabitol/xylitol		0.81	1.06E-07	6.43E-07
+Carbohydrate	Pentose Metabolism	arabonate/xylonate		0.74	9.84E-05	2.85E-04
+Carbohydrate	Pentose Metabolism	ribitol	HMDB00508	0.99	0.370	0.448
+Carbohydrate	Pentose Metabolism	ribonate	HMDB00867	0.88	0.010	0.018
+Carbohydrate	Pentose Metabolism	sedoheptulose	HMDB03219	0.66	8.00E-04	0.002
+Carbohydrate	Pentose Metabolism	xylose	HMDB00098	0.92	0.431	0.511
+Cofactors and Vitamins	Ascorbate and Aldarate Metabolism	gulonate*	HMDB03290	0.87	0.004	0.008
+Cofactors and Vitamins	Ascorbate and Aldarate Metabolism	oxalate (ethanedioate)	HMDB02329	0.75	0.094	0.136
+Cofactors and Vitamins	Ascorbate and Aldarate Metabolism	threonate	HMDB00943	0.93	0.168	0.226
+Cofactors and Vitamins	Hemoglobin and Porphyrin Metabolism	bilirubin (E,E)*		1.73	1.00E-07	6.20E-07
+Cofactors and Vitamins	Hemoglobin and Porphyrin Metabolism	bilirubin (E,Z or Z,E)*		1.48	1.79E-07	1.03E-06
+Cofactors and Vitamins	Hemoglobin and Porphyrin Metabolism	bilirubin (Z,Z)	HMDB00054	1.30	5.83E-06	2.30E-05
+Cofactors and Vitamins	Hemoglobin and Porphyrin Metabolism	biliverdin	HMDB01008	1.42	1.00E-04	2.85E-04
+Cofactors and Vitamins	Hemoglobin and Porphyrin Metabolism	L-urobilin	HMDB04159	15.53	5.48E-07	2.73E-06
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	1-methylnicotinamide	HMDB00699	2.13	2.00E-04	5.34E-04
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	N1-Methyl-2-pyridone-5-carboxamide	HMDB04193	1.11	0.115	0.163
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	N1-Methyl-4-pyridone-3-carboxamide	HMDB04194	0.93	0.951	0.975
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	nicotinamide	HMDB01406	1.37	0.070	0.103
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	nicotinamide riboside	HMDB00855	1.17	0.038	0.062
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	quinolinate	HMDB00232	0.90	0.043	0.068
+Cofactors and Vitamins	Nicotinate and Nicotinamide Metabolism	trigonelline (N'-methylnicotinate)	HMDB00875	0.39	1.66E-05	6.04E-05
+Cofactors and Vitamins	Pantothenate and CoA Metabolism	pantothenate	HMDB00210	1.35	0.002	0.003
+Cofactors and Vitamins	Tocopherol Metabolism	alpha-tocopherol	HMDB01893	0.95	0.268	0.339
+Cofactors and Vitamins	Tocopherol Metabolism	gamma-CEHC	HMDB01931	1.24	0.036	0.059
+Cofactors and Vitamins	Tocopherol Metabolism	gamma-tocopherol/beta-tocopherol		1.07	0.173	0.231
+Cofactors and Vitamins	Vitamin A Metabolism	retinol (Vitamin A)	HMDB00305	0.84	2.00E-04	5.34E-04
+Cofactors and Vitamins	Vitamin B6 Metabolism	pyridoxal	HMDB01545	1.17	0.009	0.017
+Cofactors and Vitamins	Vitamin B6 Metabolism	pyridoxate	HMDB00017	0.80	0.120	0.169
+Energy	Oxidative Phosphorylation	phosphate	HMDB01429	1.13	0.015	0.026
+Energy	TCA Cycle	2-methylcitrate/homocitrate		1.94	7.20E-09	7.27E-08
+Energy	TCA Cycle	aconitate [cis or trans]	HMDB00072	1.68	1.71E-11	7.89E-10
+Energy	TCA Cycle	alpha-ketoglutarate	HMDB00208	1.14	0.003	0.007
+Energy	TCA Cycle	citrate	HMDB00094	1.31	5.89E-08	4.06E-07
+Energy	TCA Cycle	fumarate	HMDB00134	1.21	0.003	0.006
+Energy	TCA Cycle	malate	HMDB00156	1.27	2.00E-04	5.34E-04
+Energy	TCA Cycle	succinate	HMDB00254	1.01	0.484	0.563
+Energy	TCA Cycle	succinylcarnitine (C4-DC)		0.52	1.11E-06	5.10E-06
+Lipid	Carnitine Metabolism	carnitine	HMDB00062	0.93	0.006	0.012
+Lipid	Carnitine Metabolism	deoxycarnitine	HMDB01161	1.08	0.053	0.080
+Lipid	Ceramides	ceramide (d16:1/24:1, d18:1/22:1)*		0.68	2.86E-06	1.21E-05
+Lipid	Ceramides	ceramide (d18:1/14:0, d16:1/16:0)*		0.96	0.617	0.684
+Lipid	Ceramides	ceramide (d18:1/17:0, d17:1/18:0)*		0.86	0.090	0.131
+Lipid	Ceramides	ceramide (d18:1/20:0, d16:1/22:0, d20:1/18:0)*		0.70	6.13E-07	2.95E-06
+Lipid	Ceramides	ceramide (d18:2/24:1, d18:1/24:2)*		0.66	1.34E-10	3.28E-09
+Lipid	Ceramides	glycosyl ceramide (d18:1/20:0, d16:1/22:0)*		1.09	0.005	0.010
+Lipid	Ceramides	glycosyl ceramide (d18:1/23:1, d17:1/24:1)*		1.00	0.894	0.925
+Lipid	Ceramides	glycosyl ceramide (d18:2/24:1, d18:1/24:2)*		1.14	2.48E-05	8.61E-05
+Lipid	Diacylglycerol	diacylglycerol (16:1/18:2 [2], 16:0/18:3 [1])*		0.19	9.47E-12	5.37E-10
+Lipid	Diacylglycerol	linoleoyl-arachidonoyl-glycerol (18:2/20:4) [1]*		0.74	0.024	0.040
+Lipid	Diacylglycerol	linoleoyl-arachidonoyl-glycerol (18:2/20:4) [2]*		0.81	0.222	0.285
+Lipid	Diacylglycerol	linoleoyl-docosahexaenoyl-glycerol (18:2/22:6) [1]*		0.70	0.034	0.055
+Lipid	Diacylglycerol	linoleoyl-linolenoyl-glycerol (18:2/18:3) [1]*		0.21	1.28E-10	3.28E-09
+Lipid	Diacylglycerol	linoleoyl-linoleoyl-glycerol (18:2/18:2) [1]*		0.30	3.84E-11	1.22E-09
+Lipid	Diacylglycerol	oleoyl-arachidonoyl-glycerol (18:1/20:4) [1]*		0.71	2.00E-04	5.34E-04
+Lipid	Diacylglycerol	oleoyl-arachidonoyl-glycerol (18:1/20:4) [2]*		0.76	4.00E-04	9.96E-04
+Lipid	Diacylglycerol	oleoyl-linoleoyl-glycerol (18:1/18:2) [1]		0.31	8.49E-12	5.28E-10
+Lipid	Diacylglycerol	oleoyl-linoleoyl-glycerol (18:1/18:2) [2]		0.29	3.36E-12	3.30E-10
+Lipid	Diacylglycerol	oleoyl-oleoyl-glycerol (18:1/18:1) [1]*		0.28	3.25E-11	1.20E-09
+Lipid	Diacylglycerol	oleoyl-oleoyl-glycerol (18:1/18:1) [2]*		0.25	3.58E-12	3.30E-10
+Lipid	Diacylglycerol	palmitoleoyl-arachidonoyl-glycerol (16:1/20:4) [2]*		0.12	9.30E-14	1.23E-11
+Lipid	Diacylglycerol	palmitoleoyl-linoleoyl-glycerol (16:1/18:2) [1]*		0.19	4.52E-10	8.53E-09
+Lipid	Diacylglycerol	palmitoyl-arachidonoyl-glycerol (16:0/20:4) [1]*		1.87	1.22E-06	5.51E-06
+Lipid	Diacylglycerol	palmitoyl-arachidonoyl-glycerol (16:0/20:4) [2]*		0.74	0.018	0.031
+Lipid	Diacylglycerol	palmitoyl-docosahexaenoyl-glycerol (16:0/22:6) [1]*		0.84	0.611	0.681
+Lipid	Diacylglycerol	palmitoyl-linoleoyl-glycerol (16:0/18:2) [1]*		0.18	4.86E-08	3.48E-07
+Lipid	Diacylglycerol	palmitoyl-linoleoyl-glycerol (16:0/18:2) [2]*		0.31	3.99E-10	7.74E-09
+Lipid	Diacylglycerol	palmitoyl-oleoyl-glycerol (16:0/18:1) [1]*		0.26	2.98E-11	1.16E-09
+Lipid	Diacylglycerol	palmitoyl-oleoyl-glycerol (16:0/18:1) [2]*		0.27	4.97E-09	5.55E-08
+Lipid	Endocannabinoid	linoleoyl ethanolamide	HMDB12252	0.66	0.272	0.342
+Lipid	Endocannabinoid	N-oleoyltaurine		2.00	8.00E-04	0.002
+Lipid	Endocannabinoid	N-palmitoyltaurine		1.80	5.00E-04	0.001
+Lipid	Endocannabinoid	oleoyl ethanolamide	HMDB02088	1.57	3.00E-04	7.65E-04
+Lipid	Fatty Acid Metabolism (Acyl Choline)	linoleoylcholine*		0.59	0.002	0.003
+Lipid	Fatty Acid Metabolism (Acyl Choline)	oleoylcholine		0.53	2.00E-04	5.34E-04
+Lipid	Fatty Acid Metabolism (Acyl Choline)	palmitoylcholine		0.66	0.003	0.006
+Lipid	Fatty Acid Metabolism (Acyl Choline)	stearoylcholine*		0.53	0.051	0.078
+Lipid	Fatty Acid Metabolism (Acyl Glutamine)	hexanoylglutamine		13.80	7.10E-14	1.23E-11
+Lipid	Fatty Acid Metabolism (also BCAA Metabolism)	butyrylcarnitine (C4)	HMDB02013	1.87	2.47E-05	8.61E-05
+Lipid	Fatty Acid Metabolism (also BCAA Metabolism)	butyrylglycine	HMDB00808	0.98	0.660	0.726
+Lipid	Fatty Acid Metabolism (also BCAA Metabolism)	methylmalonate (MMA)	HMDB00202	0.82	5.49E-06	2.17E-05
+Lipid	Fatty Acid Metabolism (also BCAA Metabolism)	propionylcarnitine (C3)	HMDB00824	0.74	4.00E-04	9.96E-04
+Lipid	Fatty Acid Metabolism (also BCAA Metabolism)	propionylglycine	HMDB00783	0.71	0.011	0.020
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	3-hydroxybutyrylcarnitine (1)	HMDB13127	25.05	9.40E-14	1.23E-11
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	3-hydroxybutyrylcarnitine (2)		4.01	1.09E-10	3.09E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	acetylcarnitine (C2)	HMDB00201	2.43	2.95E-11	1.16E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	adipoylcarnitine (C6-DC)		6.32	1.00E-13	1.23E-11
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	adrenoylcarnitine (C22:4)*		0.61	6.33E-05	1.99E-04
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	arachidonoylcarnitine (C20:4)		0.75	5.39E-05	1.73E-04
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	arachidoylcarnitine (C20)*	HMDB06460	2.49	5.09E-09	5.60E-08
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	behenoylcarnitine (C22)*		1.70	9.96E-05	2.85E-04
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	cerotoylcarnitine (C26)*	HMDB06347	1.12	0.016	0.028
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	cis-4-decenoylcarnitine (C10:1)		2.20	1.36E-07	8.00E-07
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	decanoylcarnitine (C10)	HMDB00651	2.56	1.97E-07	1.10E-06
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	dihomo-linolenoylcarnitine (20:3n3 or 6)*		0.78	7.43E-06	2.81E-05
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	dihomo-linoleoylcarnitine (C20:2)*		1.16	0.007	0.014
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	eicosenoylcarnitine (C20:1)*		1.85	2.63E-10	5.88E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	erucoylcarnitine (C22:1)*		3.94	4.04E-09	4.88E-08
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	hexanoylcarnitine (C6)	HMDB00705	2.76	3.02E-09	3.78E-08
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	laurylcarnitine (C12)	HMDB02250	3.28	6.52E-09	6.87E-08
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	lignoceroylcarnitine (C24)*		1.89	1.38E-07	8.07E-07
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	linolenoylcarnitine (C18:3)*		1.57	4.54E-06	1.83E-05
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	linoleoylcarnitine (C18:2)*	HMDB06469	1.24	0.002	0.004
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	margaroylcarnitine*		1.67	4.23E-07	2.12E-06
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	myristoleoylcarnitine (C14:1)*		4.40	1.23E-10	3.28E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	myristoylcarnitine (C14)	HMDB05066	2.60	9.63E-09	9.34E-08
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	nervonoylcarnitine (C24:1)*		1.92	2.06E-10	4.74E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	octanoylcarnitine (C8)	HMDB00791	2.46	1.91E-07	1.09E-06
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	oleoylcarnitine (C18:1)	HMDB05065	1.77	2.24E-08	1.88E-07
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	palmitoleoylcarnitine (C16:1)*		3.06	3.88E-11	1.22E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	palmitoylcarnitine (C16)	HMDB00222	1.59	1.44E-08	1.31E-07
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	pimeloylcarnitine/3-methyladipoylcarnitine (C7-DC)		1.77	5.87E-07	2.86E-06
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	stearoylcarnitine (C18)	HMDB00848	1.38	7.58E-05	2.34E-04
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	suberoylcarnitine (C8-DC)		7.61	3.96E-11	1.22E-09
+Lipid	Fatty Acid Metabolism(Acyl Carnitine)	ximenoylcarnitine (C26:1)*		1.27	6.95E-05	2.15E-04
+Lipid	Fatty Acid Metabolism(Acyl Glycine)	hexanoylglycine	HMDB00701	2.54	3.12E-10	6.58E-09
+Lipid	Fatty Acid Metabolism(Acyl Glycine)	N-palmitoylglycine		1.38	1.16E-06	5.29E-06
+Lipid	Fatty Acid Synthesis	2-methylmalonylcarnitine (C4-DC)	HMDB13133	1.00	0.490	0.568
+Lipid	Fatty Acid Synthesis	malonate	HMDB00691	1.23	5.84E-07	2.86E-06
+Lipid	Fatty Acid Synthesis	malonylcarnitine	HMDB02095	1.02	0.709	0.773
+Lipid	Fatty Acid, Amide	oleamide	HMDB02117	1.53	0.066	0.099
+Lipid	Fatty Acid, Amino	2-aminoheptanoate		1.41	0.005	0.009
+Lipid	Fatty Acid, Amino	2-aminooctanoate	HMDB00991	1.98	2.37E-06	1.01E-05
+Lipid	Fatty Acid, Branched	13-methylmyristate		2.22	4.04E-07	2.05E-06
+Lipid	Fatty Acid, Branched	15-methylpalmitate		2.88	4.46E-09	5.22E-08
+Lipid	Fatty Acid, Branched	17-methylstearate		2.49	6.26E-08	4.23E-07
+Lipid	Fatty Acid, Branched	isocaproate	HMDB00689	0.65	0.003	0.006
+Lipid	Fatty Acid, Dicarboxylate	2-hydroxyadipate	HMDB00321	1.34	0.028	0.045
+Lipid	Fatty Acid, Dicarboxylate	2-hydroxyglutarate	HMDB00606	1.10	0.023	0.038
+Lipid	Fatty Acid, Dicarboxylate	3-carboxy-4-methyl-5-propyl-2-furanpropanoate (CMPF)	HMDB61112	1.15	2.68E-06	1.14E-05
+Lipid	Fatty Acid, Dicarboxylate	3-methyladipate	HMDB00555	3.59	4.98E-10	8.74E-09
+Lipid	Fatty Acid, Dicarboxylate	4-hydroxy-2-oxoglutaric acid	HMDB02070	0.49	1.01E-07	6.20E-07
+Lipid	Fatty Acid, Dicarboxylate	adipate	HMDB00448	4.50	9.07E-08	5.71E-07
+Lipid	Fatty Acid, Dicarboxylate	azelate (nonanedioate)	HMDB00784	1.10	0.036	0.058
+Lipid	Fatty Acid, Dicarboxylate	docosadioate		0.89	0.056	0.085
+Lipid	Fatty Acid, Dicarboxylate	dodecanedioate	HMDB00623	4.40	2.28E-07	1.24E-06
+Lipid	Fatty Acid, Dicarboxylate	eicosanodioate		0.81	8.90E-05	2.69E-04
+Lipid	Fatty Acid, Dicarboxylate	hexadecanedioate	HMDB00672	3.08	2.44E-09	3.39E-08
+Lipid	Fatty Acid, Dicarboxylate	maleate	HMDB00176	1.30	0.041	0.064
+Lipid	Fatty Acid, Dicarboxylate	octadecanedioate	HMDB00782	2.82	6.38E-10	1.06E-08
+Lipid	Fatty Acid, Dicarboxylate	sebacate (decanedioate)	HMDB00792	6.06	6.93E-07	3.32E-06
+Lipid	Fatty Acid, Dicarboxylate	tetradecanedioate	HMDB00872	3.59	6.82E-09	7.07E-08
+Lipid	Fatty Acid, Dihydroxy	12,13-DiHOME	HMDB04705	1.67	4.00E-05	1.31E-04
+Lipid	Fatty Acid, Dihydroxy	9,10-DiHOME	HMDB04704	1.62	7.00E-04	0.002
+Lipid	Fatty Acid, Monohydroxy	13-HODE + 9-HODE		2.45	2.45E-07	1.32E-06
+Lipid	Fatty Acid, Monohydroxy	16-hydroxypalmitate	HMDB06294	1.73	6.20E-05	1.95E-04
+Lipid	Fatty Acid, Monohydroxy	2-hydroxydecanoate		1.84	1.55E-08	1.37E-07
+Lipid	Fatty Acid, Monohydroxy	2-hydroxyoctanoate	HMDB02264	1.98	2.19E-09	3.11E-08
+Lipid	Fatty Acid, Monohydroxy	2-hydroxypalmitate	HMDB31057	1.18	0.006	0.012
+Lipid	Fatty Acid, Monohydroxy	2-hydroxystearate		1.16	0.009	0.017
+Lipid	Fatty Acid, Monohydroxy	3-hydroxydecanoate	HMDB02203	4.68	6.39E-11	1.88E-09
+Lipid	Fatty Acid, Monohydroxy	3-hydroxyhexanoate		6.25	4.33E-12	3.55E-10
+Lipid	Fatty Acid, Monohydroxy	3-hydroxylaurate	HMDB00387	3.71	2.98E-11	1.16E-09
+Lipid	Fatty Acid, Monohydroxy	3-hydroxyoctanoate	HMDB01954	5.02	1.30E-10	3.28E-09
+Lipid	Fatty Acid, Monohydroxy	3-hydroxysebacate	HMDB00350	10.04	6.37E-09	6.80E-08
+Lipid	Fatty Acid, Monohydroxy	5-hydroxyhexanoate	HMDB00525	2.68	7.18E-08	4.72E-07
+Lipid	Fatty Acid, Monohydroxy	9-hydroxystearate		3.09	3.84E-07	1.97E-06
+Lipid	Fatty Acid, Monohydroxy	alpha-hydroxycaproate	HMDB01624	0.93	0.952	0.975
+Lipid	Glycerolipid Metabolism	glycerol	HMDB00131	1.65	1.96E-07	1.10E-06
+Lipid	Glycerolipid Metabolism	glycerol 3-phosphate	HMDB00126	0.80	0.044	0.069
+Lipid	Glycerolipid Metabolism	glycerophosphoglycerol		0.73	0.145	0.200
+Lipid	Inositol Metabolism	inositol hexakisphosphate	HMDB03502	1.00	1.000	1.000
+Lipid	Inositol Metabolism	myo-inositol	HMDB00211	1.29	0.002	0.004
+Lipid	Ketone Bodies	3-hydroxybutyrate (BHBA)	HMDB00357	31.25	3.00E-14	1.11E-11
+Lipid	Ketone Bodies	acetoacetate	HMDB00060	20.59	5.33E-10	9.14E-09
+Lipid	Long Chain Fatty Acid	10-heptadecenoate (17:1n7)	HMDB60038	4.24	1.79E-09	2.64E-08
+Lipid	Long Chain Fatty Acid	10-nonadecenoate (19:1n9)	HMDB13622	4.34	1.39E-08	1.28E-07
+Lipid	Long Chain Fatty Acid	arachidate (20:0)	HMDB02212	2.08	1.07E-07	6.44E-07
+Lipid	Long Chain Fatty Acid	behenate (22:0)*	HMDB00944	1.51	0.004	0.008
+Lipid	Long Chain Fatty Acid	eicosenoate (20:1)	HMDB02231	4.71	6.65E-10	1.07E-08
+Lipid	Long Chain Fatty Acid	erucate (22:1n9)	HMDB02068	3.42	3.03E-09	3.78E-08
+Lipid	Long Chain Fatty Acid	margarate (17:0)	HMDB02259	2.73	1.00E-07	6.20E-07
+Lipid	Long Chain Fatty Acid	myristate (14:0)	HMDB00806	4.12	3.94E-10	7.74E-09
+Lipid	Long Chain Fatty Acid	myristoleate (14:1n5)	HMDB02000	5.70	7.20E-10	1.11E-08
+Lipid	Long Chain Fatty Acid	nervonate (24:1n9)*	HMDB02368	1.79	3.72E-06	1.53E-05
+Lipid	Long Chain Fatty Acid	nonadecanoate (19:0)	HMDB00772	2.07	5.74E-08	4.03E-07
+Lipid	Long Chain Fatty Acid	oleate/vaccenate (18:1)		2.51	1.99E-09	2.87E-08
+Lipid	Long Chain Fatty Acid	palmitate (16:0)	HMDB00220	2.20	1.65E-10	3.92E-09
+Lipid	Long Chain Fatty Acid	palmitoleate (16:1n7)	HMDB03229	4.74	3.39E-10	6.95E-09
+Lipid	Long Chain Fatty Acid	pentadecanoate (15:0)	HMDB00826	2.04	2.68E-09	3.54E-08
+Lipid	Long Chain Fatty Acid	stearate (18:0)	HMDB00827	1.80	2.57E-08	2.04E-07
+Lipid	Lysolipid	1-arachidonoyl-GPC (20:4n6)*	HMDB10395	0.87	5.00E-04	0.001
+Lipid	Lysolipid	1-arachidonoyl-GPE (20:4n6)*	HMDB11517	0.89	0.038	0.061
+Lipid	Lysolipid	1-arachidonoyl-GPI (20:4)*	HMDB61690	1.38	0.039	0.062
+Lipid	Lysolipid	1-lignoceroyl-GPC (24:0)		0.70	1.00E-04	2.85E-04
+Lipid	Lysolipid	1-linolenoyl-GPC (18:3)*		0.53	3.33E-08	2.50E-07
+Lipid	Lysolipid	1-linolenoyl-GPE (18:3)*		0.49	7.16E-06	2.73E-05
+Lipid	Lysolipid	1-linoleoyl-GPA (18:2)*	HMDB07856	1.18	0.163	0.221
+Lipid	Lysolipid	1-linoleoyl-GPC (18:2)	HMDB10386	0.80	5.00E-04	0.001
+Lipid	Lysolipid	1-linoleoyl-GPE (18:2)*	HMDB11507	0.65	2.97E-06	1.24E-05
+Lipid	Lysolipid	1-linoleoyl-GPI (18:2)*		1.50	0.125	0.175
+Lipid	Lysolipid	1-oleoyl-GPC (18:1)	HMDB02815	0.72	1.55E-06	6.85E-06
+Lipid	Lysolipid	1-oleoyl-GPE (18:1)	HMDB11506	0.68	9.26E-05	2.77E-04
+Lipid	Lysolipid	1-oleoyl-GPG (18:1)*		0.84	0.251	0.319
+Lipid	Lysolipid	1-oleoyl-GPI (18:1)*		0.88	0.324	0.401
+Lipid	Lysolipid	1-palmitoleoyl-GPC (16:1)*	HMDB10383	0.56	2.52E-09	3.45E-08
+Lipid	Lysolipid	1-palmitoyl-GPC (16:0)	HMDB10382	0.70	3.84E-08	2.81E-07
+Lipid	Lysolipid	1-palmitoyl-GPE (16:0)	HMDB11503	0.65	3.06E-07	1.62E-06
+Lipid	Lysolipid	1-stearoyl-GPC (18:0)	HMDB10384	0.47	3.66E-09	4.50E-08
+Lipid	Lysolipid	1-stearoyl-GPE (18:0)	HMDB11130	0.58	4.78E-08	3.46E-07
+Lipid	Lysolipid	1-stearoyl-GPI (18:0)	HMDB61696	0.80	0.078	0.114
+Lipid	Lysolipid	2-palmitoleoyl-GPC (16:1)*		0.62	0.006	0.012
+Lipid	Lysolipid	2-palmitoyl-GPC (16:0)*	HMDB61702	0.65	1.61E-06	7.04E-06
+Lipid	Lysolipid	2-stearoyl-GPE (18:0)*		0.61	3.00E-04	7.65E-04
+Lipid	Lysoplasmalogen	1-(1-enyl-oleoyl)-2-linoleoyl-GPE (P-18:1/18:2)*		0.93	0.212	0.275
+Lipid	Lysoplasmalogen	1-(1-enyl-oleoyl)-GPE (P-18:1)*		0.75	0.024	0.041
+Lipid	Lysoplasmalogen	1-(1-enyl-palmitoyl)-GPC (P-16:0)*		0.69	2.96E-05	1.01E-04
+Lipid	Lysoplasmalogen	1-(1-enyl-palmitoyl)-GPE (P-16:0)*		0.75	0.003	0.006
+Lipid	Lysoplasmalogen	1-(1-enyl-stearoyl)-GPE (P-18:0)*		0.70	4.00E-04	9.96E-04
+Lipid	Medium Chain Fatty Acid	10-undecenoate (11:1n1)		2.10	1.59E-08	1.38E-07
+Lipid	Medium Chain Fatty Acid	5-dodecenoate (12:1n7)	HMDB00529	5.36	4.84E-10	8.70E-09
+Lipid	Medium Chain Fatty Acid	caprate (10:0)	HMDB00511	2.07	2.58E-08	2.04E-07
+Lipid	Medium Chain Fatty Acid	caproate (6:0)	HMDB00535	1.41	6.02E-08	4.11E-07
+Lipid	Medium Chain Fatty Acid	caprylate (8:0)	HMDB00482	1.77	4.61E-09	5.30E-08
+Lipid	Medium Chain Fatty Acid	heptanoate (7:0)	HMDB00666	0.87	0.964	0.982
+Lipid	Medium Chain Fatty Acid	laurate (12:0)	HMDB00638	3.32	2.78E-08	2.15E-07
+Lipid	Mevalonate Metabolism	3-hydroxy-3-methylglutarate	HMDB00355	1.65	3.85E-08	2.81E-07
+Lipid	Monoacylglycerol	1-linolenoylglycerol (18:3)	HMDB11569	0.52	3.00E-04	7.65E-04
+Lipid	Monoacylglycerol	1-linoleoylglycerol (18:2)		0.67	0.035	0.058
+Lipid	Monoacylglycerol	1-oleoylglycerol (18:1)	HMDB11567	0.59	0.001	0.003
+Lipid	Phosphatidylserine (PS)	1-stearoyl-2-oleoyl-GPS (18:0/18:1)		1.53	0.245	0.313
+Lipid	Phospholipid Metabolism	1,2-dilinoleoyl-GPC (18:2/18:2)		0.70	6.84E-05	2.13E-04
+Lipid	Phospholipid Metabolism	1,2-dilinoleoyl-GPE (18:2/18:2)*		0.39	1.00E-04	2.85E-04
+Lipid	Phospholipid Metabolism	1,2-dipalmitoyl-GPC (16:0/16:0)	HMDB00564	1.16	0.002	0.004
+Lipid	Phospholipid Metabolism	1-linoleoyl-2-arachidonoyl-GPC (18:2/20:4n6)*		0.77	2.89E-06	1.21E-05
+Lipid	Phospholipid Metabolism	1-linoleoyl-2-linolenoyl-GPC (18:2/18:3)*		0.49	3.10E-07	1.63E-06
+Lipid	Phospholipid Metabolism	1-oleoyl-2-linoleoyl-GPC (18:1/18:2)*		0.73	4.00E-04	9.96E-04
+Lipid	Phospholipid Metabolism	1-palmitoleoyl-2-linolenoyl-GPC (16:1/18:3)*		0.48	0.101	0.144
+Lipid	Phospholipid Metabolism	1-palmitoleoyl-2-linoleoyl-GPC (16:1/18:2)*		0.73	0.007	0.013
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-alpha-linolenoyl-GPC (16:0/18:3n3)*		0.92	0.795	0.842
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-arachidonoyl-GPC (16:0/20:4n6)		1.13	3.00E-04	7.65E-04
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-arachidonoyl-GPE (16:0/20:4)*	HMDB05323	0.93	0.507	0.582
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-arachidonoyl-GPI (16:0/20:4)*		0.58	4.78E-09	5.42E-08
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-linoleoyl-GPC (16:0/18:2)		1.00	0.761	0.820
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-linoleoyl-GPE (16:0/18:2)	HMDB05322	0.64	0.001	0.003
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-linoleoyl-GPI (16:0/18:2)		0.69	2.87E-05	9.89E-05
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-oleoyl-GPC (16:0/18:1)		0.95	0.072	0.106
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-oleoyl-GPE (16:0/18:1)	HMDB05320	0.67	0.009	0.017
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-oleoyl-GPI (16:0/18:1)*		0.68	2.48E-07	1.33E-06
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-palmitoleoyl-GPC (16:0/16:1)*		0.67	4.89E-05	1.58E-04
+Lipid	Phospholipid Metabolism	1-palmitoyl-2-stearoyl-GPC (16:0/18:0)		0.77	2.11E-05	7.53E-05
+Lipid	Phospholipid Metabolism	1-stearoyl-2-arachidonoyl-GPC (18:0/20:4)		1.00	0.676	0.742
+Lipid	Phospholipid Metabolism	1-stearoyl-2-arachidonoyl-GPE (18:0/20:4)		0.95	0.971	0.985
+Lipid	Phospholipid Metabolism	1-stearoyl-2-arachidonoyl-GPI (18:0/20:4)		0.91	0.011	0.020
+Lipid	Phospholipid Metabolism	1-stearoyl-2-linoleoyl-GPC (18:0/18:2)*		0.81	1.27E-07	7.62E-07
+Lipid	Phospholipid Metabolism	1-stearoyl-2-linoleoyl-GPE (18:0/18:2)*		0.55	1.02E-05	3.79E-05
+Lipid	Phospholipid Metabolism	1-stearoyl-2-linoleoyl-GPI (18:0/18:2)		0.85	0.002	0.005
+Lipid	Phospholipid Metabolism	1-stearoyl-2-oleoyl-GPC (18:0/18:1)		0.62	1.68E-11	7.89E-10
+Lipid	Phospholipid Metabolism	1-stearoyl-2-oleoyl-GPE (18:0/18:1)		0.55	2.00E-04	5.34E-04
+Lipid	Phospholipid Metabolism	1-stearoyl-2-oleoyl-GPI (18:0/18:1)*		0.64	8.31E-08	5.42E-07
+Lipid	Phospholipid Metabolism	arachidonoylcholine		0.70	0.014	0.024
+Lipid	Phospholipid Metabolism	choline	HMDB00097	0.90	0.019	0.032
+Lipid	Phospholipid Metabolism	choline phosphate	HMDB01565	1.02	0.744	0.807
+Lipid	Phospholipid Metabolism	glycerophosphoethanolamine	HMDB00114	0.84	0.083	0.121
+Lipid	Phospholipid Metabolism	glycerophosphorylcholine (GPC)	HMDB00086	0.68	3.82E-05	1.26E-04
+Lipid	Phospholipid Metabolism	phosphoethanolamine	HMDB00224	1.41	0.060	0.090
+Lipid	Phospholipid Metabolism	trimethylamine N-oxide	HMDB00925	1.15	0.743	0.807
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-arachidonoyl-GPC (P-16:0/20:4)*		1.20	2.32E-08	1.90E-07
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-arachidonoyl-GPE (P-16:0/20:4)*		0.91	0.386	0.465
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-linoleoyl-GPC (P-16:0/18:2)*		1.32	8.59E-08	5.50E-07
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-linoleoyl-GPE (P-16:0/18:2)*		1.01	0.308	0.383
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-oleoyl-GPC (P-16:0/18:1)*		1.39	7.18E-09	7.27E-08
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-oleoyl-GPE (P-16:0/18:1)*		0.96	0.615	0.684
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-palmitoleoyl-GPC (P-16:0/16:1)*		1.63	1.65E-11	7.89E-10
+Lipid	Plasmalogen	1-(1-enyl-palmitoyl)-2-palmitoyl-GPC (P-16:0/16:0)*		1.37	1.56E-08	1.37E-07
+Lipid	Plasmalogen	1-(1-enyl-stearoyl)-2-arachidonoyl-GPE (P-18:0/20:4)*	HMDB05779	0.88	0.183	0.243
+Lipid	Plasmalogen	1-(1-enyl-stearoyl)-2-linoleoyl-GPE (P-18:0/18:2)*		0.87	0.016	0.028
+Lipid	Plasmalogen	1-(1-enyl-stearoyl)-2-oleoyl-GPE (P-18:0/18:1)		0.79	3.48E-05	1.16E-04
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	adrenate (22:4n6)	HMDB02226	2.39	7.00E-04	0.002
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	arachidonate (20:4n6)	HMDB01043	1.60	8.34E-05	2.55E-04
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	dihomo-linoleate (20:2n6)	HMDB05060	3.93	1.62E-07	9.37E-07
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	dihomo-linolenate (20:3n3 or n6)	HMDB02925	1.69	2.00E-04	5.34E-04
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	docosadienoate (22:2n6)	HMDB61714	3.12	4.40E-09	5.22E-08
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	docosahexaenoate (DHA; 22:6n3)	HMDB02183	1.84	2.12E-05	7.55E-05
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	docosapentaenoate (n3 DPA; 22:5n3)	HMDB01976	2.73	1.24E-06	5.58E-06
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	docosapentaenoate (n6 DPA; 22:5n6)	HMDB01976	1.49	3.00E-04	7.65E-04
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	eicosapentaenoate (EPA; 20:5n3)	HMDB01999	1.89	3.26E-05	1.11E-04
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	linoleate (18:2n6)	HMDB00673	2.86	9.22E-09	9.06E-08
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	linolenate [alpha or gamma; (18:3n3 or 6)]	HMDB03073	4.06	2.69E-09	3.54E-08
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	mead acid (20:3n9)	HMDB10378	1.86	9.12E-05	2.74E-04
+Lipid	Polyunsaturated Fatty Acid (n3 and n6)	stearidonate (18:4n3)	HMDB06547	3.16	1.31E-07	7.76E-07
+Lipid	Primary Bile Acid Metabolism	chenodeoxycholate	HMDB00518	0.64	0.080	0.118
+Lipid	Primary Bile Acid Metabolism	cholate	HMDB00619	0.51	0.012	0.023
+Lipid	Primary Bile Acid Metabolism	glycochenodeoxycholate	HMDB00637	0.82	0.593	0.666
+Lipid	Primary Bile Acid Metabolism	glycochenodeoxycholate glucuronide (1)		0.68	0.048	0.074
+Lipid	Primary Bile Acid Metabolism	glycochenodeoxycholate sulfate		1.28	0.018	0.031
+Lipid	Primary Bile Acid Metabolism	glycocholate	HMDB00138	0.78	0.682	0.747
+Lipid	Primary Bile Acid Metabolism	taurochenodeoxycholate	HMDB00951	1.16	0.150	0.206
+Lipid	Primary Bile Acid Metabolism	taurocholate	HMDB00036	0.74	0.789	0.839
+Lipid	Secondary Bile Acid Metabolism	deoxycholate	HMDB00626	0.34	0.006	0.011
+Lipid	Secondary Bile Acid Metabolism	glycocholenate sulfate*		1.05	0.544	0.619
+Lipid	Secondary Bile Acid Metabolism	glycodeoxycholate	HMDB00631	0.62	0.140	0.195
+Lipid	Secondary Bile Acid Metabolism	glycodeoxycholate sulfate		1.09	0.065	0.097
+Lipid	Secondary Bile Acid Metabolism	glycohyocholate		1.06	0.037	0.060
+Lipid	Secondary Bile Acid Metabolism	glycolithocholate sulfate*	HMDB02639	1.21	0.018	0.032
+Lipid	Secondary Bile Acid Metabolism	glycoursodeoxycholate	HMDB00708	0.67	0.232	0.297
+Lipid	Secondary Bile Acid Metabolism	hyocholate	HMDB00760	0.81	0.192	0.253
+Lipid	Secondary Bile Acid Metabolism	isoursodeoxycholate	HMDB00686	0.49	4.00E-04	9.96E-04
+Lipid	Secondary Bile Acid Metabolism	taurocholenate sulfate		1.56	0.002	0.005
+Lipid	Secondary Bile Acid Metabolism	taurodeoxycholate	HMDB00896	0.82	0.962	0.982
+Lipid	Secondary Bile Acid Metabolism	taurolithocholate 3-sulfate	HMDB02580	1.89	4.70E-05	1.53E-04
+Lipid	Secondary Bile Acid Metabolism	ursodeoxycholate	HMDB00946	0.37	9.00E-04	0.002
+Lipid	Sphingolipid Metabolism	behenoyl dihydrosphingomyelin (d18:0/22:0)*		1.46	2.00E-04	5.34E-04
+Lipid	Sphingolipid Metabolism	behenoyl sphingomyelin (d18:1/22:0)*		1.15	3.00E-04	7.65E-04
+Lipid	Sphingolipid Metabolism	glycosyl-N-behenoyl-sphingadienine (d18:2/22:0)*		1.15	4.66E-05	1.52E-04
+Lipid	Sphingolipid Metabolism	glycosyl-N-palmitoyl-sphingosine (d18:1/16:0)		1.18	2.00E-04	5.34E-04
+Lipid	Sphingolipid Metabolism	lactosyl-N-nervonoyl-sphingosine (d18:1/24:1)*		1.14	1.68E-05	6.06E-05
+Lipid	Sphingolipid Metabolism	lactosyl-N-palmitoyl-sphingosine (d18:1/16:0)		1.13	2.69E-05	9.31E-05
+Lipid	Sphingolipid Metabolism	lignoceroyl sphingomyelin (d18:1/24:0)		1.24	9.44E-06	3.55E-05
+Lipid	Sphingolipid Metabolism	myristoyl dihydrosphingomyelin (d18:0/14:0)*		0.90	0.046	0.071
+Lipid	Sphingolipid Metabolism	N-behenoyl-sphingadienine (d18:2/22:0)*		0.66	9.36E-05	2.79E-04
+Lipid	Sphingolipid Metabolism	N-palmitoyl-sphinganine (d18:0/16:0)	HMDB11760	1.02	0.496	0.573
+Lipid	Sphingolipid Metabolism	N-palmitoyl-sphingosine (d18:1/16:0)	HMDB04949	0.89	0.004	0.008
+Lipid	Sphingolipid Metabolism	N-stearoyl-sphingosine (d18:1/18:0)*	HMDB04950	0.84	0.003	0.007
+Lipid	Sphingolipid Metabolism	palmitoyl dihydrosphingomyelin (d18:0/16:0)*		1.17	5.69E-05	1.81E-04
+Lipid	Sphingolipid Metabolism	palmitoyl sphingomyelin (d18:1/16:0)		1.06	0.006	0.012
+Lipid	Sphingolipid Metabolism	sphinganine	HMDB00269	0.94	0.937	0.963
+Lipid	Sphingolipid Metabolism	sphinganine-1-phosphate	HMDB01383	0.90	0.165	0.222
+Lipid	Sphingolipid Metabolism	sphingomyelin (d17:2/16:0, d18:2/15:0)*		0.96	0.393	0.472
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:0/18:0, d19:0/17:0)*		1.62	7.34E-06	2.79E-05
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:0/20:0, d16:0/22:0)*		1.41	7.00E-04	0.002
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/14:0, d16:1/16:0)*		0.96	0.442	0.522
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/15:0, d16:1/17:0)*		1.06	0.073	0.108
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/17:0, d17:1/18:0, d19:1/16:0)		1.13	9.00E-04	0.002
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/18:1, d18:2/18:0)		1.24	2.20E-07	1.21E-06
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/19:0, d19:1/18:0)*		1.16	3.00E-04	7.65E-04
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/20:0, d16:1/22:0)*		1.24	1.50E-08	1.35E-07
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/20:1, d18:2/20:0)*		1.36	2.43E-08	1.97E-07
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/20:2, d18:2/20:1, d16:1/22:2)*		1.26	0.012	0.022
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/21:0, d17:1/22:0, d16:1/23:0)*		1.12	0.010	0.019
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/22:1, d18:2/22:0, d16:1/24:1)*		1.25	2.47E-05	8.61E-05
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/22:2, d18:2/22:1, d16:1/24:2)*		1.16	3.00E-04	7.65E-04
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/24:1, d18:2/24:0)*		1.08	0.002	0.004
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:1/25:0, d19:0/24:1, d20:1/23:0, d19:1/24:0)*		1.05	0.269	0.340
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/14:0, d18:1/14:1)*		0.77	8.84E-08	5.62E-07
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/16:0, d18:1/16:1)*		1.15	1.85E-06	8.06E-06
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/18:1)*		1.25	9.04E-07	4.19E-06
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/21:0, d16:2/23:0)*		1.04	0.257	0.325
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/23:0, d18:1/23:1, d17:1/24:1)*		1.10	0.041	0.064
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/23:1)*		1.00	0.981	0.992
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/24:1, d18:1/24:2)*		1.13	2.00E-04	5.34E-04
+Lipid	Sphingolipid Metabolism	sphingomyelin (d18:2/24:2)*		1.16	0.003	0.007
+Lipid	Sphingolipid Metabolism	sphingosine	HMDB00252	0.97	0.394	0.472
+Lipid	Sphingolipid Metabolism	sphingosine 1-phosphate	HMDB00277	0.81	0.005	0.009
+Lipid	Sphingolipid Metabolism	stearoyl sphingomyelin (d18:1/18:0)	HMDB01348	1.39	3.74E-08	2.78E-07
+Lipid	Sphingolipid Metabolism	tricosanoyl sphingomyelin (d18:1/23:0)*		1.11	0.006	0.012
+Lipid	Steroid	16a-hydroxy DHEA 3-sulfate		1.70	5.91E-07	2.86E-06
+Lipid	Steroid	17alpha-hydroxypregnenolone 3-sulfate	HMDB00416	0.82	0.006	0.012
+Lipid	Steroid	21-hydroxypregnenolone disulfate	HMDB04026	1.34	1.13E-05	4.16E-05
+Lipid	Steroid	5alpha-androstan-3alpha,17alpha-diol monosulfate		1.24	0.212	0.275
+Lipid	Steroid	5alpha-androstan-3alpha,17beta-diol disulfate		1.12	0.010	0.018
+Lipid	Steroid	5alpha-androstan-3alpha,17beta-diol monosulfate (1)		1.17	0.023	0.039
+Lipid	Steroid	5alpha-androstan-3alpha,17beta-diol monosulfate (2)		0.80	0.002	0.004
+Lipid	Steroid	5alpha-androstan-3beta,17alpha-diol disulfate		1.50	9.00E-04	0.002
+Lipid	Steroid	5alpha-androstan-3beta,17beta-diol disulfate	HMDB00493	1.00	0.595	0.667
+Lipid	Steroid	5alpha-androstan-3beta,17beta-diol monosulfate (2)		1.18	0.017	0.029
+Lipid	Steroid	5alpha-pregnan-3(alpha or beta),20beta-diol disulfate		1.57	0.013	0.023
+Lipid	Steroid	5alpha-pregnan-3beta,20alpha-diol disulfate		1.23	3.00E-04	7.65E-04
+Lipid	Steroid	5alpha-pregnan-3beta,20alpha-diol monosulfate (2)		1.16	0.449	0.528
+Lipid	Steroid	5alpha-pregnan-3beta,20beta-diol monosulfate (1)		1.14	0.559	0.633
+Lipid	Steroid	andro steroid monosulfate (1)*	HMDB02759	1.66	8.64E-07	4.03E-06
+Lipid	Steroid	androstenediol (3alpha, 17alpha) monsulfate (2)		0.57	8.61E-07	4.03E-06
+Lipid	Steroid	androstenediol (3alpha, 17alpha) monsulfate (3)		1.24	1.00E-04	2.85E-04
+Lipid	Steroid	androstenediol (3beta,17beta) disulfate (1)	HMDB03818	1.21	3.98E-06	1.63E-05
+Lipid	Steroid	androstenediol (3beta,17beta) disulfate (2)	HMDB03818	1.40	2.62E-08	2.06E-07
+Lipid	Steroid	androstenediol (3beta,17beta) monosulfate (1)	HMDB03818	1.55	1.76E-08	1.51E-07
+Lipid	Steroid	androstenediol (3beta,17beta) monosulfate (2)		0.78	4.22E-06	1.71E-05
+Lipid	Steroid	androsterone sulfate	HMDB02759	1.08	0.536	0.612
+Lipid	Steroid	corticosterone	HMDB01547	0.90	0.043	0.068
+Lipid	Steroid	cortisol	HMDB00063	0.88	0.131	0.183
+Lipid	Steroid	cortisone	HMDB02802	0.92	0.026	0.043
+Lipid	Steroid	dehydroisoandrosterone sulfate (DHEA-S)	HMDB01032	1.40	1.35E-08	1.26E-07
+Lipid	Steroid	epiandrosterone sulfate	HMDB00365	1.10	0.188	0.249
+Lipid	Steroid	etiocholanolone glucuronide		0.91	0.011	0.021
+Lipid	Steroid	pregn steroid monosulfate*		1.28	3.64E-05	1.21E-04
+Lipid	Steroid	pregnanediol-3-glucuronide		1.21	0.388	0.467
+Lipid	Steroid	pregnen-diol disulfate*		1.48	7.14E-10	1.11E-08
+Lipid	Steroid	pregnenolone sulfate	HMDB00774	0.99	0.354	0.432
+Lipid	Sterol	3beta-hydroxy-5-cholestenoate		1.19	6.00E-04	0.001
+Lipid	Sterol	4-cholesten-3-one	HMDB00921	0.87	0.052	0.080
+Lipid	Sterol	7-alpha-hydroxy-3-oxo-4-cholestenoate (7-Hoca)	HMDB12458	0.81	2.00E-04	5.34E-04
+Lipid	Sterol	beta-sitosterol	HMDB00852	1.04	0.331	0.407
+Lipid	Sterol	campesterol	HMDB02869	1.04	0.147	0.203
+Lipid	Sterol	cholesterol	HMDB00067	0.75	0.008	0.015
+Nucleotide	Purine Metabolism, (Hypo)Xanthine/Inosine containing	allantoin	HMDB00462	1.03	0.239	0.306
+Nucleotide	Purine Metabolism, (Hypo)Xanthine/Inosine containing	hypoxanthine	HMDB00157	0.99	0.685	0.748
+Nucleotide	Purine Metabolism, (Hypo)Xanthine/Inosine containing	inosine	HMDB00195	1.79	0.038	0.061
+Nucleotide	Purine Metabolism, (Hypo)Xanthine/Inosine containing	N1-methylinosine	HMDB02721	1.02	0.780	0.834
+Nucleotide	Purine Metabolism, (Hypo)Xanthine/Inosine containing	urate	HMDB00289	1.29	8.51E-09	8.48E-08
+Nucleotide	Purine Metabolism, (Hypo)Xanthine/Inosine containing	xanthine	HMDB00292	1.06	0.185	0.246
+Nucleotide	Purine Metabolism, Adenine containing	adenine	HMDB00034	1.09	0.115	0.163
+Nucleotide	Purine Metabolism, Adenine containing	adenosine	HMDB00050	1.04	0.394	0.472
+Nucleotide	Purine Metabolism, Adenine containing	adenosine 3',5'-cyclic monophosphate (cAMP)	HMDB00058	1.01	0.880	0.912
+Nucleotide	Purine Metabolism, Adenine containing	adenosine 5'-monophosphate (AMP)	HMDB00045	1.04	0.856	0.893
+Nucleotide	Purine Metabolism, Adenine containing	N1-methyladenosine	HMDB03331	1.04	0.579	0.653
+Nucleotide	Purine Metabolism, Adenine containing	N6-carbamoylthreonyladenosine	HMDB41623	1.06	0.205	0.267
+Nucleotide	Purine Metabolism, Adenine containing	N6-methyladenosine	HMDB04044	0.72	0.002	0.005
+Nucleotide	Purine Metabolism, Guanine containing	7-methylguanine	HMDB00897	1.05	0.100	0.143
+Nucleotide	Purine Metabolism, Guanine containing	N2,N2-dimethylguanosine	HMDB04824	1.09	0.003	0.005
+Nucleotide	Pyrimidine Metabolism, Cytidine containing	2'-O-methylcytidine		0.97	0.375	0.454
+Nucleotide	Pyrimidine Metabolism, Cytidine containing	3-methylcytidine		0.95	0.083	0.121
+Nucleotide	Pyrimidine Metabolism, Cytidine containing	cytidine	HMDB00089	1.32	0.045	0.069
+Nucleotide	Pyrimidine Metabolism, Cytidine containing	N4-acetylcytidine	HMDB05923	1.28	0.069	0.103
+Nucleotide	Pyrimidine Metabolism, Orotate containing	dihydroorotate	HMDB03349	0.72	0.013	0.024
+Nucleotide	Pyrimidine Metabolism, Orotate containing	orotate	HMDB00226	1.12	0.009	0.017
+Nucleotide	Pyrimidine Metabolism, Orotate containing	orotidine	HMDB00788	1.01	0.557	0.632
+Nucleotide	Pyrimidine Metabolism, Thymine containing	3-aminoisobutyrate	HMDB03911	1.44	6.24E-06	2.42E-05
+Nucleotide	Pyrimidine Metabolism, Thymine containing	5,6-dihydrothymine	HMDB00079	0.94	0.160	0.217
+Nucleotide	Pyrimidine Metabolism, Uracil containing	2'-deoxyuridine	HMDB00012	0.77	0.005	0.009
+Nucleotide	Pyrimidine Metabolism, Uracil containing	3-ureidopropionate	HMDB00026	1.14	0.028	0.047
+Nucleotide	Pyrimidine Metabolism, Uracil containing	5-methyluridine (ribothymidine)	HMDB00884	1.09	0.010	0.019
+Nucleotide	Pyrimidine Metabolism, Uracil containing	beta-alanine	HMDB00056	0.84	0.002	0.003
+Nucleotide	Pyrimidine Metabolism, Uracil containing	N-acetyl-beta-alanine		1.19	0.018	0.031
+Nucleotide	Pyrimidine Metabolism, Uracil containing	pseudouridine	HMDB00767	1.04	0.165	0.222
+Nucleotide	Pyrimidine Metabolism, Uracil containing	uracil	HMDB00300	0.70	0.330	0.406
+Nucleotide	Pyrimidine Metabolism, Uracil containing	uridine	HMDB00296	0.99	0.633	0.699
+Peptide	Acetylated Peptides	4-hydroxyphenylacetylglutamine		0.82	0.211	0.275
+Peptide	Acetylated Peptides	phenylacetylcarnitine		1.21	0.149	0.205
+Peptide	Acetylated Peptides	phenylacetylglutamate	HMDB59772	1.27	0.014	0.025
+Peptide	Acetylated Peptides	phenylacetylglutamine	HMDB06344	1.24	0.002	0.004
+Peptide	Dipeptide	glycylleucine	HMDB00759	0.68	0.019	0.032
+Peptide	Dipeptide	isoleucylglycine		0.59	0.386	0.465
+Peptide	Dipeptide	leucylglycine		1.04	0.829	0.870
+Peptide	Dipeptide	phenylalanylalanine		0.80	0.001	0.003
+Peptide	Dipeptide	phenylalanylglycine		0.94	0.792	0.840
+Peptide	Dipeptide	prolylglycine		0.59	0.002	0.004
+Peptide	Dipeptide	valylglycine	HMDB29127	0.84	0.595	0.667
+Peptide	Dipeptide	valylleucine	HMDB29131	0.86	0.053	0.081
+Peptide	Dipeptide Derivative	N-acetylcarnosine	HMDB12881	1.02	0.978	0.990
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamyl-2-aminobutyrate		1.42	2.10E-05	7.53E-05
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylalanine	HMDB29142	0.52	6.15E-05	1.95E-04
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamyl-alpha-lysine		0.76	9.93E-05	2.85E-04
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamyl-epsilon-lysine	HMDB03869	0.77	2.00E-04	5.34E-04
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylglutamate	HMDB11737	0.62	1.31E-06	5.86E-06
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylglutamine	HMDB11738	0.85	0.001	0.003
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylglycine	HMDB11667	0.85	5.00E-04	0.001
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylhistidine		0.84	0.006	0.012
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylisoleucine*	HMDB11170	0.95	0.459	0.537
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylleucine	HMDB11171	0.96	0.684	0.748
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylmethionine	HMDB29155	0.89	0.049	0.075
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylphenylalanine	HMDB00594	0.95	0.497	0.573
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylthreonine	HMDB29159	0.77	0.214	0.277
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamyltryptophan	HMDB29160	0.95	0.499	0.574
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamyltyrosine	HMDB11741	0.86	0.008	0.015
+Peptide	Gamma-glutamyl Amino Acid	gamma-glutamylvaline	HMDB11172	0.67	2.44E-07	1.32E-06
+Peptide	Polypeptide	bradykinin	HMDB04246	0.98	0.781	0.834
+Peptide	Polypeptide	bradykinin, hydroxy-pro(3)	HMDB11728	0.98	0.974	0.987
+Peptide	Polypeptide	HWESASLLR		0.09	5.87E-08	4.06E-07
+Peptide	Polypeptide	HWESASXX*		0.15	7.91E-07	3.76E-06
+Xenobiotics	Bacterial/Fungal	tartronate (hydroxymalonate)	HMDB35227	0.75	2.00E-04	5.34E-04
+Xenobiotics	Benzoate Metabolism	2-hydroxyhippurate (salicylurate)	HMDB00840	0.78	0.046	0.071
+Xenobiotics	Benzoate Metabolism	3-hydroxyhippurate	HMDB06116	0.39	3.00E-04	7.65E-04
+Xenobiotics	Benzoate Metabolism	3-methoxycatechol sulfate (1)		0.80	0.235	0.301
+Xenobiotics	Benzoate Metabolism	3-methyl catechol sulfate (1)		1.96	0.520	0.595
+Xenobiotics	Benzoate Metabolism	3-methyl catechol sulfate (2)		3.03	0.072	0.106
+Xenobiotics	Benzoate Metabolism	4-ethylphenylsulfate#		17.94	1.88E-06	8.15E-06
+Xenobiotics	Benzoate Metabolism	4-hydroxyhippurate	HMDB13678	0.65	0.014	0.025
+Xenobiotics	Benzoate Metabolism	4-methylcatechol sulfate		0.88	0.762	0.820
+Xenobiotics	Benzoate Metabolism	4-vinylphenol sulfate	HMDB04072	0.57	0.003	0.007
+Xenobiotics	Benzoate Metabolism	benzoate	HMDB01870	1.02	0.790	0.839
+Xenobiotics	Benzoate Metabolism	catechol sulfate	HMDB59724	0.87	0.158	0.215
+Xenobiotics	Benzoate Metabolism	hippurate	HMDB00714	0.93	0.279	0.349
+Xenobiotics	Benzoate Metabolism	methyl-4-hydroxybenzoate sulfate		0.32	0.002	0.004
+Xenobiotics	Benzoate Metabolism	O-methylcatechol sulfate		1.10	0.785	0.836
+Xenobiotics	Chemical	1,2,3-benzenetriol sulfate (2)		0.64	0.015	0.027
+Xenobiotics	Chemical	2-aminophenol sulfate	HMDB61116	1.05	0.601	0.671
+Xenobiotics	Chemical	2-methoxyresorcinol sulfate		0.55	0.002	0.004
+Xenobiotics	Chemical	3-acetylphenol sulfate		0.96	0.315	0.391
+Xenobiotics	Chemical	3-hydroxypyridine sulfate		0.80	0.834	0.873
+Xenobiotics	Chemical	4-hydroxychlorothalonil		1.13	5.39E-08	3.82E-07
+Xenobiotics	Chemical	6-hydroxyindole sulfate		0.92	0.628	0.694
+Xenobiotics	Chemical	benzoylcarnitine*		1.17	0.009	0.017
+Xenobiotics	Chemical	dexpanthenol	HMDB04231	2.29	0.253	0.322
+Xenobiotics	Chemical	dimethyl sulfone	HMDB04983	1.29	2.00E-04	5.34E-04
+Xenobiotics	Chemical	EDTA	HMDB15109	0.96	0.039	0.062
+Xenobiotics	Chemical	iminodiacetate (IDA)	HMDB11753	0.94	0.039	0.062
+Xenobiotics	Chemical	lanthionine		1.15	0.097	0.140
+Xenobiotics	Chemical	N-methylpipecolate		0.94	0.570	0.644
+Xenobiotics	Chemical	O-sulfo-L-tyrosine		0.98	0.817	0.862
+Xenobiotics	Chemical	perfluorooctanesulfonic acid (PFOS)	HMDB59586	1.02	0.087	0.126
+Xenobiotics	Chemical	succinimide		1.29	1.00E-04	2.85E-04
+Xenobiotics	Chemical	sulfate*	HMDB01448	1.05	0.194	0.255
+Xenobiotics	Drug	2-acetamidophenol sulfate		1.38	0.840	0.878
+Xenobiotics	Drug	2-hydroxyacetaminophen sulfate*		1.00	1.000	1.000
+Xenobiotics	Drug	2-methoxyacetaminophen sulfate*		1.00	1.000	1.000
+Xenobiotics	Drug	3-(N-acetyl-L-cystein-S-yl) acetaminophen		1.00	1.000	1.000
+Xenobiotics	Drug	4-acetamidophenol	HMDB01859	1.00	1.000	1.000
+Xenobiotics	Drug	4-acetamidophenylglucuronide	HMDB10316	1.00	1.000	1.000
+Xenobiotics	Drug	4-acetaminophen sulfate	HMDB59911	1.00	1.000	1.000
+Xenobiotics	Drug	4-acetylphenol sulfate#		4.97	5.00E-04	0.001
+Xenobiotics	Drug	4-hydroxycoumarin		0.88	0.083	0.121
+Xenobiotics	Drug	doxycycline		1.00	0.353	0.432
+Xenobiotics	Drug	hydroquinone sulfate	HMDB02434	0.81	0.183	0.243
+Xenobiotics	Drug	pivaloylcarnitine (C5)	HDMB41993	1.00	1.000	1.000
+Xenobiotics	Drug	salicylate	HMDB01895	1.08	0.916	0.945
+Xenobiotics	Food Component/Plant	2,3-dihydroxyisovalerate	HMDB12141	0.94	0.553	0.628
+Xenobiotics	Food Component/Plant	2-keto-3-deoxy-gluconate	HMDB01353	0.97	0.614	0.684
+Xenobiotics	Food Component/Plant	2-oxindole-3-acetate		0.48	0.846	0.883
+Xenobiotics	Food Component/Plant	2-piperidinone		1.01	0.775	0.832
+Xenobiotics	Food Component/Plant	3,4-methyleneheptanoate		3.32	1.54E-06	6.82E-06
+Xenobiotics	Food Component/Plant	4-allylphenol sulfate		0.38	7.11E-08	4.72E-07
+Xenobiotics	Food Component/Plant	acesulfame		0.09	8.56E-07	4.03E-06
+Xenobiotics	Food Component/Plant	alliin	HMDB33592	1.40	0.143	0.199
+Xenobiotics	Food Component/Plant	beta-cryptoxanthin		1.14	0.097	0.139
+Xenobiotics	Food Component/Plant	betonicine	HMDB29412	0.48	7.00E-04	0.002
+Xenobiotics	Food Component/Plant	cinnamoylglycine	HMDB11621	1.82	5.64E-05	1.80E-04
+Xenobiotics	Food Component/Plant	dihydroferulic acid		0.69	0.173	0.232
+Xenobiotics	Food Component/Plant	ergothioneine	HMDB03045	1.04	0.435	0.514
+Xenobiotics	Food Component/Plant	erythritol	HMDB02994	0.85	1.00E-04	2.85E-04
+Xenobiotics	Food Component/Plant	eugenol sulfate		0.12	1.11E-05	4.10E-05
+Xenobiotics	Food Component/Plant	ferulic acid 4-sulfate	HMDB29200	1.14	0.924	0.952
+Xenobiotics	Food Component/Plant	gluconate	HMDB00625	0.76	2.19E-05	7.77E-05
+Xenobiotics	Food Component/Plant	homostachydrine*	HMDB33433	0.62	2.97E-08	2.26E-07
+Xenobiotics	Food Component/Plant	methyl glucopyranoside (alpha + beta)		0.40	1.49E-05	5.42E-05
+Xenobiotics	Food Component/Plant	methyl indole-3-acetate	HMDB29738	1.26	0.025	0.041
+Xenobiotics	Food Component/Plant	N-(2-furoyl)glycine	HMDB00439	0.73	0.051	0.078
+Xenobiotics	Food Component/Plant	N-acetylalliin		0.99	0.965	0.982
+Xenobiotics	Food Component/Plant	piperine	HMDB29377	0.83	0.204	0.267
+Xenobiotics	Food Component/Plant	pyrraline		1.09	0.572	0.646
+Xenobiotics	Food Component/Plant	quinate	HMDB03072	0.32	0.023	0.039
+Xenobiotics	Food Component/Plant	S-allylcysteine		0.56	8.00E-04	0.002
+Xenobiotics	Food Component/Plant	stachydrine	HMDB04827	0.32	3.00E-15	2.21E-12
+Xenobiotics	Food Component/Plant	sucralose	HMDB31554	1.37	0.822	0.865
+Xenobiotics	Food Component/Plant	syringol sulfate		12.63	0.026	0.043
+Xenobiotics	Food Component/Plant	tartarate	HMDB00956	1.55	0.929	0.956
+Xenobiotics	Food Component/Plant	thymol sulfate	HMDB01878	5.94	0.009	0.017
+Xenobiotics	Tobacco Metabolite	3-hydroxycotinine glucuronide		0.78	0.142	0.197
+Xenobiotics	Tobacco Metabolite	cotinine	HMDB01046	0.46	0.396	0.473
+Xenobiotics	Tobacco Metabolite	cotinine N-oxide	HMDB01411	0.74	0.043	0.068
+Xenobiotics	Tobacco Metabolite	hydroxycotinine	HMDB01390	0.67	0.024	0.041
+Xenobiotics	Xanthine Metabolism	1,3,7-trimethylurate	HMDB02123	0.86	0.301	0.375
+Xenobiotics	Xanthine Metabolism	1,3-dimethylurate	HMDB01857	0.63	0.134	0.187
+Xenobiotics	Xanthine Metabolism	1,7-dimethylurate	HMDB11103	0.66	0.058	0.088
+Xenobiotics	Xanthine Metabolism	1-methylurate	HMDB03099	0.66	0.045	0.070
+Xenobiotics	Xanthine Metabolism	1-methylxanthine	HMDB10738	0.56	0.011	0.021
+Xenobiotics	Xanthine Metabolism	3,7-dimethylurate	HMDB01982	1.11	0.601	0.671
+Xenobiotics	Xanthine Metabolism	3-methylxanthine	HMDB01886	1.32	0.963	0.982
+Xenobiotics	Xanthine Metabolism	5-acetylamino-6-amino-3-methyluracil	HMDB04400	0.56	0.002	0.004
+Xenobiotics	Xanthine Metabolism	5-acetylamino-6-formylamino-3-methyluracil	HMDB11105	0.77	0.016	0.029
+Xenobiotics	Xanthine Metabolism	7-methylurate		1.06	0.447	0.526
+Xenobiotics	Xanthine Metabolism	7-methylxanthine	HMDB01991	1.19	0.751	0.814
+Xenobiotics	Xanthine Metabolism	caffeic acid sulfate	HMDB41708	0.61	0.021	0.035
+Xenobiotics	Xanthine Metabolism	caffeine	HMDB01847	0.77	0.250	0.319
+Xenobiotics	Xanthine Metabolism	paraxanthine	HMDB01860	0.68	0.011	0.020
+Xenobiotics	Xanthine Metabolism	theobromine	HMDB02825	1.15	0.753	0.815
+Xenobiotics	Xanthine Metabolism	theophylline	HMDB01889	0.59	0.013	0.023
+n = 24. 						
+1Group mean ratio. Colored according to increase (red) or decrease (green) from PRE to POST.						
+2Repeated measures ANOVA, main effect of time, Q < 0.10.  #Diet-by-time interaction, Q < 0.10.						
+3Benjamini-Hochberg correction.  						
+*Indicates compounds that have not been officially confirmed based on a standard, but are identified with high confidence.						
+HMDB, Human metabolome database						

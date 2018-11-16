@@ -1,0 +1,97 @@
+mb_sample_id 	subject	identifier	group	collection	replicate
+SA020202	R.A.1	140403ajlsa12_1	normal	1 Hr	1
+SA020201	R.A.3	140404ajlsa17_1	normal	1 Hr	3
+SA020200	R.A.2.	140404ajlsa44_1	normal	1 Hr	2
+SA020205	R.B.3	140403ajlsa19_1	normal	2 Hr	3
+SA020203	R.B.2	140404ajlsa15_1	normal	2 Hr	2
+SA020204	R.B.1	140404ajlsa28_1	normal	2 Hr	1
+SA020208	R.C.3	140403ajlsa02_1	normal	3 Hr	3
+SA020206	R.C.2	140403ajlsa30_1	normal	3 Hr	2
+SA020207	R.C.1	140404ajlsa21_1	normal	3 Hr	1
+SA020213	27.A.3	140403ajlsa13_1	ischemia_cold	-	3
+SA020212	8.A.2	140403ajlsa34_1	ischemia_cold	-	2
+SA020209	27.A.1	140404ajlsa02_1	ischemia_cold	-	1
+SA020211	27.A.2	140404ajlsa04_1	ischemia_cold	-	2
+SA020210	8.A.1	140404ajlsa06_1	ischemia_cold	-	1
+SA020214	8.A.3	140404ajlsa07_1	ischemia_cold	-	3
+SA020215	27.B.3	140403ajlsa15_1	ischemia_cold	1 Hr	3
+SA020220	8.B.2	140403ajlsa40_1	ischemia_cold	1 Hr	2
+SA020218	8.B.1	140404ajlsa01_1	ischemia_cold	1 Hr	1
+SA020217	27.B.1	140404ajlsa22_1	ischemia_cold	1 Hr	1
+SA020216	27.B.2	140404ajlsa37_1	ischemia_cold	1 Hr	2
+SA020219	8.B.3	140404ajlsa42_1	ischemia_cold	1 Hr	3
+SA020221	27.C.2	140403ajlsa37_1	ischemia_cold	2 Hr	2
+SA020226	8.C.3	140403ajlsa41_1	ischemia_cold	2 Hr	3
+SA020222	27.C.3	140404ajlsa16_1	ischemia_cold	2 Hr	3
+SA020223	8.C.1	140404ajlsa27_1	ischemia_cold	2 Hr	1
+SA020225	8.C.2	140404ajlsa35_1	ischemia_cold	2 Hr	2
+SA020224	27.C.1	140404ajlsa36_1	ischemia_cold	2 Hr	1
+SA020227	27.D.2	140403ajlsa03_1	ischemia_cold	3 Hr	2
+SA020234	8.D.2	140403ajlsa09_1	ischemia_cold	3 Hr	2
+SA020235	8.D.1.	140404ajlsa03_1	ischemia_cold	3 Hr	1
+SA020228	27.D.3	140404ajlsa25_1	ischemia_cold	3 Hr	3
+SA020230	27.D.1	140404ajlsa34_1	ischemia_cold	3 Hr	1
+SA020229	8.D.3	140404ajlsa40_1	ischemia_cold	3 Hr	3
+SA020232	28.D.1+_13	140512actsa07_1	ischemia_cold	3 Hr	1
+SA020233	28.D.3 *_15	140512actsa17_1	ischemia_cold	3 Hr	3
+SA020231	28.D.2 +_14	140512actsa18_1	ischemia_cold	3 Hr	2
+SA020238	30.A.1	140403ajlsa27_1	steatosis	-	1
+SA020237	30.A.3	140403ajlsa33_1	steatosis	-	3
+SA020240	30.X.3	140403ajlsa44_1	steatosis	-	3
+SA020236	30.A.2	140404ajlsa10_1	steatosis	-	2
+SA020239	30.X.1	140404ajlsa19_1	steatosis	-	1
+SA020241	30.X.2	140404ajlsa26_1	steatosis	-	2
+SA020243	30.B.2	140403ajlsa01_1	steatosis	1 Hr	2
+SA020242	30.B.1	140404ajlsa23_1	steatosis	1 Hr	1
+SA020244	30.B.3	140404ajlsa33_1	steatosis	1 Hr	3
+SA020246	30.C.2	140403ajlsa16_1	steatosis	2 Hr	2
+SA020247	30.C.3	140403ajlsa31_1	steatosis	2 Hr	3
+SA020245	30.C.1	140404ajlsa14_1	steatosis	2 Hr	1
+SA020248	30.D.2	140403ajlsa08_1	steatosis	3 Hr	2
+SA020250	30.D.1.	140403ajlsa50_1	steatosis	3 Hr	1
+SA020249	30.D.3	140404ajlsa20_1	steatosis	3 Hr	3
+SA020256	28.A.3	140403ajlsa11_1	ischemia	-	3
+SA020262	25.A.3	140403ajlsa35_1	ischemia	-	3
+SA020260	25.A.1	140403ajlsa47_1	ischemia	-	1
+SA020261	25.A.2	140404ajlsa05_1	ischemia	-	2
+SA020253	35.A.1	140404ajlsa09_1	ischemia	-	1
+SA020251	35.A.2	140404ajlsa12_1	ischemia	-	2
+SA020252	35.A.3	140404ajlsa32_1	ischemia	-	3
+SA020255	28.A.2	140404ajlsa41_1	ischemia	-	2
+SA020257	28.A.1	140404ajlsa45_1	ischemia	-	1
+SA020259	34.A.3 *_03	140512actsa01_1	ischemia	-	3
+SA020254	34.A.1 +_01	140512actsa03_1	ischemia	-	1
+SA020258	34.A.2 +_02	140512actsa19_1	ischemia	-	2
+SA020272	25.B.3	140403ajlsa04_1	ischemia	1 Hr	3
+SA020266	28.B.2	140403ajlsa05_1	ischemia	1 Hr	2
+SA020274	28.B.3	140403ajlsa14_1	ischemia	1 Hr	3
+SA020273	35.B.2	140403ajlsa17_1	ischemia	1 Hr	2
+SA020269	25.B.1	140403ajlsa25_1	ischemia	1 Hr	1
+SA020271	35.B.1	140403ajlsa36_1	ischemia	1 Hr	1
+SA020263	28.B.1	140403ajlsa45_1	ischemia	1 Hr	1
+SA020268	25.B.2	140403ajlsa49_1	ischemia	1 Hr	2
+SA020267	35.B.3	140404ajlsa39_1	ischemia	1 Hr	3
+SA020265	34.B.2 +_05	140512actsa06_1	ischemia	1 Hr	2
+SA020264	34.B.1 +_04	140512actsa13_1	ischemia	1 Hr	1
+SA020270	34.B.3 *_06	140512actsa16_1	ischemia	1 Hr	3
+SA020279	35.C.1	140403ajlsa20_1	ischemia	2 Hr	1
+SA020275	25.C.1	140403ajlsa21_1	ischemia	2 Hr	1
+SA020277	25.C.3	140403ajlsa22_1	ischemia	2 Hr	3
+SA020284	28.C.2	140404ajlsa08_1	ischemia	2 Hr	2
+SA020276	25.C.2	140404ajlsa11_1	ischemia	2 Hr	2
+SA020283	35.C.2	140404ajlsa24_1	ischemia	2 Hr	2
+SA020278	28.C.3	140404ajlsa29_1	ischemia	2 Hr	3
+SA020286	28.C.1	140404ajlsa30_1	ischemia	2 Hr	1
+SA020282	35.C.3	140404ajlsa43_1	ischemia	2 Hr	3
+SA020285	34.C.3 *_09	140512actsa05_1	ischemia	2 Hr	3
+SA020281	34.C.1 *_07	140512actsa11_1	ischemia	2 Hr	1
+SA020280	34.C.2 *_08	140512actsa15_1	ischemia	2 Hr	2
+SA020293	25.D.3	140403ajlsa06_1	ischemia	3 Hr	3
+SA020290	35.D.1	140403ajlsa18_1	ischemia	3 Hr	1
+SA020295	25.D.1	140403ajlsa24_1	ischemia	3 Hr	1
+SA020292	35.D.2	140403ajlsa26_1	ischemia	3 Hr	2
+SA020291	35.D.3	140403ajlsa42_1	ischemia	3 Hr	3
+SA020294	25.D.2	140404ajlsa13_1	ischemia	3 Hr	2
+SA020289	34.D.2 *_11	140512actsa02_1	ischemia	3 Hr	2
+SA020287	34.D.3 *_12	140512actsa09_1	ischemia	3 Hr	3
+SA020288	34.D.1 *_10	140512actsa20_1	ischemia	3 Hr	1
