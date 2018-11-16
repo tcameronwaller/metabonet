@@ -77,14 +77,22 @@ import textwrap
 
 # Custom.
 import metabonet.metabocurator as metabocurator
-import metabonet.candidacy as candidacy
-import metabonet.network as network
-import metabonet.conversion as conversion
-import metabonet.measurement as measurement
-import metabonet.analysis as analysis
-import metabonet.plot as plot
-import metabonet.utility as utility
-import metabonet.clean as clean
+import metabocurator.clean
+import metabocurator.collection
+import metabocurator.conversion
+import metabocurator.curation
+import metabocurator.enhancement
+import metabocurator.extraction
+import metabocurator.measurement
+import metabocurator.reconciliation
+import metabonet.analysis
+import metabonet.candidacy
+import metabonet.clean
+import metabonet.conversion
+import metabonet.measurement
+import metabonet.network
+import metabonet.plot
+import metabonet.utility
 
 #dir()
 #importlib.reload()
@@ -653,7 +661,7 @@ def evaluate_network_parameters(arguments):
         # Report status.
         print("... executing candidacy procedure ...")
         # Execute procedure.
-        candidacy.execute_procedure(
+        metabonet.candidacy.execute_procedure(
             compartmentalization=arguments.compartmentalization,
             simplification=arguments.simplification,
             directory=arguments.directory
@@ -662,7 +670,7 @@ def evaluate_network_parameters(arguments):
         # Report status.
         print("... executing network procedure ...")
         # Execute procedure.
-        network.execute_procedure(
+        metabonet.network.execute_procedure(
             component=arguments.component,
             directory=arguments.directory
         )
@@ -670,22 +678,22 @@ def evaluate_network_parameters(arguments):
         # Report status.
         print("... executing conversion procedure ...")
         # Execute procedure.
-        conversion.execute_procedure(directory=arguments.directory)
+        metabonet.conversion.execute_procedure(directory=arguments.directory)
     if arguments.measurement:
         # Report status.
         print("... executing measurement procedure ...")
         # Execute procedure.
-        measurement.execute_procedure(directory=arguments.directory)
+        metabonet.measurement.execute_procedure(directory=arguments.directory)
     if arguments.analysis:
         # Report status.
         print("... executing analysis procedure ...")
         # Execute procedure.
-        analysis.execute_procedure(directory=arguments.directory)
+        metabonet.analysis.execute_procedure(directory=arguments.directory)
     if arguments.plot:
         # Report status.
         print("... executing plot procedure ...")
         # Execute procedure.
-        plot.execute_procedure(directory=arguments.directory)
+        metabonet.plot.execute_procedure(directory=arguments.directory)
 
 
 def evaluate_clean_parameters(arguments):
@@ -708,7 +716,7 @@ def evaluate_clean_parameters(arguments):
     metabocurator.clean.execute_procedure(
         directory=arguments.directory
     )
-    clean.execute_procedure(directory=arguments.directory)
+    metabonet.clean.execute_procedure(directory=arguments.directory)
 
 
 

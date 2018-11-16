@@ -30,10 +30,10 @@ $ pip3 install -e setup.py
 Confirm installation.
 
 ```bash
-$ metabonet -help
-$ metabonet model -help
-$ metabonet network -help
-$ metabonet clean -help
+$ metabonet --help
+$ metabonet model --help
+$ metabonet network --help
+$ metabonet clean --help
 ```
 
 ## Set Up Dock Directory
