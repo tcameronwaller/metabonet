@@ -89,7 +89,6 @@ import xml.etree.ElementTree as et
 # Packages and modules from local source
 
 import metabonet.utility as utility
-import metabonet.metabocurator.enhancement as metabocurator.enhancement
 
 ###############################################################################
 # Functionality

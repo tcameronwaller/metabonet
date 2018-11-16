@@ -84,7 +84,7 @@ import pickle
 
 # Custom
 import metabonet.utility as utility
-import metabonet.metabocurator.conversion as metabocurator.conversion
+import metabonet.metabocurator.conversion
 
 #dir()
 #importlib.reload()
@@ -750,10 +750,12 @@ def execute_procedure(directory=None):
         directory=directory
     )
     # Prepare reports of information for review.
-    metabolites_report = metabocurator.conversion.convert_metabolites_text(
+    convert_one = metabonet.metabocurator.conversion.convert_metabolites_text
+    metabolites_report = convert_one(
         metabolites=metabolites_reactions["metabolites"]
     )
-    reactions_report = metabocurator.conversion.convert_reactions_text(
+    convert_two = metabonet.metabocurator.conversion.convert_reactions_text
+    reactions_report = convert_two(
         reactions=reactions
     )
     # Compile information.

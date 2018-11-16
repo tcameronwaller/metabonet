@@ -87,7 +87,7 @@ import copy
 
 # Packages and modules from local source
 import metabonet.utility as utility
-import metabonet.metabocurator.collection as metabocurator.collection
+import metabonet.metabocurator.collection as metabocurator_collection
 
 ###############################################################################
 # Functionality
@@ -153,7 +153,7 @@ def count_model_sets_entities(content=None):
     """
 
     # Copy and interpret content.
-    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+    reference = metabocurator_collection.copy_interpret_content_recon2m2(
         content=content
     )
     # Count compartments.
@@ -201,7 +201,7 @@ def change_model_boundary(content=None):
     """
 
     # Copy and interpret content.
-    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+    reference = metabocurator_collection.copy_interpret_content_recon2m2(
         content=content
     )
     # Correct designation of model's boundary in metabolites.
@@ -255,7 +255,7 @@ def change_model_compartments(curation_compartments=None, content=None):
     """
 
     # Copy and interpret content.
-    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+    reference = metabocurator_collection.copy_interpret_content_recon2m2(
         content=content
     )
     # Change content for each combination of original and novel information.
@@ -326,7 +326,7 @@ def remove_model_metabolite_prefix(content=None):
     """
 
     # Copy and interpret content.
-    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+    reference = metabocurator_collection.copy_interpret_content_recon2m2(
         content=content
     )
     # Remove prefixes from identifiers for metabolites.
@@ -387,7 +387,7 @@ def change_model_metabolites(curation_metabolites=None, content=None):
     """
 
     # Copy and interpret content.
-    reference = metabocurator.collection.copy_interpret_content_recon2m2(
+    reference = metabocurator_collection.copy_interpret_content_recon2m2(
         content=content
     )
     # Change content for each combination of original and novel identifiers.

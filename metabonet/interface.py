@@ -76,14 +76,14 @@ import textwrap
 # Relevant.
 
 # Custom.
-import metabonet.metabocurator.clean as metabocurator.clean
-import metabonet.metabocurator.collection as metabocurator.collection
-import metabonet.metabocurator.conversion as metabocurator.conversion
-import metabonet.metabocurator.curation as metabocurator.curation
-import metabonet.metabocurator.enhancement as metabocurator.enhancement
-import metabonet.metabocurator.extraction as metabocurator.extraction
-import metabonet.metabocurator.measurement as metabocurator.measurement
-import metabonet.metabocurator.reconciliation as metabocurator.reconciliation
+import metabonet.metabocurator.clean
+import metabonet.metabocurator.collection
+import metabonet.metabocurator.conversion
+import metabonet.metabocurator.curation
+import metabonet.metabocurator.enhancement
+import metabonet.metabocurator.extraction
+import metabonet.metabocurator.measurement
+import metabonet.metabocurator.reconciliation
 import metabonet.analysis
 import metabonet.candidacy
 import metabonet.clean
@@ -593,49 +593,49 @@ def evaluate_model_parameters(arguments):
         # Report status.
         print("... executing reconciliation procedure ...")
         # Execute procedure.
-        metabocurator.reconciliation.execute_procedure(
+        metabonet.metabocurator.reconciliation.execute_procedure(
             directory=arguments.directory
         )
     if arguments.collection:
         # Report status.
         print("... executing collection procedure ...")
         # Execute procedure.
-        metabocurator.collection.execute_procedure(
+        metabonet.metabocurator.collection.execute_procedure(
             directory=arguments.directory
         )
     if arguments.extraction:
         # Report status.
         print("... executing extraction procedure ...")
         # Execute procedure.
-        metabocurator.extraction.execute_procedure(
+        metabonet.metabocurator.extraction.execute_procedure(
             directory=arguments.directory
         )
     if arguments.enhancement:
         # Report status.
         print("... executing enhancement procedure ...")
         # Execute procedure.
-        metabocurator.enhancement.execute_procedure(
+        metabonet.metabocurator.enhancement.execute_procedure(
             directory=arguments.directory
         )
     if arguments.curation:
         # Report status.
         print("... executing curation procedure ...")
         # Execute procedure.
-        metabocurator.curation.execute_procedure(
+        metabonet.metabocurator.curation.execute_procedure(
             directory=arguments.directory
         )
     if arguments.conversion:
         # Report status.
         print("... executing conversion procedure ...")
         # Execute procedure.
-        metabocurator.conversion.execute_procedure(
+        metabonet.metabocurator.conversion.execute_procedure(
             directory=arguments.directory
         )
     if arguments.measurement:
         # Report status.
         print("... executing measurement procedure ...")
         # Execute procedure.
-        metabocurator.measurement.execute_procedure(
+        metabonet.metabocurator.measurement.execute_procedure(
             directory=arguments.directory
         )
 
@@ -712,7 +712,7 @@ def evaluate_clean_parameters(arguments):
     print("--------------------------------------------------")
     print("... call to clean routine ...")
     # Execute procedure.
-    metabocurator.clean.execute_procedure(
+    metabonet.metabocurator.clean.execute_procedure(
         directory=arguments.directory
     )
     metabonet.clean.execute_procedure(directory=arguments.directory)

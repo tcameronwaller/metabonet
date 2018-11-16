@@ -88,7 +88,7 @@ import pickle
 # Packages and modules from local source
 
 import metabonet.utility as utility
-import metabonet.metabocurator.conversion as metabocurator.conversion
+import metabonet.metabocurator.conversion
 
 ###############################################################################
 # Functionality
@@ -1001,10 +1001,12 @@ def execute_procedure(directory=None):
         reactions_original=reactions_process
     )
     # Prepare reports of information for review.
-    metabolites_report = metabocurator.conversion.convert_metabolites_text(
+    convert_one = metabonet.metabocurator.conversion.convert_metabolites_text
+    metabolites_report = convert_one(
         metabolites=metabolites
     )
-    reactions_report = metabocurator.conversion.convert_reactions_text(
+    convert_two = metabonet.metabocurator.conversion.convert_reactions_text
+    reactions_report = convert_two(
         reactions=reactions_replication
     )
     # Filter reactions.
