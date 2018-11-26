@@ -170,6 +170,8 @@ reactions.tsv -> /dock/reconciliation/recon2m2_metanetx_reactions.tsv
 Execute the "collection", "extraction", "enhancement", "curation", and
 "conversion" procedures of the "model" routine in MetaboNet.
 
+The "enhancement" procedure alone requires about 1 hour to complete.
+
 ```bash
 $ metabonet model -d /dock/ -ceauv
 ```
@@ -262,72 +264,22 @@ Run time of "analysis" procedure can be 0.5-2.0 hours depending on the network.
 
 ## Integrate Metabolomic Measurements in Metabolic Network
 
+Execute the "measurement" proceduree of the "network" routine in MetaboNet.
 
+```bash
+$ metabonet network -d /dock/ -m
+```
 
+The following file includes measurements from all studies ready for integration
+with the metabolic network in Cytoscape.
 
-
-
-
-
-All procedures require specification of a path to a root directory, and this
-directory will usually be the same for all procedures. Procedures read source
-information from directories and files within this root directory. Procedures
-also write product information to directories and files within this root
-directory.
-
-$ python3 interface.py {model,network,clean} -d root/directory
-
-
-
-
-
-
-## Curation of metabolic model and metabolomic measurements
-
-This procedure involves the "model" routine within MetaboNet.
-
-$ python3 interface.py model -help
-$ python3 interface.py model -d root/directory -rceauvm
-
-1. Reconcile raw metabolic model for integration to MetaNetX.
-
-$ python3 interface.py model -reconciliation
-
-2. Collect information about compartments, processes, reactions, and
-metabolites.
-
-$ python3 interface.py model -collection
-
-3. Extract reference information about metabolites from the Human Metabolome
-Database (HMDB).
-
-$ python3 interface.py model -extraction
-
-4. Enhance information about metabolites and reactions.
-
-$ python3 interface.py model -enhancement
-
-5. Curate information about individual compartments, processes, reactions, and
-metabolites.
-
-$ python3 interface.py model -curation
-
-6. Convert information for review and export.
-
-$ python3 interface.py model -conversion
-
-7. Curate metabolomic measurements from multiple studies.
-
-$ python3 interface.py model -measurement
-
-## Definition of custom metabolic networks and association of measurements
-
-$ python3 interface.py network -help
-
+```bash
+/root/measurement/metabolites.tsv
+```
 
 ## Removal of automatically-generate files and directories
 
-$ python3 interface.py clean -help
+$ metabonet clean -d /dock/
 
 [1]: [https://github.com/tcameronwaller/metabonet]
 [2]: [https://www.sylabs.io/docs/]

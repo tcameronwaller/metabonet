@@ -225,6 +225,10 @@ def read_source(directory=None):
 
     # Specify directories and files.
     path_conversion = os.path.join(directory, "conversion")
+    path_compartments = os.path.join(path_conversion, "compartments.pickle")
+    path_processes = os.path.join(path_conversion, "processes.pickle")
+    path_reactions = os.path.join(path_conversion, "reactions.pickle")
+    path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
     path_source = os.path.join(directory, "source")
     path_customization = os.path.join(path_source, "customization")
     path_networkx = os.path.join(
@@ -239,6 +243,14 @@ def read_source(directory=None):
     #    path_network, "nodes_metabolites.pickle"
     #)
     # Read information from file.
+    with open(path_compartments, "rb") as file_source:
+        compartments = pickle.load(file_source)
+    with open(path_processes, "rb") as file_source:
+        processes = pickle.load(file_source)
+    with open(path_reactions, "rb") as file_source:
+        reactions = pickle.load(file_source)
+    with open(path_metabolites, "rb") as file_source:
+        metabolites = pickle.load(file_source)
     with open(path_networkx, "rb") as file_source:
         information = pickle.load(file_source)
     simplification_metabolites = utility.read_file_table(
@@ -248,6 +260,10 @@ def read_source(directory=None):
     )
     # Compile and return information.
     return {
+        "compartments": compartments,
+        "processes": processes,
+        "reactions": reactions,
+        "metabolites": metabolites,
         "nodes": information["nodes"],
         "links": information["links"],
         "nodes_reactions_identifiers": (
@@ -1688,6 +1704,59 @@ def generate_random_bipartite_network_elements(
     }
 
 
+def query_metabolite_node(
+    node=None,
+    network=None,
+    compartments=None,
+    processes=None,
+    reactions=None
+):
+    """
+    Query metabolite node.
+
+    arguments:
+        node (str): identifier of a metabolite's node
+        network (object): instance of network in NetworkX
+        compartments (dict<dict>): information about compartments
+        processes (dict<dict>): information about processes
+        reactions (dict<dict>): information about reactions
+
+    raises:
+
+    returns:
+
+
+    """
+
+    print("executing query...")
+    # Determine count of reactions.
+    reactions_neighbors = network.neighbors(node)
+    print("count of reactions: " + str(len(reactions_neighbors)))
+    # Determine counts of compartments and processes.
+    compartments_neighbors = []
+    processes_neighbors = []
+    for reaction_neighbor in reactions_neighbors:
+        reaction = reactions[reaction_neighbor]
+        reaction_compartments = utility.collect_value_from_records(
+            key="compartment", records=reaction["participants"]
+        )
+        reaction_compartments_unique = utility.collect_unique_elements(
+            elements_original=reaction_compartments
+        )
+        reaction_processes = reaction["processes"]
+        compartments_neighbors.extend(reaction_compartments_unique)
+        processes_neighbors.extend(reaction_processes)
+    compartments_unique = utility.collect_unique_elements(
+        elements_original=compartments_neighbors
+    )
+    processes_unique = utility.collect_unique_elements(
+        elements_original=processes_neighbors
+    )
+    print("count of compartments: " + str(len(compartments_unique)))
+    print("count of processes: " + str(len(processes_unique)))
+    pass
+
+
 # Generate report.
 
 
@@ -1816,6 +1885,7 @@ def execute_procedure(directory=None):
     returns:
 
     """
+    print("executing the new analysis procedure!!!")
 
     # Read source information from file.
     source = read_source(directory=directory)
@@ -1824,47 +1894,57 @@ def execute_procedure(directory=None):
         nodes=source["nodes"],
         links=source["links"]
     )
-    # Network is bipartite.
-    # Store references to separate groups of nodes for reactions and
-    # metabolites.
-    # Analyze entire network.
-    report_network = analyze_bipartite_network(
+    # Query individual metabolite.
+    print("ready to call query")
+    query_metabolite_node(
+        node="MNXM89557",
         network=network,
-        nodes_reactions=source["nodes_reactions_identifiers"],
-        nodes_metabolites=source["nodes_metabolites_identifiers"]
+        compartments=source["compartments"],
+        processes=source["processes"],
+        reactions=source["reactions"]
     )
     if False:
-        entry = {
-            "blah": 1,
-            "foo": 2,
-            "bar": 3
+        # Network is bipartite.
+        # Store references to separate groups of nodes for reactions and
+        # metabolites.
+        # Analyze entire network.
+        report_network = analyze_bipartite_network(
+            network=network,
+            nodes_reactions=source["nodes_reactions_identifiers"],
+            nodes_metabolites=source["nodes_metabolites_identifiers"]
+        )
+        if False:
+            entry = {
+                "blah": 1,
+                "foo": 2,
+                "bar": 3
+            }
+            report_network = {
+                "metabolites": entry,
+                "reactions": entry
+            }
+        # Analyze network's individual nodes.
+        report_nodes = analyze_bipartite_network_nodes(
+            network=network,
+            nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
+            nodes_reactions=source["nodes_reactions"],
+            nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
+            nodes_metabolites=source["nodes_metabolites"]
+        )
+        # Prepare reports.
+        # Report node degrees in metabolite simplifications.
+        simplification_metabolites = report_metabolite_degrees(
+            metabolites_query=source["simplification_metabolites"],
+            metabolites_nodes=report_nodes["metabolites"]
+        )
+        # Compile information.
+        information = {
+            "network_reactions": [report_network["reactions"]],
+            "network_metabolites": [report_network["metabolites"]],
+            "nodes_metabolites": report_nodes["metabolites"],
+            "nodes_reactions_text": list(report_nodes["reactions"].values()),
+            "nodes_metabolites_text": list(report_nodes["metabolites"].values()),
+            "simplification_metabolites": simplification_metabolites
         }
-        report_network = {
-            "metabolites": entry,
-            "reactions": entry
-        }
-    # Analyze network's individual nodes.
-    report_nodes = analyze_bipartite_network_nodes(
-        network=network,
-        nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
-        nodes_reactions=source["nodes_reactions"],
-        nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
-        nodes_metabolites=source["nodes_metabolites"]
-    )
-    # Prepare reports.
-    # Report node degrees in metabolite simplifications.
-    simplification_metabolites = report_metabolite_degrees(
-        metabolites_query=source["simplification_metabolites"],
-        metabolites_nodes=report_nodes["metabolites"]
-    )
-    # Compile information.
-    information = {
-        "network_reactions": [report_network["reactions"]],
-        "network_metabolites": [report_network["metabolites"]],
-        "nodes_metabolites": report_nodes["metabolites"],
-        "nodes_reactions_text": list(report_nodes["reactions"].values()),
-        "nodes_metabolites_text": list(report_nodes["metabolites"].values()),
-        "simplification_metabolites": simplification_metabolites
-    }
-    #Write product information to file.
-    write_product(directory=directory, information=information)
+        #Write product information to file.
+        write_product(directory=directory, information=information)
