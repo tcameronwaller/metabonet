@@ -1729,8 +1729,10 @@ def query_metabolite_node(
     """
 
     print("executing query...")
+    # Convert to undirected.
+    network_undirected = network.to_undirected()
     # Determine count of reactions.
-    reactions_neighbors = network.neighbors(node)
+    reactions_neighbors = list(network_undirected.neighbors(node))
     print("count of reactions: " + str(len(reactions_neighbors)))
     # Determine counts of compartments and processes.
     compartments_neighbors = []
