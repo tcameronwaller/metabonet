@@ -1,23 +1,24 @@
-# [MetaboNet][1]
+# [MetaboNet](1)
 
 This project supports curation of the human metabolic models, definition of
 custom metabolic networks, and analyses of these networks.
 
-## Launch MetaboNet's [Singularity][2] Container
+## Launch MetaboNet's [Singularity](2) Container
 
-... Coming soon!
+```bash
+docker pull jordanberg/metabonet:publication
+docker run metabonet
+```
 
 ## Install MetaboNet
 
-Download [MetaboNet][1] from [GitHub][3].
+Download [MetaboNet](1) from [GitHub](3).
 
 ```bash
 $ cd ~/Downloads/
 $ wget https://github.com/tcameronwaller/metabonet/archive/master.zip
 $ unzip master.zip
 $ cd metabonet-master/
-$ ls
-dock LICENSE metabonet README.md setup.py
 ```
 
 Install MetaboNet to default directory for third-party Python packages.
@@ -28,7 +29,7 @@ or
 $ pip3 install -e setup.py
 ```
 
-Confirm installation.
+Confirm installation. If no errors are output, installation was successful.
 
 ```bash
 $ metabonet --help
@@ -50,38 +51,43 @@ MetaboNet repository.
 
 ### Metabolic Information
 
-Metabonet derives information from both a model of human metabolism and from a
+MetaboNet derives information from both a model of human metabolism and from a
 database of information about metabolites. As the necessary files are large,
 these instructions specify how to access them from original repositories.
 
 Download model of human metabolism.
 
 MetaboNet derives information about human metabolism from model
-[Recon 2M.2][4]. Access [Recon 2M.2][4] by downloading file
-"Recon2M.2_MNX_Entrez_Gene.xml" (14.2 MB) from record [583326][5] on the
-[Zenodo][6] repository. Change the name of this file to "recon2m2.xml" and
+[Recon 2M.2](4). Access [Recon 2M.2](4) by downloading file
+"Recon2M.2_MNX_Entrez_Gene.xml" (14.2 MB) from record [583326](5) on the
+[Zenodo](6) repository. Change the name of this file to "recon2m2.xml" and
 place it in the following location.
 
 ```bash
-/dock/source/recon2m2.xml
+$ wget https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml?download=1
+$ mv Recon2M.2_MNX_Entrez_Gene.xml?download=1 recon2m2.xml
+$ mv recon2m2.xml dock/source/
 ```
 
 Download database about human metabolites.
 
 MetaboNet enhances information about human metabolites from the
-[Human Metabolome Database][7] [(HMDB)][8]. Access the [(HMDB)][8] by
-[downloading][9] version "4.0" of file "hmdb_metabolites.xml" (4.2 GB).
+[Human Metabolome Database](7) [HMDB](8). Access the [HMDB](8) by
+[downloading](9) version "4.0" of file "hmdb_metabolites.xml" (4.2 GB).
 Decompress this file and place it in the following location.
 
 ```bash
-/dock/source/hmdb_metabolites.xml
+$ wget http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip
+$ unzip hmdb_metabolites.zip
+$ mv hmdb_metabolites.xml dock/source/
+$ rm hmdb_metabolites.zip
 ```
 
 ### Customization Parameters
 
 MetaboNet is versatile in its support for customization at many levels. Files
 of default customization parameters are available within the "customization"
-directory in the [MetaboNet][1] repository on [GitHub][3].
+directory in the [MetaboNet](1) repository on [GitHub](3).
 
 Copy customization files to "dock" directory.
 
@@ -92,7 +98,7 @@ $ cp ~/Downloads/metabonet-master/customization/ /dock/source/
 ### Metabolomic Measurements
 
 MetaboNet curates and analyzes metabolomic measurements. The original data sets
-come from [Metabolomics Workbench][10], a [repository][11] for data from metabolomic
+come from [Metabolomics Workbench](10), a [repository](11) for data from metabolomic
 studies. The user has 2 options to prepare these data sets for use in MetaboNet.
 
 #### 1. Access and prepare metabolomic measurements
@@ -142,10 +148,10 @@ Execute the "reconciliation" procedure of the "model" routine in MetaboNet.
 $ metabonet model -d /dock/ -r
 ```
 
-[MetaNetX][12] is a [repository][13] of metabolic models with tools to curate
+[MetaNetX](12) is a [repository](13) of metabolic models with tools to curate
 these models.
 
-1. Import the following file to [MetaNetX][13].
+1. Import the following file to [MetaNetX](13).
 ```bash
 /dock/reconciliation/recon2m2_reconciliation.xml
 ```
