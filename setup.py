@@ -109,6 +109,12 @@ def execute_procedure():
             "metabonet", "metabonet.metabocurator"
         ],#setuptools.find_packages(),
         #package_dir={"":"metabonet"},
+        install_requires=[
+              'pandas',
+              'numpy',
+              'networkx',
+              'wordcloud',
+          ],
         license="https://www.gnu.org/licenses/gpl.html",
         entry_points={
             "console_scripts": [
@@ -116,7 +122,6 @@ def execute_procedure():
             ]
         }
     )
-
 
 
 if (__name__ == "__main__"):
