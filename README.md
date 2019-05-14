@@ -285,7 +285,13 @@ with the metabolic network in Cytoscape.
 
 ## Removal of automatically-generate files and directories
 
+```bash
 $ metabonet clean -d /dock/
+```
+
+
+
+
 
 [1]: [https://github.com/tcameronwaller/metabonet]
 [2]: [https://www.sylabs.io/docs/]
