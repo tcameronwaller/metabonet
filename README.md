@@ -6,13 +6,13 @@ This project supports curation of the human metabolic models, definition of cust
 
 Coming soon...
 ```bash
-docker pull jordanberg/metabonet:publication
-docker run metabonet
+$ docker pull jordanberg/metabonet:publication
+$ docker run metabonet <insert commands here>
 ```
 
 ## Install MetaboNet
 
-Download [MetaboNet](1) from [GitHub](3).
+Download [MetaboNet][1] from [GitHub][3].
 
 ```bash
 $ cd ~/Downloads/
