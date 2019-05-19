@@ -1,0 +1,6 @@
+dock/collection/
+dock/extraction/
+dock/enhancement/
+
+dock/source/hmdb_metabolites.xml
+dock/source/recon2m2.xml
