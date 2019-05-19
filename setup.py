@@ -70,6 +70,7 @@ License:
 # Installation and importation
 
 # Standard.
+import os
 import sys
 import subprocess
 import setuptools
@@ -123,21 +124,41 @@ def test_helps():
         sys.exit(1)
     else:
         subprocess.call(
-            'Tests passed without error, installation successful',
+            'echo "Tests passed without error, installation successful"',
             shell = True
             )
+
+# Install Recon and HMDB databases to dock/source/ location in metabonet
+def install_databases():
+
+    __path__  =  os.path.dirname(os.path.realpath(__file__))
+    __path__ = __path__ + '/dock/source/'
+
+    subprocess.call(
+        ('echo "Installing databases..."; '
+        + 'curl https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml?download=1 -o ' + str(__path__) + 'recon2m2.xml; '
+        + 'echo "Recon2M.2_MNX_Entrex_Gene Human Metabolism database installed"; '
+        + 'curl http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip -o ' + str(__path__) + 'hmdb_metabolites.zip; '
+        + 'unzip ' + str(__path__) + 'hmdb_metabolites.zip -d ' + str(__path__) + '; '
+        + 'rm ' + str(__path__) + 'hmdb_metabolites.zip; '
+        + 'echo "HMDB metabolite database v4.0 installed"; '
+        + 'echo "Database installs complete"'),
+        shell = True
+        )
 
 class PostDevelopCommand(develop):
     # Post-installation for python setup.py develop
     def run(self):
         develop.run(self)
         test_helps()
+        install_databases()
 
 class PostInstallCommand(install):
     # Post-installation for python setup.py install
     def run(self):
         install.run(self)
         test_helps()
+        install_databases()
 
 #dir()
 #importlib.reload()
