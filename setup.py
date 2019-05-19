@@ -70,11 +70,74 @@ License:
 # Installation and importation
 
 # Standard.
+import sys
+import subprocess
 import setuptools
+from setuptools.command.develop import develop
+from setuptools.command.install import install
 
 # Relevant.
 
 # Custom.
+def test_helps():
+
+    return_list = []
+
+    # Check help menus
+    return_list.append(
+        subprocess.call(
+            'metabonet --help > /dev/null',
+            shell = True
+            )
+        )
+    return_list.append(
+        subprocess.call(
+            'metabonet model --help > /dev/null',
+            shell = True
+            )
+        )
+    return_list.append(
+        subprocess.call(
+            'metabonet network --help > /dev/null',
+            shell = True
+            )
+        )
+    return_list.append(
+        subprocess.call(
+            'metabonet clean --help > /dev/null',
+            shell = True
+            )
+        )
+
+    # Ensure all outputs were successful
+    result = all(x == 0 for x in return_list)
+    if result == False:
+        subprocess.call(
+            'pip uninstall metabonet -y',
+            shell = True
+            )
+        subprocess.call(
+            'echo "Error: Something went wrong during installation. Please fix the errors and try reinstalling"',
+            shell = True
+            )
+        sys.exit(1)
+    else:
+        subprocess.call(
+            'Tests passed without error, installation successful',
+            shell = True
+            )
+
+class PostDevelopCommand(develop):
+    # Post-installation for python setup.py develop
+    def run(self):
+        develop.run(self)
+        test_helps()
+
+class PostInstallCommand(install):
+    # Post-installation for python setup.py install
+    def run(self):
+        install.run(self)
+        test_helps()
 
 #dir()
 #importlib.reload()
@@ -113,9 +176,13 @@ def execute_procedure():
               'pandas',
               'numpy',
               'networkx',
-              'wordcloud',
-          ],
+              'wordcloud'
+              ],
         license="https://www.gnu.org/licenses/gpl.html",
+        cmdclass={
+            'develop': PostDevelopCommand,
+            'install': PostInstallCommand
+            },
         entry_points={
             "console_scripts": [
                 "metabonet = metabonet.interface:execute_procedure"
