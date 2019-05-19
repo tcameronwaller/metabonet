@@ -72,8 +72,9 @@ License:
 # Packages and modules from the python standard library
 
 import os
-#import sys
+import sys
 import shutil
+import time
 #import importlib
 import csv
 import copy
@@ -81,7 +82,7 @@ import pickle
 
 # Packages and modules from third parties
 
-#import numpy
+import numpy
 #import pandas
 #import scipy
 
@@ -90,9 +91,43 @@ import pickle
 import metabonet.utility as utility
 import metabonet.metabocurator.conversion
 
+### Start of externally licensed code #########################################
+
+# From https://gist.github.com/vladignatyev/06860ec2040cb497f0f3
+# The MIT License (MIT)
+# Copyright (c) 2016 Vladimir Ignatev
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the Software
+# is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+# PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+# FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
+# OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+def progress_bar(counter, total, status=''):
+
+    bar_len = 60
+    filled_len = int(round(bar_len * counter / float(total)))
+
+    percents = round(100.0 * counter / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush()  # As suggested by Rom Ruben (see: http://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console/27871113#comment50529068_27871113)
+
+### End of externally licensed code ###########################################
+
 ###############################################################################
 # Functionality
-
 
 def read_source(directory=None):
     """
@@ -155,6 +190,10 @@ def enhance_metabolites(
     """
 
     metabolites_novel = {}
+
+    counter = 0
+    total = metabolites_original.values().size
+
     # Iterate on records for metabolites.
     for metabolite in metabolites_original.values():
         # Enhance information about metabolite.
@@ -164,6 +203,10 @@ def enhance_metabolites(
         )
         # Compile information
         metabolites_novel[metabolite_novel["identifier"]] = metabolite_novel
+
+        progress_bar(counter, total, status='Enhance metabolites')
+        counter += 1
+
     return metabolites_novel
 
 
@@ -312,11 +355,19 @@ def include_reactions_behaviors(reactions_original=None):
     """
 
     reactions_novel = {}
+
+    counter = 0
+    total = reactions_original.values().size
+
     for reaction_original in reactions_original.values():
         reaction_novel = include_reaction_behavior(
             reaction_original=reaction_original
         )
         reactions_novel[reaction_novel["identifier"]] = reaction_novel
+
+        progress_bar(counter, total, status='Include reaction behavior')
+        counter += 1
+
     return reactions_novel
 
 
@@ -501,13 +552,22 @@ def include_reactions_transport_processes(reactions_original=None):
     processes_transports = filter_processes_transports(
         processes_dispersal=processes_dispersal
     )
+
     reactions_novel = {}
+
+    counter = 1
+    total = reactions_original.values().size
+
     for reaction_original in reactions_original.values():
         reaction_novel = include_reaction_transport_processes(
             reaction_original=reaction_original,
             processes_transports=processes_transports
         )
         reactions_novel[reaction_novel["identifier"]] = reaction_novel
+
+        progress_bar(counter, total, status='Including reactions and transport processes')
+        counter += 1
+
     return reactions_novel
 
 
@@ -674,13 +734,21 @@ def include_reactions_replications(reactions_original=None):
     reactions_replicates = collect_reactions_replicates(
         reactions=reactions_original
     )
+
     reactions_novel = {}
+    counter = 0
+    total = reactions_original.values().size
+
     for reaction_original in reactions_original.values():
         reaction_novel = include_reaction_replication(
             reaction_original=reaction_original,
             reactions_replicates=reactions_replicates
         )
         reactions_novel[reaction_novel["identifier"]] = reaction_novel
+
+        progress_bar(counter, total, status='Collect reactions replicates')
+        counter += 1
+
     return reactions_novel
 
 
@@ -843,10 +911,18 @@ def filter_reactions(reactions_original=None):
     """
 
     reactions_filter = []
+
+    counter = 0
+    total = reactions_original.values().size
+
     for reaction in reactions_original.values():
         match, record = filter_reaction(reaction=reaction)
         if match:
             reactions_filter.append(record)
+
+        progress_bar(counter, total, status='Filter reactions')
+        counter += 1
+
     return reactions_filter
 
 
@@ -984,32 +1060,39 @@ def execute_procedure(directory=None):
     # Read source information from file.
     source = read_source(directory=directory)
     # Enhance metabolites' references.
+    print('Step 1/8: Enhancing metabolites...')
     metabolites = enhance_metabolites(
         metabolites_original=source["metabolites"],
         summary_hmdb=source["summary_hmdb"]
     )
     # Include information about reactions' behavior.
+    print('Step 2/8: Including reactions\' behaviors...')
     reactions_behavior = include_reactions_behaviors(
         reactions_original=source["reactions"]
     )
     # Include transport reactions in processes.
+    print('Step 3/8: Including reactions transport processes...')
     reactions_process = include_reactions_transport_processes(
         reactions_original=reactions_behavior
     )
     # Include information about reactions' replicates.
+    print('Step 4/8: Including reactions replications...')
     reactions_replication = include_reactions_replications(
         reactions_original=reactions_process
     )
     # Prepare reports of information for review.
+    print('Step 5/8: Converting metabolites text...')
     convert_one = metabonet.metabocurator.conversion.convert_metabolites_text
     metabolites_report = convert_one(
         metabolites=metabolites
     )
+    print('Step 6/8: Converting reactions text...')
     convert_two = metabonet.metabocurator.conversion.convert_reactions_text
     reactions_report = convert_two(
         reactions=reactions_replication
     )
     # Filter reactions.
+    print('Step 7/8: Filtering reactions...')
     reactions_filter = filter_reactions(
         reactions_original=reactions_replication
     )
@@ -1024,6 +1107,7 @@ def execute_procedure(directory=None):
         "reactions_filter": reactions_filter
     }
     #Write product information to file.
+    print('Step 8/8: Writing outputs...')
     write_product(directory=directory, information=information)
     # Report.
     report = utility.prepare_curation_report(
