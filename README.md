@@ -1,8 +1,8 @@
-# [MetaboNet](1)
+# MetaboNet
 
 This project supports curation of the human metabolic models, definition of custom metabolic networks, and analyses of these networks.
 
-## Launch MetaboNet's [Singularity](2) Container
+## Launch MetaboNet's Singularity Container
 
 Coming soon...
 ```bash
@@ -378,7 +378,7 @@ $ metabonet clean -d dock/
 
 
 
-[1]: [https://github.com/tcameronwaller/metabonet]
+[1]: (https://github.com/tcameronwaller/metabonet)
 [2]: [https://www.sylabs.io/docs/]
 [3]: [https://github.com/]
 [4]: [https://www.ncbi.nlm.nih.gov/pubmed/29078384]
