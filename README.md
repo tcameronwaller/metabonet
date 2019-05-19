@@ -2,9 +2,17 @@
 
 This project supports curation of the human metabolic models, definition of custom metabolic networks, and analyses of these networks.
 
+## Associated manuscript:
+
+If you use MetaboNet, please cite the following [manuscript]():
+
+```
+Waller TC, Berg JA, Chapman BE, Rutter JP. (2019) Non-Compartmental Metabolic Networks without Hubs Contextualize Metabolomic Measurements. GigaScience XX(XX). doi: xx.xxxx/xxxx
+```
+
 ## Launch MetaboNet's Singularity Container
 
-Coming soon...
+COMING SOON...
 ```bash
 $ docker pull jordanberg/metabonet:publication
 $ docker run metabonet <insert commands here>
@@ -12,7 +20,7 @@ $ docker run metabonet <insert commands here>
 
 ## Install MetaboNet
 
-Download [MetaboNet][1] from [GitHub][3].
+Download [MetaboNet][1] from [GitHub][3]:
 
 ```bash
 $ cd ~/Downloads/
@@ -21,11 +29,13 @@ $ unzip master.zip
 $ cd metabonet-master/
 ```
 
-Install MetaboNet to default directory for third-party Python packages.
+Install MetaboNet to default directory for third-party Python packages:
 
 ```bash
 $ sudo python3 setup.py install
+```
 or
+```
 $ pip3 install -e setup.py
 ```
 
@@ -42,9 +52,9 @@ $ metabonet clean --help
 
 Procedures in MetaboNet utilize a central directory in which to organize both
 source and product files. These instructions refer to this directory by the
-name "dock". This directory can be anywhere the user wants.
+name `dock`. This directory can be anywhere the user wants.
 
-A template "dock" directory with default files is accessible within the
+A template `dock` directory with default files is accessible within the
 MetaboNet repository installation.
 
 ## Set Up Source Information Within Dock
@@ -60,8 +70,8 @@ these instructions specify how to access them from original repositories.
 ### Download Model of Human Metabolism
 
 MetaboNet derives information about human metabolism from model
-[Recon 2M.2](4). Access [Recon 2M.2](4) by downloading file
-`Recon2M.2_MNX_Entrez_Gene.xml` (14.2 MB) from [Zenodo](6) record [583326](5).
+[Recon 2M.2][4]. Access [Recon 2M.2][4] by downloading file
+`Recon2M.2_MNX_Entrez_Gene.xml` (14.2 MB) from [Zenodo][6] record [583326][5].
 Follow the directions below to change the name of this file to `recon2m2.xml`
 and place it in the following location.
 
@@ -74,7 +84,7 @@ $ mv Recon2M.2_MNX_Entrez_Gene.xml?download=1 dock/source/recon2m2.xml
 ### Download Human Metabolite Database
 
 MetaboNet enhances information about human metabolites from the
-[Human Metabolome Database](7) [HMDB](8). Access the [HMDB](8) by
+[Human Metabolome Database][7] [HMDB][8]. Access the [HMDB][8] by
 downloading version `4.0` of file `hmdb_metabolites.xml` (4.2 GB).
 Decompress this file and place it in the following location, as shown below.
 
@@ -90,7 +100,7 @@ $ rm hmdb_metabolites.zip
 
 MetaboNet is versatile in its support for customization at many levels. Files
 of default customization parameters are available within the "customization"
-directory in the [MetaboNet](1) repository. These are already provided, but can
+directory in the [MetaboNet][1] repository. These are already provided, but can
 removed by doing the following:
 
 ```bash
@@ -104,7 +114,7 @@ parameters with your favorite text editor.
 ## Metabolomic Measurements
 
 MetaboNet curates and analyzes metabolomic measurements. The original data sets
-come from [Metabolomics Workbench](10), a [repository](11) for data from metabolomic
+come from [Metabolomics Workbench][10], a [repository][11] for data from metabolomic
 studies. For the example case, the information is already provided; however, if one wishes
 to use a custom metabolomic dataset, the user should follow the steps below.
 
@@ -158,7 +168,7 @@ metabolites: 4000
 ```
 
 ### (Optional) Retrieve Metabolic Model Files from MetaNetX
-[MetaNetX](13) is a repository of metabolic models with tools to curate
+[MetaNetX][13] is a repository of metabolic models with tools to curate
 these models.
 
 1. Import the following file to [MetaNetX](https://www.metanetx.org/cgi-bin/mnxweb/import_mnet).
@@ -194,7 +204,7 @@ of information about metabolites.
 `conversion` procedures of the `model` routine in MetaboNet using the command provided below:
 
 ```bash
-$ metabonet model -d /dock/ -ceauv
+$ metabonet model -d dock/ -ceauv
 ```
 
 The `enhancement` procedure alone requires about 1 hour to complete. The process altogether may take a couple of hours to complete. Below are example system specs:
@@ -228,17 +238,19 @@ Below are execution specs for each sub-module of the above command:
 Collection:
 real	0m5.039s
 user	0m5.238s
-sys	0m0.249s
+sys	 0m0.249s
 ```
 ```
 Extraction:
 real	2m54.355s
 user	2m52.744s
-sys	0m1.683s
+sys	 0m1.683s
 ```
 ```
 Enhancement:
-
+real	84m2.673s
+user	83m37.094s
+sys	 0m13.875s
 ```
 ```
 Curation:
@@ -248,8 +260,6 @@ Curation:
 Conversion:
 
 ```
-
-
 
 2. (Optional) Edit file of special use for automatic curation of reactions:
 
@@ -284,7 +294,7 @@ metabolites. Discrepancies might justify modifications to curation of
 metabolites.
 
 ```bash
-root/measurement/study_one_report.tsv
+dock/source/measurement/study_one_report.tsv
 root/measurement/study_two_report.tsv
 root/measurement/study_three_report.tsv
 root/measurement/study_four_report.tsv
@@ -381,13 +391,13 @@ $ metabonet clean -d dock/
 [1]: https://github.com/tcameronwaller/metabonet
 [2]: https://www.sylabs.io/docs/
 [3]: https://github.com/
-[4]: [https://www.ncbi.nlm.nih.gov/pubmed/29078384]
-[5]: [https://zenodo.org/record/583326]
-[6]: [https://zenodo.org/]
-[7]: [https://www.ncbi.nlm.nih.gov/pubmed/29140435]
-[8]: [http://www.hmdb.ca/]
-[9]: [http://www.hmdb.ca/downloads]
-[10]: [https://www.ncbi.nlm.nih.gov/pubmed/26467476]
-[11]: [http://www.metabolomicsworkbench.org/]
-[12]: [https://www.ncbi.nlm.nih.gov/pubmed/26527720]
-[13]: [https://www.metanetx.org/]
+[4]: https://www.ncbi.nlm.nih.gov/pubmed/29078384
+[5]: https://zenodo.org/record/583326
+[6]: https://zenodo.org/
+[7]: https://www.ncbi.nlm.nih.gov/pubmed/29140435
+[8]: http://www.hmdb.ca/
+[9]: http://www.hmdb.ca/downloads
+[10]: https://www.ncbi.nlm.nih.gov/pubmed/26467476
+[11]: http://www.metabolomicsworkbench.org/
+[12]: https://www.ncbi.nlm.nih.gov/pubmed/26527720
+[13]: https://www.metanetx.org/
