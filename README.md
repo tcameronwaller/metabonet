@@ -378,9 +378,9 @@ $ metabonet clean -d dock/
 
 
 
-[1]: (https://github.com/tcameronwaller/metabonet)
-[2]: [https://www.sylabs.io/docs/]
-[3]: [https://github.com/]
+[1]: https://github.com/tcameronwaller/metabonet
+[2]: https://www.sylabs.io/docs/
+[3]: https://github.com/
 [4]: [https://www.ncbi.nlm.nih.gov/pubmed/29078384]
 [5]: [https://zenodo.org/record/583326]
 [6]: [https://zenodo.org/]
