@@ -200,8 +200,8 @@ of information about metabolites.
 
 ### Curate the Metabolic Model
 
-1. Execute the `collection`, `extraction`, `enhancement`, `curation`, and
-`conversion` procedures of the `model` routine in MetaboNet using the command provided below:
+1. Execute the `collection (-c)`, `extraction (-e)`, `enhancement (-a)`, `curation (-u)`, and
+`conversion (-v)` procedures of the `model` routine in MetaboNet using the command provided below:
 
 ```bash
 $ metabonet model -d dock/ -ceauv
@@ -254,11 +254,15 @@ sys	 0m13.875s
 ```
 ```
 Curation:
-
+real	12m34.925s
+user	12m32.675s
+sys	 0m2.242s
 ```
 ```
 Conversion:
-
+real	0m1.923s
+user	0m1.855s
+sys	 0m0.314s
 ```
 
 2. (Optional) Edit file of special use for automatic curation of reactions:
@@ -286,7 +290,9 @@ $ metabonet model -d dock/ -m
 
 Below are execution specs for the above `measurement` command:
 ```
-
+real	2m7.496s
+user	2m6.403s
+sys	 0m0.723s
 ```
 
 2. Review the following files to check the matches between analytes and
@@ -295,10 +301,10 @@ metabolites.
 
 ```bash
 dock/source/measurement/study_one_report.tsv
-root/measurement/study_two_report.tsv
-root/measurement/study_three_report.tsv
-root/measurement/study_four_report.tsv
-root/measurement/study_five_report.tsv
+dock/source/measurement/study_two_report.tsv
+dock/source/measurement/study_three_report.tsv
+dock/source/measurement/study_four_report.tsv
+dock/source/measurement/study_five_report.tsv
 ```
 
 ## Define Custom Metabolic Networks
@@ -307,10 +313,10 @@ Customize definition of metabolic networks by editing the following files of
 parameters.
 
 ```bash
-/dock/source/customization/filtration_compartments.tsv
-/dock/source/customization/filtration_processes.tsv
-/dock/source/customization/simplification_reactions.tsv
-/dock/source/customization/simplification_metabolites.tsv
+dock/source/customization/filtration_compartments.tsv
+dock/source/customization/filtration_processes.tsv
+dock/source/customization/simplification_reactions.tsv
+dock/source/customization/simplification_metabolites.tsv
 ```
 
 Execute the `candidacy`, `network`, and `conversion` procedures of the
@@ -323,17 +329,17 @@ $ metabonet network -d dock/ -yc -np -v
 
 - Set `compartments == True` and `hubs == False`:
 ```bash
-$ metabonet network -d /dock/ -ycs -np -v
+$ metabonet network -d dock/ -ycs -np -v
 ```
 
 - Set `compartments == False` and `hubs == True`:
 ```bash
-$ metabonet network -d /dock/ -y -np -v
+$ metabonet network -d dock/ -y -np -v
 ```
 
 - Set `compartments == False` and `hubs == False`:
 ```bash
-$ metabonet network -d /dock/ -ys -np -v
+$ metabonet network -d dock/ -ys -np -v
 ```
 
 Below are execution specs for the `compartments == True` and `hubs == True` execution:
@@ -350,11 +356,6 @@ $ metabonet network -d dock/ -a
 ```
 
 Run time of `analysis` procedure can be 0.5-2.0 hours depending on the network.
-
-Below are execution specs for the `compartments == True` and `hubs == True` execution:
-```
-
-```
 
 ## Visualize Metabolic Networks
 
