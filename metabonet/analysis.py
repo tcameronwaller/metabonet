@@ -1897,9 +1897,11 @@ def execute_procedure(directory=None):
         links=source["links"]
     )
     # Query individual metabolite.
+    #MNXM89557
+    # MNXM6 NADPH
     print("ready to call query")
     query_metabolite_node(
-        node="MNXM89557",
+        node="MNXM5", # NADP
         network=network,
         compartments=source["compartments"],
         processes=source["processes"],
