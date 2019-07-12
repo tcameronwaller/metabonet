@@ -279,6 +279,103 @@ def convert_reactions_text(reactions=None):
     return records
 
 
+def convert_reactions_export_text(
+    reactions=None,
+    metabolites=None,
+    compartments=None,
+    processes=None,
+):
+    """
+    Converts information about reactions to text format.
+
+    Converts identifiers of metabolites, compartments, and processes to names.
+
+    arguments:
+        reactions (dict<dict>): information about reactions
+        metabolites (dict<dict>): information about metabolites
+        compartments (dict<dict>): information about compartments
+        processes (dict<dict>): information about processes
+
+
+    returns:
+        (list<dict>): information about reactions
+
+    raises:
+
+    """
+
+    records = []
+    for reaction in reactions.values():
+        # Participants.
+        # Write a function to compose identifier (name) human readable...
+        # Compartments
+        compartments_identifiers = utility.collect_value_from_records(
+            key="compartment", records=reaction["participants"]
+        )
+        compartments_identifiers_unique = utility.collect_unique_elements(
+            elements_original=compartments_identifiers
+        )
+        compartments_names = utility.collect_values_from_records_in_reference(
+            key="name",
+            identifiers=compartments_identifiers_unique,
+            reference=compartments,
+        )
+        # Processes
+        processes_names = utility.collect_values_from_records_in_reference(
+            key="name",
+            identifiers=reaction["processes"],
+            reference=processes,
+        )
+        # Metabolites
+        reactants_identifiers = utility.collect_reaction_participants_value(
+            key="metabolite",
+            criteria={"roles": ["reactant"]},
+            participants=reaction["participants"]
+        )
+        reactants_names = utility.collect_values_from_records_in_reference(
+            key="name",
+            identifiers=reactants_identifiers,
+            reference=metabolites,
+        )
+        products_identifiers = utility.collect_reaction_participants_value(
+            key="metabolite",
+            criteria={"roles": ["product"]},
+            participants=reaction["participants"]
+        )
+        products_names = utility.collect_values_from_records_in_reference(
+            key="name",
+            identifiers=products_identifiers,
+            reference=metabolites,
+        )
+        # Compile information.
+        record = {
+            "identifier": reaction["identifier"],
+            "name": reaction["name"],
+            "reactants": "; ".join(reactants_names),
+            "products": "; ".join(products_names),
+            "compartments": "; ".join(compartments_names),
+            "processes": ";".join(processes_names),
+
+            "reversibility": reaction["reversibility"],
+            "reference_metanetx": (
+                "; ".join(reaction["references"]["metanetx"])
+            ),
+            "reference_recon2m2": (
+                "; ".join(reaction["references"]["recon2m2"])
+            ),
+            "reference_gene": "; ".join(reaction["references"]["gene"]),
+            "reference_enzyme": "; ".join(reaction["references"]["enzyme"]),
+            "reference_kegg": "; ".join(reaction["references"]["kegg"]),
+            "reference_reactome": (
+                "; ".join(reaction["references"]["reactome"])
+            ),
+            "reference_metacyc": "; ".join(reaction["references"]["metacyc"]),
+            "reference_bigg": "; ".join(reaction["references"]["bigg"]),
+        }
+        records.append(record)
+    return records
+
+
 def convert_metabolites_text(metabolites=None):
     """
     Converts information about metabolites to text format.

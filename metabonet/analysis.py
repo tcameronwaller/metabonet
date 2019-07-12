@@ -94,6 +94,7 @@ import networkx as ntx
 import numpy
 
 # Custom
+import metabonet.metabocurator.conversion as conversion
 import metabonet.utility as utility
 
 #dir()
@@ -1709,7 +1710,8 @@ def query_metabolite_node(
     network=None,
     compartments=None,
     processes=None,
-    reactions=None
+    metabolites=None,
+    reactions=None,
 ):
     """
     Query metabolite node.
@@ -1719,6 +1721,7 @@ def query_metabolite_node(
         network (object): instance of network in NetworkX
         compartments (dict<dict>): information about compartments
         processes (dict<dict>): information about processes
+        metabolites (dict<dict>): information about metabolites
         reactions (dict<dict>): information about reactions
 
     raises:
@@ -1729,16 +1732,17 @@ def query_metabolite_node(
     """
 
     print("executing query...")
-    # Convert to undirected.
+    # Convert to undirected to detect both reactant and product reactions.
     network_undirected = network.to_undirected()
     # Determine count of reactions.
-    reactions_neighbors = list(network_undirected.neighbors(node))
-    print("count of reactions: " + str(len(reactions_neighbors)))
+    reactions_nodes_neighbors = list(network_undirected.neighbors(node))
+    print("count of reactions: " + str(len(reactions_nodes_neighbors)))
     # Determine counts of compartments and processes.
+    reactions_neighbors = dict()
     compartments_neighbors = []
     processes_neighbors = []
-    for reaction_neighbor in reactions_neighbors:
-        reaction = reactions[reaction_neighbor]
+    for reaction_node in reactions_nodes_neighbors:
+        reaction = reactions[reaction_node]
         reaction_compartments = utility.collect_value_from_records(
             key="compartment", records=reaction["participants"]
         )
@@ -1746,8 +1750,12 @@ def query_metabolite_node(
             elements_original=reaction_compartments
         )
         reaction_processes = reaction["processes"]
+        # Collect information about reaction.
+        reactions_neighbors[reaction_node] = reaction
         compartments_neighbors.extend(reaction_compartments_unique)
         processes_neighbors.extend(reaction_processes)
+        pass
+    print("count of reactions: " + str(len(reactions_neighbors)))
     compartments_unique = utility.collect_unique_elements(
         elements_original=compartments_neighbors
     )
@@ -1756,7 +1764,19 @@ def query_metabolite_node(
     )
     print("count of compartments: " + str(len(compartments_unique)))
     print("count of processes: " + str(len(processes_unique)))
-    pass
+    # Convert reactions to a text report.
+    reactions_neighbors_records = conversion.convert_reactions_export_text(
+        reactions=reactions_neighbors,
+        metabolites=metabolites,
+        compartments=compartments,
+        processes=processes,
+    )
+    # Compile information.
+    information = {
+        "reactions_neighbors": reactions_neighbors_records
+    }
+    # Return information.
+    return information
 
 
 # Generate report.
@@ -1801,6 +1821,35 @@ def report_metabolite_degrees(
         metabolites_report.append(record)
     # Return information.
     return metabolites_report
+
+
+def write_product_metabolite(directory=None, information=None):
+    """
+    Writes product information to file
+
+    arguments:
+        directory (str): directory for product files
+        information (object): information to write to file
+
+    raises:
+
+    returns:
+
+    """
+
+    # Specify directories and files.
+    path = os.path.join(directory, "analysis")
+    utility.confirm_path_directory(path)
+    path_metabolite_reactions_text = os.path.join(
+        path, "metabolite_reactions_neighbors.txt"
+    )
+    # Write information to file.
+    utility.write_file_table(
+        information=information["reactions_neighbors"],
+        path_file=path_metabolite_reactions_text,
+        names=information["reactions_neighbors"][0].keys(),
+        delimiter="\t"
+    )
 
 
 def write_product(directory=None, information=None):
@@ -1898,15 +1947,23 @@ def execute_procedure(directory=None):
     )
     # Query individual metabolite.
     #MNXM89557
-    # MNXM6 NADPH
+    # "MNXM5", NADP
+    # "MNXM6", NADPH
     print("ready to call query")
-    query_metabolite_node(
+    metabolite_report = query_metabolite_node(
         node="MNXM5", # NADP
         network=network,
         compartments=source["compartments"],
         processes=source["processes"],
-        reactions=source["reactions"]
+        metabolites=source["metabolites"],
+        reactions=source["reactions"],
     )
+    # Write metabolite report to file.
+    #Write product information to file.
+    write_product_metabolite(
+        directory=directory, information=metabolite_report
+    )
+
     if False:
         # Network is bipartite.
         # Store references to separate groups of nodes for reactions and
