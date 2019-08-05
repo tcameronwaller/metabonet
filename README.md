@@ -19,7 +19,7 @@ $ ls ./
 dock LICENSE metabonet README.md setup.py
 ```
 
-**_DO:_** Inspect the repositories contents.
+**_DO:_** Inspect the repository's contents.
 
 ```bash
 $ ls ~/Downloads/metabonet-master/
@@ -103,10 +103,10 @@ $ mv ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml ~/dock/source/recon2m2.xml
 $ ls ~/dock/source/
 ```
 
-Access the [(HMDB)][6] in version _"4.0"_ of file _"hmdb_metabolites.xml"_
+Access the [HMDB][6] in version _"4.0"_ of file _"hmdb_metabolites.xml"_
 (4.2 GB).
 
-**_DO:_** Download [(HMDB)][6] database about human metabolites. Extract this
+**_DO:_** Download the [HMDB][6] database about human metabolites. Extract this
 file and move it to the _"dock"_ directory.
 
 ```bash
@@ -119,45 +119,52 @@ $ ls ~/dock/source/
 
 ### Metabolomic Measurements
 
-MetaboNet curates and analyzes metabolomic measurements. The original data sets
-come from [Metabolomics Workbench][10], a [repository][11] for data from metabolomic
-studies. The user has 2 options to prepare these data sets for use in MetaboNet.
+[MetaboNet][1] integrates metabolomic measurements with metabolic networks. The
+authors curated metabolomic measurements from five specific studies and used
+these as examples. The original data sets for these metabolomic measurements
+came from [Metabolomics Workbench][8], a [repository][9] for data from
+metabolomic studies. These instructions explain the collection and curation of
+these data sets for use in [MetaboNet][1], and they also explain how to
+access ready archives.
 
-#### 1. Access and prepare metabolomic measurements
-
-1. Locate specific project and study on [Metabolomics Workbench][11].
-2. Copy information about samples.
--Click on study's tab "Show all samples".
--Copy information from sample table.
--Save file as "samples.tsv".
-3. Copy information about analytes.
--Click on study's tab "Show named metabolites".
--Save file as "analytes.tsv".
-4. Copy information about measurements.
--Click on study's tab "Download named metabolite data".
--Save file as "measurements.tsv".
-5. Copy information about signals.
--Click on study's tab "Download all metabolite data".
--Save file as "signals.tsv".
-6. Correct errors.
-Project PR000305, Study ST000390
-analytes.tsv
-"ascorbic acid", "Vitamin C", change PubChem identifier from 5785 to 54670067.
-Project PR000322, Study ST000412
-analytes.tsv
-"putrescine", "Putrescine", change PubChem identifier from 1049 to 1045.
-Remove record for "maltose", "Maltose", PubChem 439186.
-That record is redundant with the record for "cellobiose", PubChem 6255.
-
-#### 2. Copy measurement files to "dock" directory
+#### Option 1: Access measurement files in _"dock"_ directory
 
 ```bash
-$ cp ~/Downloads/metabonet-master/measurement/ /dock/source/
+$ ls ~/Downloads/dock/source/measurement/
 ```
 
+#### Option 2: Access and prepare metabolomic measurements
 
-
-
+1. Locate specific projects and studies on [Metabolomics Workbench][9].
+- Project: [PR000305][10], Study: ST000390
+- Project: [PR000058][11], Study: ST000061
+- Project: [PR000322][12], Study: ST000412
+- Project: [PR000322][12], Study: ST000412
+- Project: [PR000599][13], Study: ST000842
+2. Copy information about samples.
+- Click on study's tab "Show all samples".
+- Copy information from sample table.
+- Save file as "samples.tsv".
+3. Copy information about analytes.
+- Click on study's tab "Show named metabolites".
+- Save file as "analytes.tsv".
+4. Copy information about measurements.
+- Click on study's tab "Download named metabolite data".
+- Save file as "measurements.tsv".
+5. Copy information about signals.
+- Click on study's tab "Download all metabolite data".
+- Save file as "signals.tsv".
+6. Correct errors.
+- Project PR000305, Study ST000390
+-- _"analytes.tsv"_
+--- _"ascorbic acid"_, _"Vitamin C"_, change PubChem identifier from _"5785"_
+to _"54670067"_.
+- Project PR000322, Study ST000412
+-- _"analytes.tsv"_
+--- _"putrescine"_, _"Putrescine"_, change PubChem identifier from _"1049"_ to
+_"1045"_.
+Remove record for _"maltose"_, _"Maltose"_, PubChem _"439186"_.
+That record is redundant with the record for _"cellobiose"_, PubChem _"6255"_.
 
 
 
@@ -324,5 +331,11 @@ $ metabonet clean -d /dock/
 [7]: http://www.hmdb.ca/
 [8]: https://www.ncbi.nlm.nih.gov/pubmed/26467476
 [9]: http://www.metabolomicsworkbench.org/
+[10]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000305
+[11]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000058
+[12]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000322
+[13]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000599
+
+
 [10]: https://www.ncbi.nlm.nih.gov/pubmed/26527720
 [11]: https://www.metanetx.org/
