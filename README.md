@@ -1,34 +1,42 @@
 # [MetaboNet][1]
 
-This project supports curation of the human metabolic models, definition of
-custom metabolic networks, and analyses of these networks.
+This project supports curation of the model of human cellular metabolism,
+definition of custom metabolic networks to represent this model, and analyses
+of these networks.
 
-## Launch MetaboNet's [Singularity][2] Container
 
-... Coming soon!
 
 ## Install MetaboNet
 
-Download [MetaboNet][1] from [GitHub][3].
+**_DO:_** Download [MetaboNet][1] from [GitHub][2] and extract the archive.
 
 ```bash
 $ cd ~/Downloads/
 $ wget https://github.com/tcameronwaller/metabonet/archive/master.zip
 $ unzip master.zip
 $ cd metabonet-master/
-$ ls
+$ ls ./
 dock LICENSE metabonet README.md setup.py
 ```
 
-Install MetaboNet to default directory for third-party Python packages.
+**_DO:_** Inspect the repositories contents.
 
 ```bash
-$ sudo python3 setup.py install
-or
-$ pip3 install -e setup.py
+$ ls ~/Downloads/metabonet-master/
+dock LICENSE metabonet README.md setup.py
 ```
 
-Confirm installation.
+**_DO:_** Install MetaboNet to default directory for third-party Python
+packages.
+
+```bash
+$ cd metabonet-master/
+$ sudo python setup.py install
+or
+$ pip install -e setup.py
+```
+
+**_DO:_** Confirm installation.
 
 ```bash
 $ metabonet --help
@@ -37,56 +45,76 @@ $ metabonet network --help
 $ metabonet clean --help
 ```
 
+
+
 ## Set Up Dock Directory
 
-Procedures in MetaboNet utilize a central directory in which to organize both
-source and product files. These instructions refer to this directory by the
-name "dock". This directory can be anywhere the user wants.
+Procedures in [MetaboNet][1] organize both source (input) and product (output)
+files within a central directory. These instructions refer to this directory by
+the name _"dock"_. The user can place this directory wherever on their machine
+but must tell [MetaboNet][1] where to find it.
 
-A template "dock" directory with default files is accessible within the
-MetaboNet repository.
+A template _"dock"_ directory with default files is accessible within the
+[MetaboNet][1] repository.
 
-## Set Up Source Information Within Dock
+**_DO:_** Copy default _"dock"_ directory to accessible location.
+
+```bash
+$ cp ~/Downloads/metabonet-master/dock/ ~/dock/
+$ ls ~/dock/
+```
+
+### Customizable Parameters
+
+MetaboNet supports customization at the level of curation of the metabolic
+model and at the level of definition of metabolic networks.
+
+The [MetaboNet][1] repository on [GitHub][2] contains default parameters within
+the "customization" directory.
+
+**_DO:_** Inspect these files of customizable parameters.
+
+```bash
+$ ls ~/dock/source/customization/
+```
 
 ### Metabolic Information
 
-Metabonet derives information from both a model of human metabolism and from a
-database of information about metabolites. As the necessary files are large,
-these instructions specify how to access them from original repositories.
+[MetaboNet][1] derives information from the [Recon 2M.2][3] model of human
+metabolism and from the [Human Metabolome Database][6] [(HMDB)][7] of
+metabolites. As the necessary files are large, these instructions specify how
+to access them from the original repositories.
 
-Download model of human metabolism.
+Access [Recon 2M.2][3] in file _"Recon2M.2_MNX_Entrez_Gene.xml"_
+(14.2 MB) from record [583326][4] on the [Zenodo][5] repository.
 
-MetaboNet derives information about human metabolism from model
-[Recon 2M.2][4]. Access [Recon 2M.2][4] by downloading file
-"Recon2M.2_MNX_Entrez_Gene.xml" (14.2 MB) from record [583326][5] on the
-[Zenodo][6] repository. Change the name of this file to "recon2m2.xml" and
-place it in the following location.
+**_DO:_** Download [Recon 2M.2][3] model of human metabolism.
 
 ```bash
-/dock/source/recon2m2.xml
+$ cd ~/Downloads/
+$ wget https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml
 ```
 
-Download database about human metabolites.
-
-MetaboNet enhances information about human metabolites from the
-[Human Metabolome Database][7] [(HMDB)][8]. Access the [(HMDB)][8] by
-[downloading][9] version "4.0" of file "hmdb_metabolites.xml" (4.2 GB).
-Decompress this file and place it in the following location.
+**_DO:_** Change the name of this file to _"recon2m2.xml"_ and move it to the
+_"dock"_ directory.
 
 ```bash
-/dock/source/hmdb_metabolites.xml
+$ mv ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml ~/dock/source/recon2m2.xml
+$ ls ~/dock/source/
 ```
 
-### Customization Parameters
+Access the [(HMDB)][6] in version _"4.0"_ of file _"hmdb_metabolites.xml"_
+(4.2 GB).
 
-MetaboNet is versatile in its support for customization at many levels. Files
-of default customization parameters are available within the "customization"
-directory in the [MetaboNet][1] repository on [GitHub][3].
-
-Copy customization files to "dock" directory.
+**_DO:_** Download [(HMDB)][6] database about human metabolites. Extract this
+file and move it to the _"dock"_ directory.
 
 ```bash
-$ cp ~/Downloads/metabonet-master/customization/ /dock/source/
+$ cd ~/Downloads/
+$ wget http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip
+$ unzip hmdb_metabolites.zip
+$ mv ~/Downloads/hmdb_metabolites.xml ~/dock/source/hmdb_metabolites.xml
+$ ls ~/dock/source/
 ```
 
 ### Metabolomic Measurements
@@ -126,6 +154,12 @@ That record is redundant with the record for "cellobiose", PubChem 6255.
 ```bash
 $ cp ~/Downloads/metabonet-master/measurement/ /dock/source/
 ```
+
+
+
+
+
+
 
 ## Curate Metabolic Model and Metabolomic Measurements
 
@@ -281,16 +315,14 @@ with the metabolic network in Cytoscape.
 
 $ metabonet clean -d /dock/
 
-[1]: [https://github.com/tcameronwaller/metabonet]
-[2]: [https://www.sylabs.io/docs/]
-[3]: [https://github.com/]
-[4]: [https://www.ncbi.nlm.nih.gov/pubmed/29078384]
-[5]: [https://zenodo.org/record/583326]
-[6]: [https://zenodo.org/]
-[7]: [https://www.ncbi.nlm.nih.gov/pubmed/29140435]
-[8]: [http://www.hmdb.ca/]
-[9]: [http://www.hmdb.ca/downloads]
-[10]: [https://www.ncbi.nlm.nih.gov/pubmed/26467476]
-[11]: [http://www.metabolomicsworkbench.org/]
-[12]: [https://www.ncbi.nlm.nih.gov/pubmed/26527720]
-[13]: [https://www.metanetx.org/]
+[1]: https://github.com/tcameronwaller/metabonet
+[2]: https://github.com/
+[3]: https://www.ncbi.nlm.nih.gov/pubmed/29078384
+[4]: https://zenodo.org/record/583326
+[5]: https://zenodo.org/
+[6]: https://www.ncbi.nlm.nih.gov/pubmed/29140435
+[7]: http://www.hmdb.ca/
+[8]: https://www.ncbi.nlm.nih.gov/pubmed/26467476
+[9]: http://www.metabolomicsworkbench.org/
+[10]: https://www.ncbi.nlm.nih.gov/pubmed/26527720
+[11]: https://www.metanetx.org/
