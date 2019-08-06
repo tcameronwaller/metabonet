@@ -46,13 +46,13 @@ exports from [MetaboNet][1].
 | :-------------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
 | ~/dock/conversion/dymetabonet.json            | ~/model/dymetabonet.json                 | metabolic model format for DyMetaboNet          |
 | ~/dock/conversion/compartments.pickle         | ~/model/compartments.pickle              | information about cellular compartments         |
-| ~/dock/conversion/compartments.tsv            | ~/model/compartments.tsv                 | information about cellular compartments         |
+| ~/dock/conversion/compartments.tsv            | ~/model/compartments.tsv                 | text abbreviation of cellular compartments      |
 | ~/dock/conversion/processes.pickle            | ~/model/processes.pickle                 | information about metabolic processes           |
-| ~/dock/conversion/processes.tsv               | ~/model/processes.tsv                    | information about metabolic processes           |
+| ~/dock/conversion/processes.tsv               | ~/model/processes.tsv                    | text abbreviation of metabolic processes        |
 | ~/dock/conversion/reactions.pickle            | ~/model/reactions.pickle                 | information about chemical reactions            |
-| ~/dock/conversion/reactions.tsv               | ~/model/reactions.tsv                    | information about chemical reactions            |
+| ~/dock/conversion/reactions.tsv               | ~/model/reactions.tsv                    | text abbreviation of chemical reactions         |
 | ~/dock/conversion/metabolites.pickle          | ~/model/metabolites.pickle               | information about metabolites                   |
-| ~/dock/conversion/metabolites.tsv             | ~/model/metabolites.tsv                  | information about metabolites                   |
+| ~/dock/conversion/metabolites.tsv             | ~/model/metabolites.tsv                  | text abbreviation of metabolites                |
 | ~/dock/measurement/metabolites.tsv            | ~/measurement/metabolites.tsv            | integration of measurements with metabolites    |
 | ~/dock/network/compartments-true_hubs-true/   | ~/network/compartments-true_hubs-true/   | files for compartmental network with hubs       |
 | ~/dock/network/compartments-true_hubs-false/  | ~/network/compartments-true_hubs-false/  | files for compartmental network without hubs    |
