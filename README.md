@@ -6,6 +6,59 @@ of these networks.
 
 
 
+## License and citation
+
+This file is part of project [MetaboNet][1].
+
+> [MetaboNet][1] supports custom definition of metabolic networks.
+Copyright (C) 2018 Thomas Cameron Waller
+
+> This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version.
+
+> This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+> You should have received a copy of the GNU General Public License along
+with this program.
+If not, see <http://www.gnu.org/licenses/>.
+
+If you use [MetaboNet][1], please cite its publication.
+
+> T. Cameron Waller, Jordan A. Berg, Brian E. Chapman, Jared P. Rutter.
+> "Compartments and Hubs Differentiate the Relevance of Metabolic Networks to
+Metabolomic Experiments".
+> Journal. Year. Issue.
+> link
+
+
+
+## Archives
+
+Many users might find it more convenient to access archive versions of major
+exports from [MetaboNet][1].
+
+| export from [MetaboNet][1]                        | archive on [Zenodo][5] repository |
+| :------------------------------------------------ | :-------------------------------- |
+| ~/dock/conversion/dymetabonet.json                | ~/model/dymetabonet.json
+| ~/dock/conversion/compartments.pickle             | ~/model/compartments.pickle
+| ~/dock/conversion/compartments.tsv                | ~/model/compartments.tsv
+| ~/dock/conversion/processes.pickle                | ~/model/
+| ~/dock/conversion/processes.tsv                   | ~/model/
+| ~/dock/conversion/reactions.pickle                | ~/model/
+| ~/dock/conversion/reactions.tsv                   | ~/model/
+| ~/dock/conversion/metabolites.pickle              | ~/model/
+| ~/dock/conversion/metabolites.tsv                 | ~/model/
+| ~/dock/conversion/network_elements_cytoscape.json | ~/network/
+| ~/dock/conversion/network_elements_networkx.json  |
+
+
+
+
 ## Install MetaboNet
 
 **_DO:_** Download [MetaboNet][1] from [GitHub][2] and extract the archive.
@@ -127,13 +180,17 @@ metabolomic studies. These instructions explain the collection and curation of
 these data sets for use in [MetaboNet][1], and they also explain how to
 access ready archives.
 
-#### Option 1: Access measurement files in _"dock"_ directory
+#### Option 1: Access previous measurement files in _"dock"_ directory
+
+**_DO:_** Inspect files from metabolomic measurements in _"dock"_ directory.
 
 ```bash
 $ ls ~/Downloads/dock/source/measurement/
 ```
 
-#### Option 2: Access and prepare metabolomic measurements
+#### Option 2: Access and prepare metabolomic measurements from scratch
+
+**_DO:_** Access and organize data for metabolomic measurements.
 
 1. Locate specific projects and studies on [Metabolomics Workbench][9].
 - Project: [PR000305][10], Study: ST000390
@@ -170,157 +227,229 @@ That record is redundant with the record for _"cellobiose"_, PubChem _"6255"_.
 
 ## Curate Metabolic Model and Metabolomic Measurements
 
-MetaboNet's "model" routine includes multiple procedures to curate the
-metabolic model and to curate metabolomic measurements. This curation prepares
-to define custom metabolic networks and integrate measurements with these
-networks.
+[MetaboNet's][1] _"model"_ routine includes multiple procedures to curate the
+metabolic model and to organize metabolomic measurements. This curation
+prepares the model to define custom metabolic networks and integrate
+measurements with these networks.
 
-### Reconcile Metabolic Model for Import to MetaNetX
+### Reconcile Metabolic Model with [MetaNetX][14]
 
-Execute the "reconciliation" procedure of the "model" routine in MetaboNet.
+[MetaNetX][14] is a [repository][15] of metabolic models with useful
+information about metabolites and reactions.
+
+#### Option 1: Access previous reconciliation files in _"dock"_ directory
+
+**_DO:_** Inspect reconciliation files in _"dock"_ directory.
 
 ```bash
-$ metabonet model -d /dock/ -r
+$ ls ~/dock/reconciliation/
 ```
 
-[MetaNetX][12] is a [repository][13] of metabolic models with tools to curate
-these models.
+#### Option 2: Access and prepare reconciliation files from scratch
 
-1. Import the following file to [MetaNetX][13].
+**_DO:_** Execute the _"reconciliation"_ procedure of the _"model"_ routine.
+
 ```bash
-/dock/reconciliation/recon2m2_reconciliation.xml
+$ metabonet model -d ~/dock/ -r
 ```
-2. Save "Mapping summary" as the following file. This summary is useful for
-review and also includes useful information to curate names of metabolites.
-Import category "chemical compounds mapped to the MNXref namespace with
-different ID and different description" is of particular interest for curation
-of information about metabolites.
+
+**_DO:_** Integrate metabolic model with [MetaNetX][15].
+
+1. Import the following file to [MetaNetX][15].
+
+```bash
+~/dock/reconciliation/recon2m2_reconciliation.xml
+```
+
+2. Save _"Mapping summary"_ from [MetaNetX][15] as the following file. This
+summary is useful for review and also includes information to curate names of
+metabolites. Import category _"chemical compounds mapped to the MNXref
+namespace with different ID and different description"_ is of particular
+interest for curation of information about metabolites.
+
 ```bash
 /dock/reconciliation/metanetx_import_report.tsv
 ```
-3. Save files from MetaNetX to the following directories and files.
+
+3. Save files from [MetaNetX][15] to the following directories and files.
+
 ```bash
-compartments.tsv -> /dock/reconciliation/recon2m2_metanetx_compartments.tsv
-enzymes.tsv -> /dock/reconciliation/recon2m2_metanetx_genes.tsv
-chemicals.tsv -> /dock/reconciliation/recon2m2_metanetx_metabolites.tsv
-reactions.tsv -> /dock/reconciliation/recon2m2_metanetx_reactions.tsv
+$ cp ~/Downloads/compartments.tsv ~/dock/reconciliation/recon2m2_metanetx_compartments.tsv
+$ cp ~/Downloads/enzymes.tsv ~/dock/reconciliation/recon2m2_metanetx_genes.tsv
+$ cp ~/Downloads/chemicals.tsv ~/dock/reconciliation/recon2m2_metanetx_metabolites.tsv
+$ cp ~/Downloads/reactions.tsv ~/dock/reconciliation/recon2m2_metanetx_reactions.tsv
 ```
 
 ### Curate Metabolic Model
 
-Execute the "collection", "extraction", "enhancement", "curation", and
-"conversion" procedures of the "model" routine in MetaboNet.
+**_DO:_** Execute the _"collection"_, _"extraction"_, _"enhancement"_,
+_"curation"_, and _"conversion"_ procedures of the _"model"_ routine.
 
-The "enhancement" procedure alone requires about 1 hour to complete.
-
-```bash
-$ metabonet model -d /dock/ -ceauv
-```
-
-A file of special use for automatic curation of reactions follows.
+The _"enhancement"_ procedure alone requires about 1 hour to complete.
 
 ```bash
-/dock/enhancement/reactions_filter.tsv
+$ metabonet model -d ~/dock/ -ceauv
 ```
 
-Customize curation by editing the following files of parameters.
+**_DO:_** Customize curation by editing the following files of parameters.
 
 ```bash
-/dock/source/customization/curation_compartments.tsv
-/dock/source/customization/curation_processes.tsv
-/dock/source/customization/curation_reactions.tsv
-/dock/source/customization/curation_metabolites.tsv
+ls ~/dock/source/customization/
+~/dock/source/customization/curation_compartments.tsv
+~/dock/source/customization/curation_processes.tsv
+~/dock/source/customization/curation_reactions_custom.tsv
+~/dock/source/customization/curation_reactions.tsv
+~/dock/source/customization/curation_metabolites.tsv
 ```
+
+A file of special use to review automatic curation of reactions follows.
+
+```bash
+~/dock/enhancement/reactions_filter.tsv
+```
+
+### Export Metabolic Model
+
+[MetaboNet's][1] _"model"_ routine exports information from the metabolic model
+to multiple formats.
+
+```bash
+ls ~/dock/conversion/
+~/dock/conversion/dymetabonet.json <- this file is compatible for import to DyMetaboNet
+~/dock/conversion/compartments.pickle
+~/dock/conversion/compartments.tsv
+~/dock/conversion/processes.pickle
+~/dock/conversion/processes.tsv
+~/dock/conversion/reactions.pickle
+~/dock/conversion/reactions.tsv
+~/dock/conversion/metabolites.pickle
+~/dock/conversion/metabolites.tsv
+```
+
+
 
 ### Curate Metabolomic Measurements
 
-Execute the "measurement" procedure of the "model" routine in MetaboNet.
+**_DO:_** Execute the _"measurement"_ procedure of the _"model"_ routine.
 
 ```bash
-$ metabonet model -d /dock/ -m
+$ metabonet model -d ~/dock/ -m
 ```
 
-Review the following files to check the matches between analytes and
+**_DO:_** Review the following files to check the matches between analytes and
 metabolites. Discrepancies might justify modifications to curation of
 metabolites.
 
 ```bash
-/root/measurement/study_one_report.tsv
-/root/measurement/study_two_report.tsv
-/root/measurement/study_three_report.tsv
-/root/measurement/study_four_report.tsv
-/root/measurement/study_five_report.tsv
+~/dock/measurement/study_one_report.tsv
+~/dock/measurement/study_two_report.tsv
+~/dock/measurement/study_three_report.tsv
+~/dock/measurement/study_four_report.tsv
+~/dock/measurement/study_five_report.tsv
 ```
+
+
 
 ## Define Custom Metabolic Networks
 
-Customize definition of metabolic networks by editing the following files of
-parameters.
+[MetaboNet's][1] _"network"_ routine includes multiple procedures to define and
+analyze customizable metabolic networks.
+
+**_DO:_** Customize definition of metabolic networks by editing the following
+files of parameters.
 
 ```bash
-/dock/source/customization/filtration_compartments.tsv
-/dock/source/customization/filtration_processes.tsv
-/dock/source/customization/simplification_reactions.tsv
-/dock/source/customization/simplification_metabolites.tsv
+~/dock/source/customization/filtration_compartments.tsv
+~/dock/source/customization/filtration_processes.tsv
+~/dock/source/customization/simplification_reactions.tsv
+~/dock/source/customization/simplification_metabolites.tsv
 ```
 
-Execute the "candidacy", "network", and "conversion" procedures of the
-"network" routine in MetaboNet.
+**_DO:_** Execute the _"candidacy"_, _"network"_, and _"conversion"_ procedures
+of the _"network"_ routine.
 
 compartments true, hubs true
 ```bash
-$ metabonet network -d /dock/ -yc -np -v
+$ metabonet network -d ~/dock/ -yc -np -v
 ```
 
 compartments true, hubs false
 ```bash
-$ metabonet network -d /dock/ -ycs -np -v
+$ metabonet network -d ~/dock/ -ycs -np -v
 ```
 
 compartments false, hubs true
 ```bash
-$ metabonet network -d /dock/ -y -np -v
+$ metabonet network -d ~/dock/ -y -np -v
 ```
 
 compartments false, hubs false
 ```bash
-$ metabonet network -d /dock/ -ys -np -v
+$ metabonet network -d ~/dock/ -ys -np -v
 ```
+
+### Export Metabolic Networks
+
+[MetaboNet's][1] _"network"_ routine exports information about the metabolic
+network.
+
+```bash
+
+ls ~/dock/network/
+~/dock/network/links.pickle
+~/dock/network/nodes_metabolites.pickle
+~/dock/network/nodes_reactions.pickle
+
+ls ~/dock/conversion/
+~/dock/conversion/network_elements_cytoscape.json <- this file is compatible for import to Cytoscape
+~/dock/conversion/network_elements_networkx.json <- this file is compatible for import to NetworkX
+```
+
+
 
 ## Analyze Metabolic Networks
 
-Execute the "analysis" procedure of the "network" routine in MetaboNet.
+[MetaboNet's][1] _"network"_ routine applies functionality from the
+[NetworkX][16] [application][17] to describe metabolic networks.
+
+**_DO:_** Execute the _"analysis"_ procedure of the _"network"_ routine.
 
 ```bash
-$ metabonet network -d /dock/ -a
+$ metabonet network -d ~/dock/ -a
 ```
 
-Run time of "analysis" procedure can be 0.5-2.0 hours depending on the network.
+Run time of _"analysis"_ procedure can be 0.5-2.0 hours depending on the
+network.
+
+
 
 ## Visualize Metabolic Networks
 
+The [Cytoscape][18] [application][19] is useful to visualize metabolic networks
+from [MetaboNet][1].
+
+**_DO:_** Import the following file to [Cytoscape][19].
+
 ```bash
-/dock/conversion/network_elements_cytoscape.json
+~/dock/conversion/network_elements_cytoscape.json
 ```
+
+
 
 ## Integrate Metabolomic Measurements in Metabolic Network
 
-Execute the "measurement" proceduree of the "network" routine in MetaboNet.
+**_DO:_** Execute the _"measurement"_ procedure of the _"network"_ routine.
 
 ```bash
-$ metabonet network -d /dock/ -m
+$ metabonet network -d ~/dock/ -m
 ```
 
-The following file includes measurements from all studies ready for integration
-with the metabolic network in Cytoscape.
+**_DO:_** Import the following file of measurements from all studies for
+integration with the metabolic network in [Cytoscape][19].
 
 ```bash
-/root/measurement/metabolites.tsv
+~/dock/measurement/metabolites.tsv
 ```
-
-## Removal of automatically-generate files and directories
-
-$ metabonet clean -d /dock/
 
 [1]: https://github.com/tcameronwaller/metabonet
 [2]: https://github.com/
@@ -335,7 +464,9 @@ $ metabonet clean -d /dock/
 [11]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000058
 [12]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000322
 [13]: https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR000599
-
-
-[10]: https://www.ncbi.nlm.nih.gov/pubmed/26527720
-[11]: https://www.metanetx.org/
+[14]: https://www.ncbi.nlm.nih.gov/pubmed/26527720
+[15]: https://www.metanetx.org/
+[16]: https://www.osti.gov/biblio/960616
+[17]: https://networkx.github.io/
+[18]: https://www.ncbi.nlm.nih.gov/pubmed/14597658
+[19]: https://cytoscape.org/
