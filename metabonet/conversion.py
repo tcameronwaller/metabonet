@@ -346,10 +346,10 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "conversion")
+    path = os.path.join(directory, "network")
     utility.confirm_path_directory(path)
-    path_networkx = os.path.join(path, "network_elements_networkx.pickle")
-    path_cytoscape = os.path.join(path, "network_elements_cytoscape.json")
+    path_networkx = os.path.join(path, "network_networkx.pickle")
+    path_cytoscape = os.path.join(path, "network_cytoscape.json")
     # Write information to file.
     with open(path_networkx, "wb") as file_product:
         pickle.dump(information["networkx"], file_product)

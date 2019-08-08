@@ -435,7 +435,7 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "conversion")
+    path = os.path.join(directory, "model")
     utility.confirm_path_directory(path)
     path_dymetabonet = os.path.join(path, "dymetabonet.json")
     path_compartments = os.path.join(path, "compartments.pickle")

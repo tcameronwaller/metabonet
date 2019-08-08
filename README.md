@@ -42,9 +42,9 @@ Metabolomic Experiments".
 Many users might find it more convenient to access archive versions of major
 exports from [MetaboNet][1].
 
-| export from [MetaboNet][1]                    | archive on [Zenodo][5] repository        | explanation                                     |
+| export from [MetaboNet][1]                    | file in archive[ref] on [Zenodo][5]      | explanation                                     |
 | :-------------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
-| ~/dock/conversion/dymetabonet.json            | ~/model/dymetabonet.json                 | metabolic model format for DyMetaboNet          |
+| ~/dock/conversion/dymetabonet.json            | ~/model/dymetabonet.json                 | metabolic model format for [DyMetaboNet][20]    |
 | ~/dock/conversion/compartments.pickle         | ~/model/compartments.pickle              | information about cellular compartments         |
 | ~/dock/conversion/compartments.tsv            | ~/model/compartments.tsv                 | text abbreviation of cellular compartments      |
 | ~/dock/conversion/processes.pickle            | ~/model/processes.pickle                 | information about metabolic processes           |
@@ -62,7 +62,7 @@ exports from [MetaboNet][1].
 | ./nodes_reactions.pickle                      | ./nodes_reactions.pickle                 | network's nodes for reactions                   |
 | ./nodes_metabolites.pickle                    | ./nodes_metabolites.pickle               | network's nodes for metabolites                 |
 | ./network_cytoscape.json                      | ./network_cytoscape.json                 | network format for Cytoscape                    |
-| ./network_networkx.json                       | ./network_networkx.pickle                | network format for NetworkX                     |
+| ./network_networkx.pickle                     | ./network_networkx.pickle                | network format for NetworkX                     |
 
 
 
@@ -83,7 +83,7 @@ dock LICENSE metabonet README.md setup.py
 
 ```bash
 $ ls ~/Downloads/metabonet-master/
-dock LICENSE metabonet README.md setup.py
+dock_template LICENSE metabonet README.md setup.py
 ```
 
 **_DO:_** Install MetaboNet to default directory for third-party Python
@@ -120,7 +120,7 @@ A template _"dock"_ directory with default files is accessible within the
 **_DO:_** Copy default _"dock"_ directory to accessible location.
 
 ```bash
-$ cp ~/Downloads/metabonet-master/dock/ ~/dock/
+$ cp ~/Downloads/metabonet-master/dock_template/ ~/dock/
 $ ls ~/dock/
 ```
 
@@ -192,7 +192,7 @@ access ready archives.
 **_DO:_** Inspect files from metabolomic measurements in _"dock"_ directory.
 
 ```bash
-$ ls ~/Downloads/dock/source/measurement/
+$ ls ~/dock/source/measurement/
 ```
 
 #### Option 2: Access and prepare metabolomic measurements from scratch
@@ -488,3 +488,4 @@ integration with the metabolic network in [Cytoscape][19].
 [17]: https://networkx.github.io/
 [18]: https://www.ncbi.nlm.nih.gov/pubmed/14597658
 [19]: https://cytoscape.org/
+[20]: https://github.com/tcameronwaller/dymetabonet
