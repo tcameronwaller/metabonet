@@ -249,6 +249,8 @@ information about metabolites and reactions.
 **_DO:_** Inspect reconciliation files in _"dock"_ directory.
 
 ```bash
+$ mv ~/dock/source/reconciliation_2019-08-12/ ~/dock/
+$ mv ~/dock/reconciliation_2019-08-12/ ~/dock/reconciliation/
 $ ls ~/dock/reconciliation/
 ```
 

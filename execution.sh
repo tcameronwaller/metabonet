@@ -32,13 +32,17 @@ rm -rf $path_dock
 
 echo "parameters"
 cd ~/Downloads/
-rm master.zip
+rm -rf ~/Downloads/master.zip
+rm -rf ~/Downloads/metabonet-master
 wget https://github.com/tcameronwaller/metabonet/archive/master.zip
 unzip master.zip
 cp -r ~/Downloads/metabonet-master/dock_template/ ~/
 cd ~
 mv dock_template dock_metabonet
 ls "$path_dock/source/customization/"
+
+rm -rf ~/Downloads/master.zip
+rm -rf ~/Downloads/metabonet-master
 
 ##########
 # Access source files.
@@ -48,18 +52,16 @@ cd ~/Downloads/
 rm ./Recon2M.2_MNX_Entrez_Gene.xml
 wget https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml
 cp ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml $path_dock/source/recon2m2.xml
-rm ./Recon2M.2_MNX_Entrez_Gene.xml
-
-exit 0
+rm ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml
 
 echo "HMDB"
 rm hmdb_metabolites.zip
 rm hmdb_metabolites.xml
 wget http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip
-unzip hmdb_metabolites.zip
+unzip ~/Downloads/hmdb_metabolites.zip
 cp ~/Downloads/hmdb_metabolites.xml $path_dock/source/hmdb_metabolites.xml
-rm hmdb_metabolites.zip
-rm hmdb_metabolites.xml
+rm ~/Downloads/hmdb_metabolites.zip
+rm ~/Downloads/hmdb_metabolites.xml
 
 echo "measurements"
 
@@ -69,13 +71,18 @@ ls $path_dock/source/measurement/
 # Install MetaboNet
 
 
+
 ##########
 # Curate metabolic model.
 
-metabonet model -d $path_dock -r
+#metabonet model -d $path_dock -r
 
 echo "reconcile to MetaNetX"
+mv $path_dock/source/reconciliation_2019-08-12/ $path_dock/
+mv $path_dock/reconciliation_2019-08-12/ $path_dock/reconciliation/
 ls $path_dock/reconciliation/
+
+exit 0
 
 echo "curate and organize metabolic model"
 ls $path_dock/source/customization/
