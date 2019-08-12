@@ -23,21 +23,24 @@ set -x
 
 echo "Organize source files and default parameters."
 
-rm -r $path_dock/
-mkdir $path_dock/
+rm -rf $path_dock
+
+#mkdir "$path_dock"
 
 ##########
 # Access default parameters from repository
 
 echo "parameters"
 cd ~/Downloads/
-rm ./master.zip
-rm -r ./metabonet-master/
+rm master.zip
 wget https://github.com/tcameronwaller/metabonet/archive/master.zip
 unzip master.zip
-cp -r ~/Downloads/metabonet-master/dock_template/ ~/dock_template/
-mv ~/dock_template/ ~/dock_metabonet/
-ls $path_dock/source/customization/
+cp -r ~/Downloads/metabonet-master/dock_template/ ~/
+cd ~
+mv dock_template dock_metabonet
+ls "$path_dock/source/customization/"
+
+exit 0
 
 ##########
 # Access source files.
@@ -47,6 +50,7 @@ cd ~/Downloads/
 rm ./Recon2M.2_MNX_Entrez_Gene.xml
 wget https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml
 mv ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml $path_dock/source/recon2m2.xml
+rm ./Recon2M.2_MNX_Entrez_Gene.xml
 
 echo "HMDB"
 rm hmdb_metabolites.zip
@@ -54,6 +58,8 @@ rm hmdb_metabolites.xml
 wget http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip
 unzip hmdb_metabolites.zip
 mv ~/Downloads/hmdb_metabolites.xml $path_dock/source/hmdb_metabolites.xml
+rm hmdb_metabolites.zip
+rm hmdb_metabolites.xml
 
 echo "measurements"
 

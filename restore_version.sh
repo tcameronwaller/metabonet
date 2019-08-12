@@ -11,17 +11,27 @@ echo "remove previous version of the program..."
 
 cd ~/Downloads/
 rm master.zip
-rm -r metabonet-master/
+#chmod -R 777 metabonet-master/
+#rm -rf metabonet-master/
 
 # Access current version of the program.
 
 echo "access current version of the program..."
 
+rm master.zip
 wget https://github.com/tcameronwaller/metabonet/archive/master.zip
 unzip master.zip
 cd metabonet-master/
 ls ./
 sudo python3 setup.py install
+cd ~/Downloads/
+rm master.zip
+#chmod -R 777 metabonet-master/
+#rm -rf metabonet-master/
+
 cd ~
 metabonet --help
+
+
+
 
