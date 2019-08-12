@@ -117,13 +117,14 @@ def read_source(directory=None):
     # Read information from file.
     # Compile information.
     reference = read_source_reference(directory=directory)
+
     study_one = read_source_study(
         path=path_measurement,
-        directory="metabolomics-workbench_pr000058_st000061"
+        directory="metabolomics-workbench_pr000305_st000390"
     )
     study_two = read_source_study(
         path=path_measurement,
-        directory="metabolomics-workbench_pr000305_st000390"
+        directory="metabolomics-workbench_pr000058_st000061"
     )
     study_three_four = read_source_study(
         path=path_measurement,
@@ -2994,14 +2995,14 @@ def execute_procedure(directory=None):
     #
     # Analyze measurements from all studies without pairs of samples.
     #
-    # Curate measurements from study one.
-    # Measurements from study two represent metabolites in visceral versus
-    # subcutaneous adipose.
+    # Curate measurements from study two.
+    # Measurements from study two represent metabolites in normal versus tumor
+    # lung.
     study_one = curate_study(
         pair=True,
         normalization=True,
-        group_numerator="visceral_fat",
-        group_denominator="subcutaneous_fat",
+        group_numerator="tumor",
+        group_denominator="normal",
         samples=source["study_one"]["samples"],
         analytes=source["study_one"]["analytes"],
         measurements=source["study_one"]["measurements"],
@@ -3009,14 +3010,15 @@ def execute_procedure(directory=None):
         hmdb=source["reference"]["hmdb"],
         metabolites=source["reference"]["metabolites"]
     )
-    # Curate measurements from study two.
-    # Measurements from study two represent metabolites in normal versus tumor
-    # lung.
+
+    # Curate measurements from study one.
+    # Measurements from study two represent metabolites in visceral versus
+    # subcutaneous adipose.
     study_two = curate_study(
         pair=True,
         normalization=True,
-        group_numerator="tumor",
-        group_denominator="normal",
+        group_numerator="visceral_fat",
+        group_denominator="subcutaneous_fat",
         samples=source["study_two"]["samples"],
         analytes=source["study_two"]["analytes"],
         measurements=source["study_two"]["measurements"],

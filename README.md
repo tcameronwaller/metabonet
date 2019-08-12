@@ -53,7 +53,9 @@ exports from [MetaboNet][1].
 | ~/dock/model/reactions.tsv                    | ~/model/reactions.tsv                    | text abbreviation of chemical reactions         |
 | ~/dock/model/metabolites.pickle               | ~/model/metabolites.pickle               | information about metabolites                   |
 | ~/dock/model/metabolites.tsv                  | ~/model/metabolites.tsv                  | text abbreviation of metabolites                |
+|                                               |                                          |                                                 |
 | ~/dock/measurement/metabolites.tsv            | ~/measurement/metabolites.tsv            | integration of measurements with metabolites    |
+|                                               |                                          |                                                 |
 | ~/dock/network/compartments-true_hubs-true/   | ~/network/compartments-true_hubs-true/   | files for compartmental network with hubs       |
 | ~/dock/network/compartments-true_hubs-false/  | ~/network/compartments-true_hubs-false/  | files for compartmental network without hubs    |
 | ~/dock/network/compartments-false_hubs-true/  | ~/network/compartments-false_hubs-true/  | files for noncompartmental network with hubs    |

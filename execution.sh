@@ -89,6 +89,12 @@ metabonet model -d $path_dock -ceauv
 echo "model files"
 ls $path_dock/model/
 
+echo "curate and organize measurements"
+metabonet model -d $path_dock -m
+
+echo "measurement files"
+ls $path_dock/measurement/
+
 exit 0
 
 ##########
