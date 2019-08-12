@@ -78,11 +78,9 @@ ls $path_dock/source/measurement/
 #metabonet model -d $path_dock -r
 
 echo "reconcile to MetaNetX"
-mv $path_dock/source/reconciliation_2019-08-12/ $path_dock/
+cp -r $path_dock/source/reconciliation_2019-08-12/ $path_dock/
 mv $path_dock/reconciliation_2019-08-12/ $path_dock/reconciliation/
 ls $path_dock/reconciliation/
-
-exit 0
 
 echo "curate and organize metabolic model"
 ls $path_dock/source/customization/
@@ -90,6 +88,10 @@ metabonet model -d $path_dock -ceauv
 
 echo "model files"
 ls $path_dock/model/
+
+
+exit 0
+
 
 ##########
 # Define metabolic networks.

@@ -44,15 +44,15 @@ exports from [MetaboNet][1].
 
 | export from [MetaboNet][1]                    | file in archive[ref] on [Zenodo][5]      | explanation                                     |
 | :-------------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
-| ~/dock/conversion/dymetabonet.json            | ~/model/dymetabonet.json                 | metabolic model format for [DyMetaboNet][20]    |
-| ~/dock/conversion/compartments.pickle         | ~/model/compartments.pickle              | information about cellular compartments         |
-| ~/dock/conversion/compartments.tsv            | ~/model/compartments.tsv                 | text abbreviation of cellular compartments      |
-| ~/dock/conversion/processes.pickle            | ~/model/processes.pickle                 | information about metabolic processes           |
-| ~/dock/conversion/processes.tsv               | ~/model/processes.tsv                    | text abbreviation of metabolic processes        |
-| ~/dock/conversion/reactions.pickle            | ~/model/reactions.pickle                 | information about chemical reactions            |
-| ~/dock/conversion/reactions.tsv               | ~/model/reactions.tsv                    | text abbreviation of chemical reactions         |
-| ~/dock/conversion/metabolites.pickle          | ~/model/metabolites.pickle               | information about metabolites                   |
-| ~/dock/conversion/metabolites.tsv             | ~/model/metabolites.tsv                  | text abbreviation of metabolites                |
+| ~/dock/model/dymetabonet.json                 | ~/model/dymetabonet.json                 | metabolic model format for [DyMetaboNet][20]    |
+| ~/dock/model/compartments.pickle              | ~/model/compartments.pickle              | information about cellular compartments         |
+| ~/dock/model/compartments.tsv                 | ~/model/compartments.tsv                 | text abbreviation of cellular compartments      |
+| ~/dock/model/processes.pickle                 | ~/model/processes.pickle                 | information about metabolic processes           |
+| ~/dock/model/processes.tsv                    | ~/model/processes.tsv                    | text abbreviation of metabolic processes        |
+| ~/dock/model/reactions.pickle                 | ~/model/reactions.pickle                 | information about chemical reactions            |
+| ~/dock/model/reactions.tsv                    | ~/model/reactions.tsv                    | text abbreviation of chemical reactions         |
+| ~/dock/model/metabolites.pickle               | ~/model/metabolites.pickle               | information about metabolites                   |
+| ~/dock/model/metabolites.tsv                  | ~/model/metabolites.tsv                  | text abbreviation of metabolites                |
 | ~/dock/measurement/metabolites.tsv            | ~/measurement/metabolites.tsv            | integration of measurements with metabolites    |
 | ~/dock/network/compartments-true_hubs-true/   | ~/network/compartments-true_hubs-true/   | files for compartmental network with hubs       |
 | ~/dock/network/compartments-true_hubs-false/  | ~/network/compartments-true_hubs-false/  | files for compartmental network without hubs    |
@@ -291,15 +291,6 @@ $ cp ~/Downloads/reactions.tsv ~/dock/reconciliation/recon2m2_metanetx_reactions
 
 ### Curate Metabolic Model
 
-**_DO:_** Execute the _"collection"_, _"extraction"_, _"enhancement"_,
-_"curation"_, and _"conversion"_ procedures of the _"model"_ routine.
-
-The _"enhancement"_ procedure alone requires about 1 hour to complete.
-
-```bash
-$ metabonet model -d ~/dock/ -ceauv
-```
-
 **_DO:_** Customize curation by editing the following files of parameters.
 
 ```bash
@@ -315,6 +306,21 @@ A file of special use to review automatic curation of reactions follows.
 
 ```bash
 ~/dock/enhancement/reactions_filter.tsv
+```
+
+**_DO:_** Execute the _"collection"_, _"extraction"_, _"enhancement"_,
+_"curation"_, and _"conversion"_ procedures of the _"model"_ routine.
+
+The _"enhancement"_ procedure alone requires about 1 hour to complete.
+
+```bash
+$ metabonet model -d ~/dock/ -ceauv
+```
+
+**_DO:_** Inspect files from model curation procedures.
+
+```bash
+$ ls ~/dock/model/
 ```
 
 ### Export Metabolic Model
