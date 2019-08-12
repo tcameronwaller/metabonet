@@ -40,8 +40,6 @@ cd ~
 mv dock_template dock_metabonet
 ls "$path_dock/source/customization/"
 
-exit 0
-
 ##########
 # Access source files.
 
@@ -49,15 +47,17 @@ echo "Recon2M.2"
 cd ~/Downloads/
 rm ./Recon2M.2_MNX_Entrez_Gene.xml
 wget https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml
-mv ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml $path_dock/source/recon2m2.xml
+cp ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml $path_dock/source/recon2m2.xml
 rm ./Recon2M.2_MNX_Entrez_Gene.xml
+
+exit 0
 
 echo "HMDB"
 rm hmdb_metabolites.zip
 rm hmdb_metabolites.xml
 wget http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip
 unzip hmdb_metabolites.zip
-mv ~/Downloads/hmdb_metabolites.xml $path_dock/source/hmdb_metabolites.xml
+cp ~/Downloads/hmdb_metabolites.xml $path_dock/source/hmdb_metabolites.xml
 rm hmdb_metabolites.zip
 rm hmdb_metabolites.xml
 
@@ -66,9 +66,13 @@ echo "measurements"
 ls $path_dock/source/measurement/
 
 ##########
+# Install MetaboNet
+
+
+##########
 # Curate metabolic model.
 
-#metabonet model -d $path_dock -r
+metabonet model -d $path_dock -r
 
 echo "reconcile to MetaNetX"
 ls $path_dock/reconciliation/
@@ -131,4 +135,3 @@ mv $path_dock/network/network_networkx.pickle $path_network/
 
 echo "network files"
 ls $path_dock/network/
-
