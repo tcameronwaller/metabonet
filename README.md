@@ -208,16 +208,22 @@ $ ls ~/dock/source/measurement/
 2. Copy information about samples.
 - Click on study's tab "Show all samples".
 - Copy information from sample table.
+- Some organization is necessary to match experimental groups and pairs of
+samples.
 - Save file as "samples.tsv".
 3. Copy information about analytes.
 - Click on study's tab "Show named metabolites".
 - Save file as "analytes.tsv".
 4. Copy information about measurements.
+- Some organization is necessary.
 - Click on study's tab "Download named metabolite data".
 - Save file as "measurements.tsv".
 5. Copy information about signals.
 - Click on study's tab "Download all metabolite data".
+- Some organization is necessary.
 - Save file as "signals.tsv".
+- These data are more extensive than "measurements.tsv" and are useful to
+control by total signal for each sample.
 6. Correct errors.
 - Project PR000305, Study ST000390
 -- _"analytes.tsv"_
@@ -317,28 +323,26 @@ The _"enhancement"_ procedure alone requires about 1 hour to complete.
 $ metabonet model -d ~/dock/ -ceauv
 ```
 
-**_DO:_** Inspect files from model curation procedures.
-
-```bash
-$ ls ~/dock/model/
-```
-
 ### Export Metabolic Model
 
 [MetaboNet's][1] _"model"_ routine exports information from the metabolic model
 to multiple formats.
+These files are also part of the project's archive on the [Zenodo][5]
+repository.
+
+**_DO:_** Inspect files from model curation procedures.
 
 ```bash
-ls ~/dock/conversion/
-~/dock/conversion/dymetabonet.json <- this file is compatible for import to DyMetaboNet
-~/dock/conversion/compartments.pickle
-~/dock/conversion/compartments.tsv
-~/dock/conversion/processes.pickle
-~/dock/conversion/processes.tsv
-~/dock/conversion/reactions.pickle
-~/dock/conversion/reactions.tsv
-~/dock/conversion/metabolites.pickle
-~/dock/conversion/metabolites.tsv
+ls ~/dock/model/
+~/dock/model/dymetabonet.json <- this file is compatible for import to DyMetaboNet
+~/dock/model/compartments.pickle
+~/dock/model/compartments.tsv
+~/dock/model/processes.pickle
+~/dock/model/processes.tsv
+~/dock/model/reactions.pickle
+~/dock/model/reactions.tsv
+~/dock/model/metabolites.pickle
+~/dock/model/metabolites.tsv
 ```
 
 

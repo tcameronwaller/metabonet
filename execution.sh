@@ -89,9 +89,7 @@ metabonet model -d $path_dock -ceauv
 echo "model files"
 ls $path_dock/model/
 
-
 exit 0
-
 
 ##########
 # Define metabolic networks.
