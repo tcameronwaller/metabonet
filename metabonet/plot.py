@@ -120,22 +120,27 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_analysis = os.path.join(directory, "analysis")
-    path_measurement = os.path.join(directory, "measurement")
+    path_true_true = os.path.join(directory, "compartments-true_hubs-true")
+    path_true_false = os.path.join(directory, "compartments-true_hubs-false")
+    path_false_true = os.path.join(directory, "compartments-false_hubs-true")
+    path_false_false = os.path.join(directory, "compartments-false_hubs-false")
+    path_analysis = os.path.join(path_network, "analysis")
+    path_measurement = os.path.join(path_network, "measurement")
     # Nodes.
     path_nodes_one = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-true_hubs-true.pickle"
+        path_true_true, "analysis", "nodes_metabolites.pickle"
     )
     path_nodes_two = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-true_hubs-false.pickle"
+        path_true_false, "analysis", "nodes_metabolites.pickle"
     )
     path_nodes_three = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-false_hubs-true.pickle"
+        path_false_true, "analysis", "nodes_metabolites.pickle"
     )
     path_nodes_four = os.path.join(
-        path_analysis, "nodes_metabolites_compartments-false_hubs-false.pickle"
+        path_false_false, "analysis", "nodes_metabolites.pickle"
     )
     # Measurements.
+    path_measurement = os.path.join(directory, "measurement")
     path_measurements_one = os.path.join(path_measurement, "study_one.pickle")
     path_measurements_two = os.path.join(path_measurement, "study_two.pickle")
     path_measurements_three = os.path.join(

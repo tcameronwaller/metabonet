@@ -201,7 +201,7 @@ def define_model_subparser(subparsers=None):
         name="model",
         description=description,
         epilog=epilog,
-        help="Help for model routine. :)>",
+        help="Help for model routine. 3 <-",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     # Define arguments.

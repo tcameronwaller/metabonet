@@ -1892,24 +1892,32 @@ def write_product(directory=None, information=None):
     path_network = os.path.join(directory, "network")
     path = os.path.join(path_network, "analysis")
     utility.confirm_path_directory(path)
-    path_nodes_reactions = os.path.join(path, "nodes_reactions.tsv")
-    path_nodes_metabolites = os.path.join(path, "nodes_metabolites.tsv")
+    path_nodes_reactions = os.path.join(path, "nodes_reactions.pickle")
+    path_nodes_metabolites = os.path.join(path, "nodes_metabolites.pickle")
+    path_nodes_reactions_text = os.path.join(path, "nodes_reactions.tsv")
+    path_nodes_metabolites_text = os.path.join(path, "nodes_metabolites.tsv")
     path_network_reactions = os.path.join(path, "network_reactions.tsv")
     path_network_metabolites = os.path.join(path, "network_metabolites.tsv")
     path_simplification_metabolites = os.path.join(
         path, "simplification_metabolites.tsv"
     )
     # Write information to file.
+
+    with open(path_nodes_reactions, "wb") as file_product:
+        pickle.dump(information["nodes_reactions"], file_product)
     utility.write_file_table(
-        information=information["nodes_reactions"],
-        path_file=path_nodes_reactions,
-        names=information["nodes_reactions"][0].keys(),
+        information=list(information["nodes_reactions"].values()),
+        path_file=path_nodes_reactions_text,
+        names=list(information["nodes_reactions"].values())[0].keys(),
         delimiter="\t"
     )
+
+    with open(path_nodes_metabolites, "wb") as file_product:
+        pickle.dump(information["nodes_metabolites"], file_product)
     utility.write_file_table(
-        information=information["nodes_metabolites"],
-        path_file=path_nodes_metabolites,
-        names=information["nodes_metabolites"][0].keys(),
+        information=list(information["nodes_metabolites"].values()),
+        path_file=path_nodes_metabolites_text,
+        names=list(information["nodes_metabolites"].values())[0].keys(),
         delimiter="\t"
     )
     utility.write_file_table(
@@ -2013,8 +2021,8 @@ def execute_procedure(directory=None):
     information = {
         "network_reactions": [report_network["reactions"]],
         "network_metabolites": [report_network["metabolites"]],
-        "nodes_reactions": list(report_nodes["reactions"].values()),
-        "nodes_metabolites": list(report_nodes["metabolites"].values()),
+        "nodes_reactions": report_nodes["reactions"],
+        "nodes_metabolites": report_nodes["metabolites"],
         "simplification_metabolites": simplification_metabolites
     }
     #Write product information to file.

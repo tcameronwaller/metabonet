@@ -107,9 +107,8 @@ echo "integrate measurements to network's metabolites"
 metabonet network -d $path_dock -m
 echo "analyze network"
 metabonet network -d $path_dock -a
-path_network=$path_dock/compartments-true_hubs-true/
-mkdir $path_network
-mv $path_dock/network/ $path_network/
+path_network=$path_dock/compartments-true_hubs-true
+mv $path_dock/network $path_network
 #mv $path_dock/network/links.pickle $path_network/
 #mv $path_dock/network/nodes_reactions.pickle $path_network/
 #mv $path_dock/network/nodes_metabolites.pickle $path_network/
@@ -122,25 +121,32 @@ echo "compartments true, hubs false"
 metabonet network -d $path_dock -ycs -np -v
 echo "integrate measurements to network's metabolites"
 metabonet network -d $path_dock -m
-path_network=$path_dock/compartments-true_hubs-false/
-mkdir $path_network
-mv $path_dock/network/ $path_network/
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-true_hubs-false
+mv $path_dock/network $path_network
 
 echo "compartments false, hubs true"
 metabonet network -d $path_dock -y -np -v
 echo "integrate measurements to network's metabolites"
 metabonet network -d $path_dock -m
-path_network=$path_dock/compartments-false_hubs-true/
-mkdir $path_network
-mv $path_dock/network/ $path_network/
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-false_hubs-true
+mv $path_dock/network $path_network
 
 echo "compartments false, hubs false"
 metabonet network -d $path_dock -ys -np -v
 echo "integrate measurements to network's metabolites"
 metabonet network -d $path_dock -m
-path_network=$path_dock/compartments-false_hubs-false/
-mkdir $path_network
-mv $path_dock/network/ $path_network/
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-false_hubs-false
+mv $path_dock/network $path_network
 
 echo "network files"
-ls $path_dock/network/
+ls $path_dock/
+
+# Plot.
+
+metabonet network -d $path_dock -t
