@@ -201,7 +201,7 @@ def define_model_subparser(subparsers=None):
         name="model",
         description=description,
         epilog=epilog,
-        help="Help for model routine. 3 <-",
+        help="Help for model routine. fooky bama (version check)",
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     # Define arguments.

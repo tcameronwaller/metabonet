@@ -75,7 +75,9 @@ ls $path_dock/source/measurement/
 ##########
 # Curate metabolic model.
 
-#metabonet model -d $path_dock -r
+metabonet model -d $path_dock -r
+
+exit 0
 
 echo "reconcile to MetaNetX"
 cp -r $path_dock/source/reconciliation_2019-08-12/ $path_dock/

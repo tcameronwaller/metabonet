@@ -55,10 +55,3 @@ echo "analyze network"
 metabonet network -d $path_dock -a
 path_network=$path_dock/compartments-false_hubs-false
 mv $path_dock/network $path_network
-#mv $path_dock/network/links.pickle $path_network/
-#mv $path_dock/network/nodes_reactions.pickle $path_network/
-#mv $path_dock/network/nodes_metabolites.pickle $path_network/
-#mv $path_dock/network/network_cytoscape.json $path_network/
-#mv $path_dock/network/network_networkx.pickle $path_network/
-#mv $path_dock/network/measurement/ $path_network/
-#mv $path_dock/network/analysis/ $path_network/
