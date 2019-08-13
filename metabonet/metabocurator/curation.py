@@ -719,6 +719,8 @@ def execute_procedure(directory=None):
 
     """
 
+    print("welcome to the new curation procedure! :) :) :) ")
+
     # Read source information from file.
     source = read_source(directory=directory)
     # Change procedures allow custom changes to metabolites and reactions
@@ -746,15 +748,14 @@ def execute_procedure(directory=None):
         reactions_original=metabolites_reactions["reactions"]
     )
 
-    if False:
-        # Extract information for curation of reactions.
-        # This summary is primarily useful for preparing information for custom
-        # curation of reactions.
-        reactions_summary = access_reactions_summary(
-            reactions_interest=source["reactions_interest"],
-            reactions=reactions,
-            directory=directory
-        )
+    # Extract information for curation of reactions.
+    # This summary is primarily useful for preparing information for custom
+    # curation of reactions.
+    #reactions_summary = access_reactions_summary(
+    #    reactions_interest=source["reactions_interest"],
+    #    reactions=reactions,
+    #    directory=directory
+    #)
 
     # Prepare reports of information for review.
     convert_one = metabonet.metabocurator.conversion.convert_metabolites_text
