@@ -225,15 +225,17 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_conversion = os.path.join(directory, "conversion")
+    path_conversion = os.path.join(directory, "model")
     path_compartments = os.path.join(path_conversion, "compartments.pickle")
     path_processes = os.path.join(path_conversion, "processes.pickle")
     path_reactions = os.path.join(path_conversion, "reactions.pickle")
     path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
     path_source = os.path.join(directory, "source")
     path_customization = os.path.join(path_source, "customization")
+
+    path_network = os.path.join(directory, "network")
     path_networkx = os.path.join(
-        path_conversion, "network_elements_networkx.pickle"
+        path_network, "network_networkx.pickle"
     )
     path_simplification_metabolites = os.path.join(
         path_customization, "simplification_metabolites.tsv"
