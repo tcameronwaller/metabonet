@@ -808,6 +808,7 @@ def analyze_bipartite_network(
     }
 
 
+# This function defines the analysis of the network.
 def analyze_bipartite_network_group(
     network=None,
     nodes_cis=None,
@@ -868,6 +869,11 @@ def analyze_bipartite_network_group(
         nodes_cis=nodes_cis,
         nodes_trans=nodes_trans
     )
+
+    # Assortativity.
+
+
+
     # Modularity.
     # NetworkX might lack this functionality.
     # This algorithm might be irrelevant for bipartite network.
