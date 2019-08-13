@@ -161,8 +161,8 @@ def read_source_reference(directory=None):
     # Specify directories and files.
     path_extraction = os.path.join(directory, "extraction")
     path_hmdb = os.path.join(path_extraction, "hmdb_summary.pickle")
-    path_conversion = os.path.join(directory, "conversion")
-    path_metabolites = os.path.join(path_conversion, "metabolites.pickle")
+    path_model = os.path.join(directory, "model")
+    path_metabolites = os.path.join(path_model, "metabolites.pickle")
     # Read information from file.
     with open(path_hmdb, "rb") as file_source:
         hmdb = pickle.load(file_source)

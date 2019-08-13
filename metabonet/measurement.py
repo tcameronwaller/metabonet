@@ -498,7 +498,8 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "measurement")
+    path_network = os.path.join(directory, "network")
+    path = os.path.join(path_network, "measurement")
     utility.confirm_path_directory(path)
     path_pickle = os.path.join(path, "metabolites.pickle")
     path_metabolites_text = os.path.join(path, "metabolites.tsv")
@@ -512,12 +513,13 @@ def write_product(directory=None, information=None):
         names=information["metabolites_measurement_text"][0].keys(),
         delimiter="\t"
     )
-    utility.write_file_table(
-        information=information["reactions_measurement_text"],
-        path_file=path_reactions_text,
-        names=information["reactions_measurement_text"][0].keys(),
-        delimiter="\t"
-    )
+    if False:
+        utility.write_file_table(
+            information=information["reactions_measurement_text"],
+            path_file=path_reactions_text,
+            names=information["reactions_measurement_text"][0].keys(),
+            delimiter="\t"
+        )
 
 
 ###############################################################################

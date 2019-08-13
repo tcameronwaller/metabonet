@@ -687,12 +687,16 @@ def write_product(directory=None, information=None):
         names=information["reactions_report"][0].keys(),
         delimiter="\t"
     )
-    utility.write_file_table(
-        information=information["reactions_summary"],
-        path_file=path_reactions_summary,
-        names=information["reactions_summary"][0].keys(),
-        delimiter="\t"
-    )
+
+    if False:
+        utility.write_file_table(
+            information=information["reactions_summary"],
+            path_file=path_reactions_summary,
+            names=information["reactions_summary"][0].keys(),
+            delimiter="\t"
+        )
+
+    pass
 
 
 ###############################################################################
@@ -741,14 +745,17 @@ def execute_procedure(directory=None):
         reactions_curation=source["reactions_curation"],
         reactions_original=metabolites_reactions["reactions"]
     )
-    # Extract information for curation of reactions.
-    # This summary is primarily useful for preparing information for custom
-    # curation of reactions.
-    reactions_summary = access_reactions_summary(
-        reactions_interest=source["reactions_interest"],
-        reactions=reactions,
-        directory=directory
-    )
+
+    if False:
+        # Extract information for curation of reactions.
+        # This summary is primarily useful for preparing information for custom
+        # curation of reactions.
+        reactions_summary = access_reactions_summary(
+            reactions_interest=source["reactions_interest"],
+            reactions=reactions,
+            directory=directory
+        )
+
     # Prepare reports of information for review.
     convert_one = metabonet.metabocurator.conversion.convert_metabolites_text
     metabolites_report = convert_one(
@@ -764,7 +771,7 @@ def execute_procedure(directory=None):
         "processes": processes_reactions["processes"],
         "metabolites": metabolites_reactions["metabolites"],
         "reactions": reactions,
-        "reactions_summary": reactions_summary,
+        #"reactions_summary": reactions_summary,
         "metabolites_report": metabolites_report,
         "reactions_report": reactions_report,
     }

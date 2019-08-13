@@ -42,30 +42,44 @@ Metabolomic Experiments".
 Many users might find it more convenient to access archive versions of major
 exports from [MetaboNet][1].
 
-| export from [MetaboNet][1]                    | file in archive[ref] on [Zenodo][5]      | explanation                                     |
-| :-------------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
-| ~/dock/model/dymetabonet.json                 | ~/model/dymetabonet.json                 | metabolic model format for [DyMetaboNet][20]    |
-| ~/dock/model/compartments.pickle              | ~/model/compartments.pickle              | information about cellular compartments         |
-| ~/dock/model/compartments.tsv                 | ~/model/compartments.tsv                 | text abbreviation of cellular compartments      |
-| ~/dock/model/processes.pickle                 | ~/model/processes.pickle                 | information about metabolic processes           |
-| ~/dock/model/processes.tsv                    | ~/model/processes.tsv                    | text abbreviation of metabolic processes        |
-| ~/dock/model/reactions.pickle                 | ~/model/reactions.pickle                 | information about chemical reactions            |
-| ~/dock/model/reactions.tsv                    | ~/model/reactions.tsv                    | text abbreviation of chemical reactions         |
-| ~/dock/model/metabolites.pickle               | ~/model/metabolites.pickle               | information about metabolites                   |
-| ~/dock/model/metabolites.tsv                  | ~/model/metabolites.tsv                  | text abbreviation of metabolites                |
-|                                               |                                          |                                                 |
-| ~/dock/measurement/metabolites.tsv            | ~/measurement/metabolites.tsv            | integration of measurements with metabolites    |
-|                                               |                                          |                                                 |
-| ~/dock/network/compartments-true_hubs-true/   | ~/network/compartments-true_hubs-true/   | files for compartmental network with hubs       |
-| ~/dock/network/compartments-true_hubs-false/  | ~/network/compartments-true_hubs-false/  | files for compartmental network without hubs    |
-| ~/dock/network/compartments-false_hubs-true/  | ~/network/compartments-false_hubs-true/  | files for noncompartmental network with hubs    |
-| ~/dock/network/compartments-false_hubs-false/ | ~/network/compartments-false_hubs-false/ | files for noncompartmental network without hubs |
-| ./links.pickle                                | ./links.pickle                           | network's links                                 |
-| ./nodes_reactions.pickle                      | ./nodes_reactions.pickle                 | network's nodes for reactions                   |
-| ./nodes_metabolites.pickle                    | ./nodes_metabolites.pickle               | network's nodes for metabolites                 |
-| ./network_cytoscape.json                      | ./network_cytoscape.json                 | network format for Cytoscape                    |
-| ./network_networkx.pickle                     | ./network_networkx.pickle                | network format for NetworkX                     |
-
+| export from [MetaboNet][1]                    | file in archive[ref] on [Zenodo][5]      | explanation                                      |
+| :-------------------------------------------- | :--------------------------------------- | :----------------------------------------------- |
+| ~/dock/model/dymetabonet.json                 | ~/model/dymetabonet.json                 | metabolic model format for [DyMetaboNet][20]     |
+| ~/dock/model/compartments.pickle              | ~/model/compartments.pickle              | information about cellular compartments          |
+| ~/dock/model/compartments.tsv                 | ~/model/compartments.tsv                 | text abbreviation of cellular compartments       |
+| ~/dock/model/processes.pickle                 | ~/model/processes.pickle                 | information about metabolic processes            |
+| ~/dock/model/processes.tsv                    | ~/model/processes.tsv                    | text abbreviation of metabolic processes         |
+| ~/dock/model/reactions.pickle                 | ~/model/reactions.pickle                 | information about chemical reactions             |
+| ~/dock/model/reactions.tsv                    | ~/model/reactions.tsv                    | text abbreviation of chemical reactions          |
+| ~/dock/model/metabolites.pickle               | ~/model/metabolites.pickle               | information about metabolites                    |
+| ~/dock/model/metabolites.tsv                  | ~/model/metabolites.tsv                  | text abbreviation of metabolites                 |
+| ...                                           | ...                                      | ...                                              |
+| ~/dock/measurement/                           | ~/measurement/                           | files from organization of metabolomic studies   |
+| ./study_one_report.tsv                        | ./study_one_report.tsv                   | summary from match measurements to metabolites   |
+| ./study_one.tsv                               | ./study_one.tsv                          | fold changes and probabilities                   |
+| ./study_two_report.tsv                        | ./study_two_report.tsv                   | summary from match measurements to metabolites   |
+| ./study_two.tsv                               | ./study_two.tsv                          | fold changes and probabilities                   |
+| ./study_three_report.tsv                      | ./study_three_report.tsv                 | summary from match measurements to metabolites   |
+| ./study_three.tsv                             | ./study_three.tsv                        | fold changes and probabilities                   |
+| ./study_four_report.tsv                       | ./study_four_report.tsv                  | summary from match measurements to metabolites   |
+| ./study_four.tsv                              | ./study_four.tsv                         | fold changes and probabilities                   |
+| ./study_five_report.tsv                       | ./study_five_report.tsv                  | summary from match measurements to metabolites   |
+| ./study_five.tsv                              | ./study_five.tsv                         | fold changes and probabilities                   |
+| ...                                           | ...                                      | ...                                              |
+| ~/dock/network/compartments-true_hubs-true/   | ~/network/compartments-true_hubs-true/   | files for compartmental network with hubs        |
+| ~/dock/network/compartments-true_hubs-false/  | ~/network/compartments-true_hubs-false/  | files for compartmental network without hubs     |
+| ~/dock/network/compartments-false_hubs-true/  | ~/network/compartments-false_hubs-true/  | files for noncompartmental network with hubs     |
+| ~/dock/network/compartments-false_hubs-false/ | ~/network/compartments-false_hubs-false/ | files for noncompartmental network without hubs  |
+| ./links.pickle                                | ./links.pickle                           | network's links                                  |
+| ./nodes_reactions.pickle                      | ./nodes_reactions.pickle                 | network's nodes for reactions                    |
+| ./nodes_metabolites.pickle                    | ./nodes_metabolites.pickle               | network's nodes for metabolites                  |
+| ./network_cytoscape.json                      | ./network_cytoscape.json                 | network format for Cytoscape                     |
+| ./network_networkx.pickle                     | ./network_networkx.pickle                | network format for NetworkX                      |
+| ./analysis/nodes_reactions.tsv                | ./analysis/nodes_reactions.tsv           | metrics on bipartite nodes for reactions         |
+| ./analysis/nodes_metabolites.tsv              | ./analysis/nodes_metabolites.tsv         | metrics on bipartite nodes for metabolites       |
+| ./analysis/network_reactions.tsv              | ./analysis/network_reactions.tsv         | metrics on network relative to reactions         |
+| ./analysis/network_metabolites.tsv            | ./analysis/network_metabolites.tsv       | metrics on network relative to metabolites       |
+| ./measurement/metabolites.tsv                 | ./measurement/metabolites.tsv            | integration of measurements with metabolites     |
 
 
 ## Install MetaboNet
@@ -442,12 +456,15 @@ ls ~/dock/conversion/
 ## Analyze Metabolic Networks
 
 [MetaboNet's][1] _"network"_ routine applies functionality from the
-[NetworkX][16] [application][17] to describe metabolic networks.
+[NetworkX][16] [application][17] to describe metabolic networks. This procedure
+determines and reports multiple metrics on the basis of nodes (bipartite
+groups for both reactions and metabolites) and the entire network.
 
 **_DO:_** Execute the _"analysis"_ procedure of the _"network"_ routine.
 
 ```bash
 $ metabonet network -d ~/dock/ -a
+$ ls ~/dock/network/analysis/
 ```
 
 Run time of _"analysis"_ procedure can be 0.5-2.0 hours depending on the
@@ -474,13 +491,14 @@ from [MetaboNet][1].
 
 ```bash
 $ metabonet network -d ~/dock/ -m
+$ ls ~/dock/network/measurement/
 ```
 
 **_DO:_** Import the following file of measurements from all studies for
 integration with the metabolic network in [Cytoscape][19].
 
 ```bash
-~/dock/measurement/metabolites.tsv
+~/dock/network/measurement/metabolites.tsv
 ```
 
 [1]: https://github.com/tcameronwaller/metabonet

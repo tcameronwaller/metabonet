@@ -1867,29 +1867,27 @@ def write_product(directory=None, information=None):
     """
 
     # Specify directories and files.
-    path = os.path.join(directory, "analysis")
+    path_network = os.path.join(directory, "network")
+    path = os.path.join(path_network, "analysis")
     utility.confirm_path_directory(path)
-    path_nodes_metabolites = os.path.join(path, "nodes_metabolites.pickle")
-    path_nodes_reactions_text = os.path.join(path, "nodes_reactions.tsv")
-    path_nodes_metabolites_text = os.path.join(path, "nodes_metabolites.tsv")
+    path_nodes_reactions = os.path.join(path, "nodes_reactions.tsv")
+    path_nodes_metabolites = os.path.join(path, "nodes_metabolites.tsv")
     path_network_reactions = os.path.join(path, "network_reactions.tsv")
     path_network_metabolites = os.path.join(path, "network_metabolites.tsv")
     path_simplification_metabolites = os.path.join(
         path, "simplification_metabolites.tsv"
     )
     # Write information to file.
-    with open(path_nodes_metabolites, "wb") as file_product:
-        pickle.dump(information["nodes_metabolites"], file_product)
     utility.write_file_table(
-        information=information["nodes_reactions_text"],
-        path_file=path_nodes_reactions_text,
-        names=information["nodes_reactions_text"][0].keys(),
+        information=information["nodes_reactions"],
+        path_file=path_nodes_reactions,
+        names=information["nodes_reactions"][0].keys(),
         delimiter="\t"
     )
     utility.write_file_table(
-        information=information["nodes_metabolites_text"],
-        path_file=path_nodes_metabolites_text,
-        names=information["nodes_metabolites_text"][0].keys(),
+        information=information["nodes_metabolites"],
+        path_file=path_nodes_metabolites,
+        names=information["nodes_metabolites"][0].keys(),
         delimiter="\t"
     )
     utility.write_file_table(
@@ -1945,67 +1943,57 @@ def execute_procedure(directory=None):
         nodes=source["nodes"],
         links=source["links"]
     )
-    # Query individual metabolite.
-    #MNXM89557
-    # "MNXM5", NADP
-    # "MNXM6", NADPH
-    print("ready to call query")
-    metabolite_report = query_metabolite_node(
-        node="MNXM5", # NADP
-        network=network,
-        compartments=source["compartments"],
-        processes=source["processes"],
-        metabolites=source["metabolites"],
-        reactions=source["reactions"],
-    )
-    # Write metabolite report to file.
-    #Write product information to file.
-    write_product_metabolite(
-        directory=directory, information=metabolite_report
-    )
 
     if False:
-        # Network is bipartite.
-        # Store references to separate groups of nodes for reactions and
-        # metabolites.
-        # Analyze entire network.
-        report_network = analyze_bipartite_network(
+        # Query individual metabolite.
+        #MNXM89557
+        # "MNXM5", NADP
+        # "MNXM6", NADPH
+        print("ready to call query")
+        metabolite_report = query_metabolite_node(
+            node="MNXM5", # NADP
             network=network,
-            nodes_reactions=source["nodes_reactions_identifiers"],
-            nodes_metabolites=source["nodes_metabolites_identifiers"]
+            compartments=source["compartments"],
+            processes=source["processes"],
+            metabolites=source["metabolites"],
+            reactions=source["reactions"],
         )
-        if False:
-            entry = {
-                "blah": 1,
-                "foo": 2,
-                "bar": 3
-            }
-            report_network = {
-                "metabolites": entry,
-                "reactions": entry
-            }
-        # Analyze network's individual nodes.
-        report_nodes = analyze_bipartite_network_nodes(
-            network=network,
-            nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
-            nodes_reactions=source["nodes_reactions"],
-            nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
-            nodes_metabolites=source["nodes_metabolites"]
-        )
-        # Prepare reports.
-        # Report node degrees in metabolite simplifications.
-        simplification_metabolites = report_metabolite_degrees(
-            metabolites_query=source["simplification_metabolites"],
-            metabolites_nodes=report_nodes["metabolites"]
-        )
-        # Compile information.
-        information = {
-            "network_reactions": [report_network["reactions"]],
-            "network_metabolites": [report_network["metabolites"]],
-            "nodes_metabolites": report_nodes["metabolites"],
-            "nodes_reactions_text": list(report_nodes["reactions"].values()),
-            "nodes_metabolites_text": list(report_nodes["metabolites"].values()),
-            "simplification_metabolites": simplification_metabolites
-        }
+        # Write metabolite report to file.
         #Write product information to file.
-        write_product(directory=directory, information=information)
+        write_product_metabolite(
+            directory=directory, information=metabolite_report
+        )
+
+    # Network is bipartite.
+    # Store references to separate groups of nodes for reactions and
+    # metabolites.
+    # Analyze entire network.
+    report_network = analyze_bipartite_network(
+        network=network,
+        nodes_reactions=source["nodes_reactions_identifiers"],
+        nodes_metabolites=source["nodes_metabolites_identifiers"]
+    )
+    # Analyze network's individual nodes.
+    report_nodes = analyze_bipartite_network_nodes(
+        network=network,
+        nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
+        nodes_reactions=source["nodes_reactions"],
+        nodes_metabolites_identifiers=source["nodes_metabolites_identifiers"],
+        nodes_metabolites=source["nodes_metabolites"]
+    )
+    # Prepare reports.
+    # Report node degrees in metabolite simplifications.
+    simplification_metabolites = report_metabolite_degrees(
+        metabolites_query=source["simplification_metabolites"],
+        metabolites_nodes=report_nodes["metabolites"]
+    )
+    # Compile information.
+    information = {
+        "network_reactions": [report_network["reactions"]],
+        "network_metabolites": [report_network["metabolites"]],
+        "nodes_reactions": list(report_nodes["reactions"].values()),
+        "nodes_metabolites": list(report_nodes["metabolites"].values()),
+        "simplification_metabolites": simplification_metabolites
+    }
+    #Write product information to file.
+    write_product(directory=directory, information=information)

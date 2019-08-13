@@ -128,7 +128,7 @@ def read_source(directory=None):
     path_simplification_metabolites = os.path.join(
         path_customization, "simplification_metabolites.tsv"
     )
-    path = os.path.join(directory, "conversion")
+    path = os.path.join(directory, "model")
     path_compartments = os.path.join(path, "compartments.pickle")
     path_processes = os.path.join(path, "processes.pickle")
     path_reactions = os.path.join(path, "reactions.pickle")
