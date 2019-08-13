@@ -75,13 +75,11 @@ ls $path_dock/source/measurement/
 ##########
 # Curate metabolic model.
 
-metabonet model -d $path_dock -r
-
-exit 0
+#metabonet model -d $path_dock -r
 
 echo "reconcile to MetaNetX"
-cp -r $path_dock/source/reconciliation_2019-08-12/ $path_dock/
-mv $path_dock/reconciliation_2019-08-12/ $path_dock/reconciliation/
+cp -r $path_dock/source/reconciliation_2019-08-13/ $path_dock/
+mv $path_dock/reconciliation_2019-08-13/ $path_dock/reconciliation/
 ls $path_dock/reconciliation/
 
 echo "curate and organize metabolic model"
@@ -148,6 +146,8 @@ mv $path_dock/network $path_network
 
 echo "network files"
 ls $path_dock/
+
+exit 0
 
 # Plot.
 
