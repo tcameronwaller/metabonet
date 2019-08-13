@@ -871,8 +871,21 @@ def analyze_bipartite_network_group(
     )
 
     # Assortativity.
-
-
+    # Project bipartite network to unipartite representation.
+    projection = ntx.algorithms.bipartite.projection.projected_graph(
+        network,
+        nodes_cis,
+        multigraph=True
+    )
+    assortativity = (
+        ntx.algorithms.assortativity.degree_assortativity_coefficient(
+            projection,
+            x="out",
+            y="in",
+            weight=None,
+            nodes=None,
+        )
+    )
 
     # Modularity.
     # NetworkX might lack this functionality.
@@ -905,7 +918,8 @@ def analyze_bipartite_network_group(
         "cluster_coefficient": cluster_coefficient,
         #"modules_orders": modules_orders,
         "path": small_world["path"],
-        "small_world": small_world["small_world"]
+        "small_world": small_world["small_world"],
+        "assortativity": assortativity,
     }
     return collection
 
@@ -1942,7 +1956,7 @@ def execute_procedure(directory=None):
     returns:
 
     """
-    print("executing the new analysis procedure!!!")
+    print("executing the new analysis procedure... with assortativity!!!")
 
     # Read source information from file.
     source = read_source(directory=directory)
