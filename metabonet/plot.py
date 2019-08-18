@@ -124,8 +124,6 @@ def read_source(directory=None):
     path_true_false = os.path.join(directory, "compartments-true_hubs-false")
     path_false_true = os.path.join(directory, "compartments-false_hubs-true")
     path_false_false = os.path.join(directory, "compartments-false_hubs-false")
-    path_analysis = os.path.join(path_network, "analysis")
-    path_measurement = os.path.join(path_network, "measurement")
     # Nodes.
     path_nodes_one = os.path.join(
         path_true_true, "analysis", "nodes_metabolites.pickle"

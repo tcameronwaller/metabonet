@@ -1,0 +1,92 @@
+instead find top 10-25 clusters with overlap threshold of at least 0.5 (give plenty of flexibility).
+select clusters that are small with both accumulation and depletion
+
+use maximum search depth of 2
+
+search top 25 clusters X 3 at overlap thresholds of 0.25, 0.50, and 0.75
+
+prioritize clusters
+Write these selection criteria in the methods section...
+
+1. 1-3 reactions
+2. measurements for majority of metabolites
+3. both accumulation and depletion of metabolites (to infer functionality)
+4. significant measurements
+
+Include metabolites that are relevant for context regardless of their measurement status.
+If a metabolite isn't necessary for context, only include if p-value < 0.25.
+
+
+steps
+
+1. define custom metabolic network in MetaboNet
+
+2. import metabolic network into Cytoscape
+- File -> Import -> Network from file
+- file "network_cytoscape.json"
+- file does not integrate measurements with node attributes
+
+3. specify styles for visualization of global networks
+- File -> Import -> Styles from File
+- file "cytoscape/style_network.xml"
+
+4. calculate layout for global network
+- Compound Spring Embedder (CoSE)
+"Layout quality:" = "Proof"
+"Incremental:" = "False"
+"Ideal edge length:" = "500"
+"Spring strength (0-100):" = "10"
+"Repulsion strength (0-100):" = "10000"
+"Gravity strength (0-100):" = "1"
+"Compound gravity strength (0-100):" = "1"
+"Gravity range (0-100):" = "100"
+"Compound gravity range (0-100):" = "100"
+"Use smart edge length calculation:" = "True"
+"Use smart repulsion range calculation:" = "True"
+
+4. integrate measurements to candidate metabolites in MetaboNet
+
+5. import metabolite measurements into Cytoscape
+- File -> Import -> Table from File
+- file "measurement/metabolites.tsv"
+- table of fold changes and probabilities from all studies
+- match fold changes and probabilities from all studies to metabolites' nodes
+
+6. specify styles for visualization of measurements
+- File -> Import -> Styles from File
+- file "cytoscape/styles_measurements.xml"
+- each study has its own styles
+- each study has its own minimal and maximal log-2 fold changes
+
+7. explore clusters of measurements by jActiveModules
+7.1. select all metabolites' nodes in network in Cytoscape
+- "type:metabolite"
+7.2. detect clusters using jActiveModules application in Cytoscape
+- detect clusters by enrichment of probabilities (p-values)
+-"number of modules" 5-25
+-"overlap threshold" 0.25, 0.50, or 0.75
+-"adjust score for size" True
+-"regional scoring" True
+-"strategy" search
+-"search depth" 2 (bipartite network)
+-"max depth" 2 (bipartite network)
+-"search from selected nodes" True... select metabolite nodes
+
+8. visualize specific clusters of interest
+- query for list of nodes in cluster
+-- "entity:MNXM189, entity:R169F9B7A, entity:MNXM126, entity:R61E25419, entity:MNXM892"
+- hide all but selected nodes
+- apply compound spring embedder layout
+- Compound Spring Embedder (CoSE)
+"Layout quality:" = "Default"
+"Incremental:" = "False"
+"Ideal edge length:" = "100"
+"Spring strength (0-100):" = "10"
+"Repulsion strength (0-100):" = "50"
+"Gravity strength (0-100):" = "10"
+"Compound gravity strength (0-100):" = "10"
+"Gravity range (0-100):" = "10"
+"Compound gravity range (0-100):" = "10"
+"Use smart edge length calculation:" = "True"
+"Use smart repulsion range calculation:" = "True"
+

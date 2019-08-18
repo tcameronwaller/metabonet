@@ -21,37 +21,12 @@ echo "--------------------------------------------------"
 # Echo each command to console.
 set -x
 
-echo "Organize source files and default parameters."
+echo "model files"
+ls $path_dock/model/
 
-#mkdir "$path_dock"
+echo "measurement files"
+ls $path_dock/measurement/
 
-##########
-# Access default parameters from repository
+# Plot.
 
-
-##########
-# Access source files.
-
-
-##########
-# Install MetaboNet
-
-
-
-##########
-# Curate metabolic model.
-
-##########
-# Define metabolic networks.
-
-echo "define metabolic networks"
-ls $path_dock/source/customization/
-
-echo "compartments false, hubs false"
-metabonet network -d $path_dock -ys -np -v
-echo "integrate measurements to network's metabolites"
-metabonet network -d $path_dock -m
-echo "analyze network"
-metabonet network -d $path_dock -a
-path_network=$path_dock/compartments-false_hubs-false
-mv $path_dock/network $path_network
+metabonet network -d $path_dock -t
