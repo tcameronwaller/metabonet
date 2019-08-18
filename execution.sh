@@ -4,6 +4,7 @@
 
 # Execution
 # $ bash execution.sh
+# nohup bash execution.sh > ~/metabonet_report.txt &
 
 path_dock=~/dock_metabonet
 
