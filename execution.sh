@@ -147,8 +147,6 @@ mv $path_dock/network $path_network
 echo "network files"
 ls $path_dock/
 
-exit 0
-
 # Plot.
 
 metabonet network -d $path_dock -t
