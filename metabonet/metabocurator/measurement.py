@@ -1,61 +1,35 @@
 """
-Extract information about metabolic sets and entities from MetaNetX.
-
-Title:
-    provision
-
-Imports:
-    os: This module from The Python Standard Library contains definitions of
-        tools to interact with the operating system.
-    sys: This module is from The Python Standard Library. It contains
-        definitions of tools to interact with the interpreter.
-    shutil: This module is from The Python Standard Library. It contains
-        definitions of tools for file operations.
-    importlib: This module is from The Python Standard library. It contains
-        definitions of tools to import packages and modules.
-
-Classes:
-    This module does not contain any classes.
-
-Exceptions:
-    This module does not contain any exceptions.
-
-Functions:
-    ...
-
 Author:
+
     Thomas Cameron Waller
     tcameronwaller@gmail.com
     Department of Biochemistry
-    Scientific Computing and Imaging Institute
-    University Of Utah
-    Room 4720 Warnock Engineering Building
-    72 South Central Campus Drive
+    University of Utah
+    Room 4100, Emma Eccles Jones Medical Research Building
+    15 North Medical Drive East
     Salt Lake City, Utah 84112
     United States of America
 
 License:
 
-    This file is part of project Profondeur
-    (https://github.com/tcameronwaller/profondeur/).
+    This file is part of MetaboNet
+    (https://github.com/tcameronwaller/metabonet/).
 
-    Profondeur supports custom definition and visual exploration of metabolic
-    networks.
-    Copyright (C) 2018 Thomas Cameron Waller
+    MetaboNet supports definition and analysis of custom metabolic networks.
+    Copyright (C) 2019 Thomas Cameron Waller
 
-    This program is free software: you can redistribute it and/or modify it
+    MetaboNet is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
     Software Foundation, either version 3 of the License, or (at your option)
     any later version.
 
-    This program is distributed in the hope that it will be useful, but WITHOUT
+    MetaboNet is distributed in the hope that it will be useful, but WITHOUT
     ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.
-    See the GNU General Public License for more details.
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
 
     You should have received a copy of the GNU General Public License along
-    with this program.
-    If not, see <http://www.gnu.org/licenses/>.
+    with MetaboNet. If not, see <http://www.gnu.org/licenses/>.
 """
 
 

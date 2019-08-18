@@ -10,8 +10,8 @@ of these networks.
 
 This file is part of project [MetaboNet][1].
 
-> [MetaboNet][1] supports custom definition of metabolic networks.
-Copyright (C) 2018 Thomas Cameron Waller
+> [MetaboNet][1] supports definition and analysis of custom metabolic networks.
+Copyright (C) 2019 Thomas Cameron Waller
 
 > This program is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free
