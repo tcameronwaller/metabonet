@@ -1,0 +1,7 @@
+metabonet.egg-info
+metabonet/__pycache__
+metabonet/metabocurator/__pycache__
+build/lib
+.ipynb_checkpoints
+dist
+dock_template/source/*xml
