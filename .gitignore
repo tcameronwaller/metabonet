@@ -13,7 +13,10 @@ dock_template/extraction
 dock_template/measurement
 dock_template/model
 dock_template/network
+<<<<<<< HEAD
 dock_template/plot
+=======
+>>>>>>> fbb986403ec660177065e1469e9c267003b40708
 dock_template/compartments-true_hubs-true
 dock_template/compartments-true_hubs-false
 dock_template/compartments-false_hubs-true
