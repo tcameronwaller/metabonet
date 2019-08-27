@@ -44,7 +44,7 @@ $ cd metabonet-master
 ```
 3. Run the interactive MetaboNet player
 ```
-$ bash execute.sh
+$ bash interactive_metabonet.sh
 ```
 
 ## Archives

@@ -5,3 +5,11 @@ build/lib
 .ipynb_checkpoints
 dist
 dock_template/source/*xml
+dock_template/candidacy
+dock_template/collection
+dock_template/curation
+dock_template/enhancement
+dock_template/extraction 
+dock_template/measurement
+dock_template/model
+dock_template/network
