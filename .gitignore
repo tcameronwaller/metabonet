@@ -9,7 +9,12 @@ dock_template/candidacy
 dock_template/collection
 dock_template/curation
 dock_template/enhancement
-dock_template/extraction 
+dock_template/extraction
 dock_template/measurement
 dock_template/model
 dock_template/network
+dock_template/plot
+dock_template/compartments-true_hubs-true
+dock_template/compartments-true_hubs-false
+dock_template/compartments-false_hubs-true
+dock_template/compartments-false_hubs-false
