@@ -2,307 +2,152 @@
 
 #chmod u+x script.sh
 
-# Interactive Execution Script
+# Execution
 # $ bash execution.sh
+# nohup bash execution.sh > ~/metabonet_report.txt &
 
-#######################
-# Get current metabonet
-# directory from user
-#######################
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
-echo "|                                  MetaboNet                                   |"
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
-echo "| Copyright (C) 2019 Thomas Cameron Waller                                     |"
-echo "| This project supports curation of the model of human cellular metabolism     |"
-echo "| definition of custom metabolic networks to represent this model, and         |"
-echo "| analyses of these networks.                                                  |"
-echo "|                                                                              |" 2>/dev/null
-echo "| If you use Metabonet, please cite the following:                             |"
-echo "| T. Cameron Waller, Jordan A. Berg, Brian E. Chapman, Jared P. Rutter. 2019.  |"
-echo "| \"Compartments and Hubs Differentiate the Relevance of Metabolic Networks to  |"
-echo "| Metabolomic Experiments\".                                                    |"
-echo "|                                                                              |"
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
-echo "| This interactive script will walk you through installing MetaboNet curating  |"
-echo "| modeling the human metabolic network, and analyzing data using this model.   |"
-echo "|                                                                              |"
-echo "| Note: Requires PyPi (comes with most current distributions of Python)        |"
-echo "|                                                                              |"
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
-echo "|                                                                              |" 2>/dev/null
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
-echo "| Step 1: Download Source Files"
-echo "| Here is your current working directory:" 2>/dev/null
-pwd 2>/dev/null
-echo "| " 2>/dev/null
-read -p "| Are you in the MetaboNet directory? (Y/n)" -n 1 -r
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  METABONET="."
-else
-  echo ""
-  read -p "| Please provide the full path to the MetaboNet directory: " -r
-  METABONET=$REPLY
-fi
+path_dock=~/dock_metabonet
 
-# Check for path formatting
-if [[ ${METABONET: -1} == "/" ]]
-then
-  METABONET=${METABONET::-1}
-else
-  METABONET=$METABONET
-fi
-echo "" 2>/dev/null
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
+# Suppress echo each command to console.
+set +x
 
-# Set dock path
-DOCK="$METABONET/dock_template"
+echo "--------------------------------------------------"
+echo "----------"
+echo "Here are your working directories."
+echo "dock: $path_dock"
+echo "----------"
+echo "--------------------------------------------------"
 
-#######################
-# Access source files
-#######################
-RECON='https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml'
+##########
+# Echo each command to console.
+set -x
 
-rm -rf $DOCK/source/recon2m2.xml 2>/dev/null
-rm -rf $DOCK/source/Recon2M.2_MNX_Entrez_Gene.xml 2>/dev/null
+echo "Organize source files and default parameters."
 
-echo "| Currently set to download the Recon database from: "
-echo "| $RECON"
-read -p "| Do you want to download and use this version? (Y/n)" -n 1 -r
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  RECON=$RECON
-else
-  echo "|"
-  read -p "| Please provide the URL for the version you would like to use: " -r
-  RECON=$REPLY
-fi
-echo ""
-echo "| Downloading Recon..."
-curl -L $RECON -o $DOCK/source/recon2m2.xml
+rm -rf $path_dock
 
+#mkdir "$path_dock"
 
-HMDB='http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip'
+##########
+# Access default parameters from repository
 
-rm -rf $DOCK/source/hmdb_metabolites.zip
-rm -rf $DOCK/source/hmdb_metabolites.xml
+echo "parameters"
+cd ~/Downloads/
+rm -rf ~/Downloads/master.zip
+rm -rf ~/Downloads/metabonet-master
+wget https://github.com/tcameronwaller/metabonet/archive/master.zip
+unzip master.zip
+cp -r ~/Downloads/metabonet-master/dock_template/ ~/
+cd ~
+mv dock_template dock_metabonet
+ls "$path_dock/source/customization/"
 
-echo "| Currently set to download and use the HMDB database from: "
-echo "| $HMDB"
-read -p "| Do you want to download this version? (Y/n)" -n 1 -r
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  HMDB=$HMDB
-else
-  echo "|"
-  read -p "| Please provide the URL for the version you would like to use: " -r
-  HMDB=$REPLY
-fi
-echo ""
-echo "| Downloading HMDB..."
-curl -L $HMDB -o $DOCK/source/hmdb_metabolites.zip
-unzip $DOCK/source/hmdb_metabolites.zip -d $DOCK/source/
-rm -rf $DOCK/source/hmdb_metabolites.zip
+rm -rf ~/Downloads/master.zip
+rm -rf ~/Downloads/metabonet-master
 
-echo "| "
-echo "| Source files downloaded."
-echo "|"
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
+##########
+# Access source files.
 
+echo "Recon2M.2"
+cd ~/Downloads/
+rm ./Recon2M.2_MNX_Entrez_Gene.xml
+wget https://zenodo.org/record/583326/files/Recon2M.2_MNX_Entrez_Gene.xml
+cp ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml $path_dock/source/recon2m2.xml
+rm ~/Downloads/Recon2M.2_MNX_Entrez_Gene.xml
 
-#######################
-# Check user has
-# included all desired
-# measurement records
-#######################
-echo "| Step 2: Include Measurement Records"
-echo "| Current measurement records include:"
-ls $DOCK/source/measurement/
-echo "| Check that no desired measurement records are missing, then press any key."
-read -p  "| Include any missing files or folders at $DOCK/source/measurements" -n 1 -r
-echo ""
-echo "|"
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
+echo "HMDB"
+rm hmdb_metabolites.zip
+rm hmdb_metabolites.xml
+wget http://www.hmdb.ca/system/downloads/current/hmdb_metabolites.zip
+unzip ~/Downloads/hmdb_metabolites.zip
+cp ~/Downloads/hmdb_metabolites.xml $path_dock/source/hmdb_metabolites.xml
+rm ~/Downloads/hmdb_metabolites.zip
+rm ~/Downloads/hmdb_metabolites.xml
 
-#######################
+echo "measurements"
+
+ls $path_dock/source/measurement/
+
+##########
 # Install MetaboNet
-#######################
-echo "| Step 3: Install MetaboNet"
-echo "| Installing MetaboNet..."
-python $METABONET/setup.py install
-echo "| MetaboNet installed."
-echo "|"
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
 
 
-#######################
-# Curate metabolic
-# model
-#######################
-echo "| Step 4: Curate Metabolic Model"
-echo "| Curating MetaboNet metabolic model..."
 
-mkdir $DOCK/reconciliation/
-METANETX="$DOCK/source/reconciliation_2019-08-13"
-echo "| Currently reconciling network using archived MetaNetX network file: "
-echo "| $METANETX"
-read -p "| Do you wish to run a new reconciliation? (Y/n)" -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  echo ""
-  echo "| Preparing reconciliation..."
-  metabonet model -d $DOCK -r
-  echo ""
-  echo "| The following will walk you through custom reconciliation of the metabolic "
-  echo "| network. We will provide you with each task step-by-step. Press any key to "
-  echo "| advance to the next step."
-  echo "| "
-  echo "| - Import the file $DOCK/reconciliation/recon2m2_reconciliation.xml "
-  read -p "| into MetaNetX @ https://www.metanetx.org/ and run. (press any key to continue)" -n 1 -r
-  echo ""
-  echo "| "
-  echo "| - Save _Mapping summary_ from [MetaNetX][15] as the following file."
-  echo "| Save the mapping summary to $DOCK/reconciliation/metanetx_import_report.tsv "
-  echo "| This summary is useful for review and also includes information to curate "
-  read -p "| (press any key to continue)" -n 1 -r
-  echo ""
-  echo "| "
-  echo "| - Save files from MetaNetX to the following directories and files:"
-  echo "| (press any key to continue for each file)"
-  read -p "| * $DOCK/reconciliation/recon2m2_metanetx_compartments.tsv " -n 1 -r
-  echo ""
-  read -p "| * $DOCK/reconciliation/recon2m2_metanetx_genes.tsv " -n 1 -r
-  echo ""
-  read -p "| * $DOCK/reconciliation/recon2m2_metanetx_metabolites.tsv " -n 1 -r
-  echo ""
-  read -p "| * $DOCK/reconciliation/recon2m2_metanetx_reactions.tsv " -n 1 -r
-  echo ""
-else
-  cp -r $DOCK/source/reconciliation_2019-08-13/ $DOCK/
-  mv $DOCK/reconciliation_2019-08-13/ $DOCK/reconciliation/
-  ls $DOCK/reconciliation/
-fi
-METANETX="$DOCK/reconciliation"
-echo "| "
-echo "| Customization files:"
-ls $DOCK/source/customization/
-echo "| "
-echo "| If you would like to edit any customizable files, do so now @ $DOCK/source/customization/"
-read -p "| (press any key to continue)" -n 1 -r
-echo ""
-echo "| "
-echo "| Curating and organizing metabolic model..."
+##########
+# Curate metabolic model.
 
-metabonet model -d $DOCK -ceauv
+#metabonet model -d $path_dock -r
 
-echo "| "
-echo "| Model files:"
-ls $DOCK/model/
+echo "reconcile to MetaNetX"
+cp -r $path_dock/source/reconciliation_2019-08-13/ $path_dock/
+mv $path_dock/reconciliation_2019-08-13/ $path_dock/reconciliation/
+ls $path_dock/reconciliation/
 
-echo "| "
-echo "| Curating and organizing measurements..."
-metabonet model -d $DOCK -m
+echo "curate and organize metabolic model"
+ls $path_dock/source/customization/
+metabonet model -d $path_dock -ceauv
 
-echo "| "
-echo "| Measurement files:"
-ls $DOCK/measurement/
+echo "model files"
+ls $path_dock/model/
 
-#######################
-# Define metabolic
-# networks
-#######################
-echo "| "
-echo "| Defined metabolic networks:"
-ls $DOCK/source/customization/
+echo "curate and organize measurements"
+metabonet model -d $path_dock -m
 
-#######################
-# Build metabolic
-# model
-#######################
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
-echo "| Step 5: Build Metabolic Model "
-echo "| We will now build the metabolic model."
-echo "| Default is yes (Y) for both options, but please refer to the MetaboNet manuscript "
-echo "| for further information. "
-read -p "| Do you want to build the model with compartments? (Y/n)" -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  COMPARTMENTS='yes'
-else
-  COMPARTMENTS='no'
-fi
-read -p "| Do you want to build the model with hubs? (Y/n)" -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  HUBS='yes'
-else
-  HUBS='no'
-fi
+echo "measurement files"
+ls $path_dock/measurement/
 
-echo "| "
-echo "| Building model..."
+##########
+# Define metabolic networks.
 
-#compartments true, hubs true
-if [ $COMPARTMENTS == 'yes' ] && [ $HUBS == 'yes' ]
-then
-  metabonet network -d ~/dock/ -yc -np -v
-  path_network=$DOCK/compartments-true_hubs-true
+echo "define metabolic networks"
+ls $path_dock/source/customization/
 
-#compartments true, hubs false
-elif [ $COMPARTMENTS == 'yes' ] && [ $HUBS == 'no' ]
-then
-  metabonet network -d ~/dock/ -ycs -np -v
-  path_network=$DOCK/compartments-true_hubs-false
+echo "compartments true, hubs true"
+metabonet network -d $path_dock -yc -np -v
+echo "integrate measurements to network's metabolites"
+metabonet network -d $path_dock -m
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-true_hubs-true
+mv $path_dock/network $path_network
+#mv $path_dock/network/links.pickle $path_network/
+#mv $path_dock/network/nodes_reactions.pickle $path_network/
+#mv $path_dock/network/nodes_metabolites.pickle $path_network/
+#mv $path_dock/network/network_cytoscape.json $path_network/
+#mv $path_dock/network/network_networkx.pickle $path_network/
+#mv $path_dock/network/measurement/ $path_network/
+#mv $path_dock/network/analysis/ $path_network/
 
-#compartments false, hubs true
-elif [ $COMPARTMENTS == 'no' ] && [ $HUBS == 'yes' ]
-then
-  metabonet network -d ~/dock/ -y -np -v
-  path_network=$DOCK/compartments-false_hubs-true
+echo "compartments true, hubs false"
+metabonet network -d $path_dock -ycs -np -v
+echo "integrate measurements to network's metabolites"
+metabonet network -d $path_dock -m
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-true_hubs-false
+mv $path_dock/network $path_network
 
-#compartments false, hubs false
-elif [ $COMPARTMENTS == 'no' ] && [ $HUBS == 'no' ]
-then
-  metabonet network -d ~/dock/ -ys -np -v
-  path_network=$DOCK/compartments-false_hubs-false
-else
-  echo "| Something went wrong with the input"
-  exit 1
-fi
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
-echo "| Step 6: Integrate measurements into model"
-echo "| Integrating measurements to network's metabolites..."
-metabonet network -d $DOCK -m
+echo "compartments false, hubs true"
+metabonet network -d $path_dock -y -np -v
+echo "integrate measurements to network's metabolites"
+metabonet network -d $path_dock -m
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-false_hubs-true
+mv $path_dock/network $path_network
 
+echo "compartments false, hubs false"
+metabonet network -d $path_dock -ys -np -v
+echo "integrate measurements to network's metabolites"
+metabonet network -d $path_dock -m
+echo "analyze network"
+metabonet network -d $path_dock -a
+path_network=$path_dock/compartments-false_hubs-false
+mv $path_dock/network $path_network
 
-#######################
-# Analysis
-#######################
-echo "| "
-echo "+-------------------------------------------------------------------------------" 2>/dev/null
-echo "| Step 7: Analyzing Network"
-echo "| Analyzing network..."
-metabonet network -d $DOCK -a
-mv $DOCK/network $path_network
-#mv $DOCK/network/links.pickle $path_network/
-#mv $DOCK/network/nodes_reactions.pickle $path_network/
-#mv $DOCK/network/nodes_metabolites.pickle $path_network/
-#mv $DOCK/network/network_cytoscape.json $path_network/
-#mv $DOCK/network/network_networkx.pickle $path_network/
-#mv $DOCK/network/measurement/ $path_network/
-#mv $DOCK/network/analysis/ $path_network/
-echo "| "
-echo "| Network files:"
-ls $DOCK/
+echo "network files"
+ls $path_dock/
 
-# Plot
-echo "| "
-echo "| Plotting results..."
-metabonet network -d $DOCK -t
-echo "| "
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
-echo "|                         MetaboNet execution complete                         |"
-echo "+------------------------------------------------------------------------------+" 2>/dev/null
+# Plot.
+
+metabonet network -d $path_dock -t
