@@ -138,8 +138,15 @@ def bipartite_closeness_centrality(G, nodes, normalized=True):
     path_length = ntx.single_source_shortest_path_length
     top = set(nodes)
     bottom = set(G) - top
+
     n = float(len(top))
     m = float(len(bottom))
+
+
+    counter = 1
+    total_top = len(top)
+    total_bottom = len(bottom)
+
     for node in top:
         sp = dict(path_length(G, node))
         totsp = sum(sp.values())
@@ -151,6 +158,13 @@ def bipartite_closeness_centrality(G, nodes, normalized=True):
         else:
             # TODO: correction of error in original
             closeness[node] = 0.0
+
+        utility.progress_bar(counter, total_top, status='Computing top centrality')
+        counter += 1
+
+    print('')
+    counter = 1
+
     for node in bottom:
         sp = dict(path_length(G, node))
         totsp = sum(sp.values())
@@ -163,6 +177,12 @@ def bipartite_closeness_centrality(G, nodes, normalized=True):
         else:
             # TODO: correction of error in original
             closeness[node] = 0.0
+
+        utility.progress_bar(counter, total_bottom, status='Computing bottom centrality')
+        counter += 1
+
+    print('')
+
     return closeness
 
 
@@ -297,6 +317,7 @@ def analyze_bipartite_network_nodes(
     """
 
     # Reactions.
+    print('-> Analyzing reaction network nodes...')
     reactions = analyze_network_nodes_group(
         type="reaction",
         network=network,
@@ -304,6 +325,7 @@ def analyze_bipartite_network_nodes(
         nodes=nodes_reactions
     )
     # Metabolites.
+    print('-> Analyzing metabolite network nodes...')
     metabolites = analyze_network_nodes_group(
         type="metabolite",
         network=network,
@@ -746,12 +768,14 @@ def analyze_bipartite_network(
     """
 
     # Reactions.
+    print('-> Analyzing bipartite network groups for reactions...')
     reactions = analyze_bipartite_network_group(
         network=network,
         nodes_cis=nodes_reactions,
         nodes_trans=nodes_metabolites
     )
     # Metabolites.
+    print('-> Analyzing bipartite network groups for metabolites...')
     metabolites = analyze_bipartite_network_group(
         network=network,
         nodes_cis=nodes_metabolites,
@@ -799,8 +823,10 @@ def analyze_bipartite_network_group(
         if not (bipartite_cis and bipartite_trans):
             print("Error! ... Bipartite node sets are inaccurate!")
     # Scale.
+    print('-> Determining network scale...')
     scale = determine_network_scale(network=network, nodes=nodes_cis)
     # Connectivity.
+    print("-> Calculating connectivity...")
     connectivity = determine_network_connectivity(
         network=network, nodes=nodes_cis
     )
@@ -809,6 +835,7 @@ def analyze_bipartite_network_group(
     # non-connected or even less-connected networks.
     #distance = determine_network_distance(network=network, nodes=nodes_cis)
     # Centralization.
+    print('-> Determining centralization...')
     centralization = determine_bipartite_network_centralization(
         network=network,
         nodes_cis=nodes_cis,
@@ -816,10 +843,12 @@ def analyze_bipartite_network_group(
         method="separate"
     )
     # Cluster.
+    print('-> Clustering...')
     cluster_coefficient = ntx.algorithms.bipartite.cluster.average_clustering(
         network, nodes=nodes_cis, mode="dot"
     )
     # Small-world.
+    print('-> Calculating small world coefficient...')
     small_world = calculate_bipartite_network_small_world_coefficient(
         network=network,
         nodes_cis=nodes_cis,
@@ -1055,20 +1084,24 @@ def determine_bipartite_network_centralization(
     # Formulas for centralization will be relevant to these normal
     # centralities.
     # Degree centrality.
+    print('---> Calculating degree centrality...')
     degree = ntx.algorithms.bipartite.centrality.degree_centrality(
         network, nodes_cis
     )
     # Closeness centrality.
     # Centralization formulas might not account for the supplemental
     # normalization to order of node's component.
+    print('---> Calculating closeness centrality...')
     closeness = bipartite_closeness_centrality(
         network, nodes_cis, normalized=True
     )
     # Betweenness centrality.
+    print('---> Calculating betweeness centrality...')
     betweenness = ntx.algorithms.bipartite.centrality.betweenness_centrality(
         network, nodes_cis
     )
     # Calculate centralization.
+    print('---> Calculating centrality...')
     centralization = calculate_bipartite_network_centralization(
         centralities_degree=degree,
         centralities_closeness=closeness,
@@ -1412,6 +1445,7 @@ def calculate_bipartite_network_small_world_coefficient(
     """
 
     # Calculate relevant properties of the real network.
+    print('---> Calculating real network...')
     real = calculate_bipartite_network_small_world_properties(
         network=network,
         nodes_cis=nodes_cis,
@@ -1424,7 +1458,11 @@ def calculate_bipartite_network_small_world_coefficient(
         "clusters": [],
         "paths": []
     }
+
+    print('---> Simulating networks...')
+
     for index in range(10):
+        print('-----> ' + str(index + 1) + '/' + str(10))
         # Generate random bipartite network with comparable orders of bipartite
         # sets and size.
         simulation = generate_random_bipartite_network(
@@ -1781,6 +1819,9 @@ def report_metabolite_degrees(
     """
 
     metabolites_report = []
+    counter = 1
+    total = len(metabolites_query)
+
     for record in metabolites_query:
         record_metabolite = record["metabolite"]
         # Collect degrees of all nodes that represent the metabolite.
@@ -1797,6 +1838,10 @@ def report_metabolite_degrees(
             degree_total = 0
         record["degree_total"] = degree_total
         metabolites_report.append(record)
+
+        utility.progress_bar(counter, total, status='Reporting metabolite degrees')
+        counter += 1
+
     # Return information.
     return metabolites_report
 
@@ -1923,8 +1968,11 @@ def execute_procedure(directory=None):
     print("executing the new analysis procedure... with assortativity!!!")
 
     # Read source information from file.
+    print("Reading in source files...")
     source = read_source(directory=directory)
+
     # Instantiate network in NetworkX.
+    print('Instantiating networks in NetworkX...')
     network = instantiate_networkx(
         nodes=source["nodes"],
         links=source["links"]
@@ -1954,12 +2002,14 @@ def execute_procedure(directory=None):
     # Store references to separate groups of nodes for reactions and
     # metabolites.
     # Analyze entire network.
+    print('Analyzing bipartite network...')
     report_network = analyze_bipartite_network(
         network=network,
         nodes_reactions=source["nodes_reactions_identifiers"],
         nodes_metabolites=source["nodes_metabolites_identifiers"]
     )
     # Analyze network's individual nodes.
+    print('Analyzing network nodes...')
     report_nodes = analyze_bipartite_network_nodes(
         network=network,
         nodes_reactions_identifiers=source["nodes_reactions_identifiers"],
@@ -1969,6 +2019,7 @@ def execute_procedure(directory=None):
     )
     # Prepare reports.
     # Report node degrees in metabolite simplifications.
+    print('Reporting metabolite node degrees...')
     simplification_metabolites = report_metabolite_degrees(
         metabolites_query=source["simplification_metabolites"],
         metabolites_nodes=report_nodes["metabolites"]
@@ -1982,4 +2033,5 @@ def execute_procedure(directory=None):
         "simplification_metabolites": simplification_metabolites
     }
     #Write product information to file.
+    print('Writing output...')
     write_product(directory=directory, information=information)
