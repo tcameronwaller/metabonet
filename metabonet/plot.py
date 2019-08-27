@@ -76,68 +76,54 @@ def read_source(directory=None):
     """
 
     # Specify directories and files.
-    path_true_true = os.path.join(directory, "compartments-true_hubs-true")
-    path_true_false = os.path.join(directory, "compartments-true_hubs-false")
-    path_false_true = os.path.join(directory, "compartments-false_hubs-true")
-    path_false_false = os.path.join(directory, "compartments-false_hubs-false")
-    # Nodes.
-    path_nodes_one = os.path.join(
-        path_true_true, "analysis", "nodes_metabolites.pickle"
-    )
-    path_nodes_two = os.path.join(
-        path_true_false, "analysis", "nodes_metabolites.pickle"
-    )
-    path_nodes_three = os.path.join(
-        path_false_true, "analysis", "nodes_metabolites.pickle"
-    )
-    path_nodes_four = os.path.join(
-        path_false_false, "analysis", "nodes_metabolites.pickle"
-    )
+    nodes_dictionary = {
+        "path_true_true": os.path.join(directory, "compartments-true_hubs-true"),
+        "path_true_false": os.path.join(directory, "compartments-true_hubs-false"),
+        "path_false_true": os.path.join(directory, "compartments-false_hubs-true"),
+        "path_false_false": os.path.join(directory, "compartments-false_hubs-false")
+        }
+
+    # Nodes
+    for key in nodes_dictionary:
+        if os.path.exists(nodes_dictionary[key]):
+
+            # Nodes.
+            path_nodes_x = os.path.join(
+                nodes_dictionary[key], "analysis", "nodes_metabolites.pickle"
+            )
+            with open(path_nodes_x, "rb") as file_source:
+                nodes_x = pickle.load(file_source)
+                nodes_dictionary[key] = nodes_x
+
+        else:
+            nodes_dictionary[key] = None
+
     # Measurements.
+    measurement_list = []
     path_measurement = os.path.join(directory, "measurement")
-    path_measurements_one = os.path.join(path_measurement, "study_one.pickle")
-    path_measurements_two = os.path.join(path_measurement, "study_two.pickle")
-    path_measurements_three = os.path.join(
-        path_measurement, "study_three.pickle"
-    )
-    path_measurements_four = os.path.join(
-        path_measurement, "study_four.pickle"
-    )
-    path_measurements_five = os.path.join(
-        path_measurement, "study_five.pickle"
-    )
-    # Read information from file.
-    # Nodes.
-    with open(path_nodes_one, "rb") as file_source:
-        nodes_one = pickle.load(file_source)
-    with open(path_nodes_two, "rb") as file_source:
-        nodes_two = pickle.load(file_source)
-    with open(path_nodes_three, "rb") as file_source:
-        nodes_three = pickle.load(file_source)
-    with open(path_nodes_four, "rb") as file_source:
-        nodes_four = pickle.load(file_source)
-    # Measurements.
-    with open(path_measurements_one, "rb") as file_source:
-        measurements_one = pickle.load(file_source)
-    with open(path_measurements_two, "rb") as file_source:
-        measurements_two = pickle.load(file_source)
-    with open(path_measurements_three, "rb") as file_source:
-        measurements_three = pickle.load(file_source)
-    with open(path_measurements_four, "rb") as file_source:
-        measurements_four = pickle.load(file_source)
-    with open(path_measurements_five, "rb") as file_source:
-        measurements_five = pickle.load(file_source)
+    if os.path.exists(path_measurement):
+
+        for file in os.listdir(path_measurement):
+            if file.endswith(".pickle"):
+                measure_path = os.path.join(path_measurement, file)
+                with open(measure_path, "rb") as file_source:
+                    measurement_x = pickle.load(file_source)
+                    measurement_list.append(measurement_x)
+            else:
+                pass
+
+    # Check nodes and measurements for non-zero value
+    if len(measurement_list) < 1:
+
+        raise Exception("No measurement files found. Exiting...")
+
     # Compile and return information.
     return {
-        "nodes_one": nodes_one,
-        "nodes_two": nodes_two,
-        "nodes_three": nodes_three,
-        "nodes_four": nodes_four,
-        "measurements_one": measurements_one,
-        "measurements_two": measurements_two,
-        "measurements_three": measurements_three,
-        "measurements_four": measurements_four,
-        "measurements_five": measurements_five
+        "compartmentsTrue_hubsTrue": nodes_dictionary["path_true_true"],
+        "compartmentsTrue_hubsFalse": nodes_dictionary["path_true_false"],
+        "compartmentsFalse_hubsTrue": nodes_dictionary["path_false_true"],
+        "compartmentsFalse_hubsFalse": nodes_dictionary["path_false_false"],
+        "measurements": measurement_list
     }
 
 
@@ -299,19 +285,26 @@ def plot_degrees(
         (dict<object>): references to chart objects
 
     """
+    if nodes_one != None and nodes_two != None:
+        chart_one_two = plot_degree_distributions(
+            nodes_hubs_yes=nodes_one,
+            nodes_hubs_no=nodes_two,
+            fonts=fonts,
+            colors=colors
+        )
+    else:
+        chart_one_two = None
 
-    chart_one_two = plot_degree_distributions(
-        nodes_hubs_yes=nodes_one,
-        nodes_hubs_no=nodes_two,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_three_four = plot_degree_distributions(
-        nodes_hubs_yes=nodes_three,
-        nodes_hubs_no=nodes_four,
-        fonts=fonts,
-        colors=colors
-    )
+    if nodes_three != None and nodes_four != None:
+        chart_three_four = plot_degree_distributions(
+            nodes_hubs_yes=nodes_three,
+            nodes_hubs_no=nodes_four,
+            fonts=fonts,
+            colors=colors
+        )
+    else:
+        chart_three_four = None
+
     # Compile and return information.
     return {
         "one_two": chart_one_two,
@@ -341,6 +334,9 @@ def plot_degree_distributions(
         (object): chart object
 
     """
+    if nodes_hubs_yes == None or nodes_hubs_no == None:
+        print("Cannot plot hubs degree comparison.")
+        return -1
 
     series_one = utility.collect_value_from_records(
         key="degree",
@@ -486,35 +482,50 @@ def plot_ranks(
         (dict<object>): references to chart objects
 
     """
+    if nodes_one != None:
+        chart_one = plot_nodes_ranks(
+            color="blue",
+            count=count,
+            nodes=nodes_one,
+            fonts=fonts,
+            colors=colors
+        )
+    else:
+        chart_one = None
 
-    chart_one = plot_nodes_ranks(
-        color="blue",
-        count=count,
-        nodes=nodes_one,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_two = plot_nodes_ranks(
-        color="orange",
-        count=count,
-        nodes=nodes_two,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_three = plot_nodes_ranks(
-        color="blue",
-        count=count,
-        nodes=nodes_three,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_four = plot_nodes_ranks(
-        color="orange",
-        count=count,
-        nodes=nodes_four,
-        fonts=fonts,
-        colors=colors
-    )
+    if nodes_two != None:
+        chart_two = plot_nodes_ranks(
+            color="orange",
+            count=count,
+            nodes=nodes_two,
+            fonts=fonts,
+            colors=colors
+        )
+    else:
+        chart_two = None
+
+    if nodes_three != None:
+        chart_three = plot_nodes_ranks(
+            color="blue",
+            count=count,
+            nodes=nodes_three,
+            fonts=fonts,
+            colors=colors
+        )
+    else:
+        chart_three = None
+
+    if nodes_four != None:
+        chart_four = plot_nodes_ranks(
+            color="orange",
+            count=count,
+            nodes=nodes_four,
+            fonts=fonts,
+            colors=colors
+        )
+    else:
+        chart_four = None
+
     # Compile and return information.
     return {
         "one": chart_one,
@@ -749,22 +760,42 @@ def plot_names(
 
     """
 
-    chart_one = plot_names_clouds(
-        count=count,
-        nodes=nodes_one
-    )
-    chart_two = plot_names_clouds(
-        count=count,
-        nodes=nodes_two
-    )
-    chart_three = plot_names_clouds(
-        count=count,
-        nodes=nodes_three
-    )
-    chart_four = plot_names_clouds(
-        count=count,
-        nodes=nodes_four
-    )
+    if nodes_one != None:
+        print('-> Plotting name cloud for compartments=True and hubs=True...')
+        chart_one = plot_names_clouds(
+            count=count,
+            nodes=nodes_one
+        )
+    else:
+        chart_one = None
+
+    if nodes_two != None:
+        print('-> Plotting name cloud for compartments=True and hubs=False...')
+        chart_two = plot_names_clouds(
+            count=count,
+            nodes=nodes_two
+        )
+    else:
+        chart_two = None
+
+    if nodes_three != None:
+        print('-> Plotting name cloud for compartments=False and hubs=True...')
+        chart_three = plot_names_clouds(
+            count=count,
+            nodes=nodes_three
+        )
+    else:
+        chart_three = None
+
+    if nodes_four != None:
+        print('-> Plotting name cloud for compartments=False and hubs=False...')
+        chart_four = plot_names_clouds(
+            count=count,
+            nodes=nodes_four
+        )
+    else:
+        chart_four = None
+
     # Compile and return information.
     return {
         "one": chart_one,
@@ -822,11 +853,7 @@ def plot_names_clouds(
 
 
 def plot_measurements(
-    records_one=None,
-    records_two=None,
-    records_three=None,
-    records_four=None,
-    records_five=None,
+    records=None,
     threshold_p=None,
     threshold_fold=None,
     pad=None,
@@ -856,60 +883,25 @@ def plot_measurements(
         (dict<object>): references to chart objects
 
     """
+    charts = []
 
-    chart_one = plot_volcano(
-        records=records_one,
-        threshold_p=0.025,
-        threshold_fold=1.414,
-        label=label,
-        pad=pad,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_two = plot_volcano(
-        records=records_two,
-        threshold_p=0.025,
-        threshold_fold=1.414,
-        label=label,
-        pad=pad,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_three = plot_volcano(
-        records=records_three,
-        threshold_p=0.01,
-        threshold_fold=2.0,
-        label=label,
-        pad=pad,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_four = plot_volcano(
-        records=records_four,
-        threshold_p=0.01,
-        threshold_fold=2.0,
-        label=label,
-        pad=pad,
-        fonts=fonts,
-        colors=colors
-    )
-    chart_five = plot_volcano(
-        records=records_five,
-        threshold_p=0.05,
-        threshold_fold=1.189,
-        label=label,
-        pad=pad,
-        fonts=fonts,
-        colors=colors
-    )
-    # Compile and return information.
-    return {
-        "one": chart_one,
-        "two": chart_two,
-        "three": chart_three,
-        "four": chart_four,
-        "five": chart_five
-    }
+    if len(records) > 0:
+        for record_x in records:
+            chart_x = plot_volcano(
+                records=record_x,
+                threshold_p=0.025,
+                threshold_fold=1.414,
+                label=label,
+                pad=pad,
+                fonts=fonts,
+                colors=colors
+            )
+            charts.append(chart_x)
+
+        # Compile and return information.
+        return charts
+    else:
+        return None
 
 
 def plot_volcano(
@@ -1110,6 +1102,8 @@ def write_product(directory=None, information=None):
     arguments:
         directory (str): directory for product files
         information (object): information to write to file
+            for all keys except measurements, contains a dictionary of several plots or None if no plot available
+            for measurements, list of plots or None
 
     raises:
 
@@ -1120,139 +1114,112 @@ def write_product(directory=None, information=None):
     # Specify directories and files.
     path = os.path.join(directory, "plot")
     utility.confirm_path_directory(path)
-    # Degree.
-    path_degree_one_two = os.path.join(
-        path, "metabolite_degrees_compartments-true.svg"
-    )
-    path_degree_three_four = os.path.join(
-        path, "metabolite_degrees_compartments-false.svg"
-    )
-    # Rank.
-    path_rank_one = os.path.join(
-        path, "metabolite_ranks_compartments-true_hubs-true.svg"
-    )
-    path_rank_two = os.path.join(
-        path, "metabolite_ranks_compartments-true_hubs-false.svg"
-    )
-    path_rank_three = os.path.join(
-        path, "metabolite_ranks_compartments-false_hubs-true.svg"
-    )
-    path_rank_four = os.path.join(
-        path, "metabolite_ranks_compartments-false_hubs-false.svg"
-    )
-    # Name.
-    path_name_one = os.path.join(
-        path, "metabolite_names_compartments-true_hubs-true.png"
-    )
-    path_name_two = os.path.join(
-        path, "metabolite_names_compartments-true_hubs-false.png"
-    )
-    path_name_three = os.path.join(
-        path, "metabolite_names_compartments-false_hubs-true.png"
-    )
-    path_name_four = os.path.join(
-        path, "metabolite_names_compartments-false_hubs-false.png"
-    )
-    # Measurement.
-    path_measurement_one = os.path.join(path, "measurements_one.svg")
-    path_measurement_two = os.path.join(path, "measurements_two.svg")
-    path_measurement_three = os.path.join(path, "measurements_three.svg")
-    path_measurement_four = os.path.join(path, "measurements_four.svg")
-    path_measurement_five = os.path.join(path, "measurements_five.svg")
-    # Write information to file.
-    information["charts_degrees"]["one_two"].savefig(
-        path_degree_one_two,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_degrees"]["three_four"].savefig(
-        path_degree_three_four,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_ranks"]["one"].savefig(
-        path_rank_one,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_ranks"]["two"].savefig(
-        path_rank_two,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_ranks"]["three"].savefig(
-        path_rank_three,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_ranks"]["four"].savefig(
-        path_rank_four,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_names"]["one"].to_file(path_name_one)
-    information["charts_names"]["two"].to_file(path_name_two)
-    information["charts_names"]["three"].to_file(path_name_three)
-    information["charts_names"]["four"].to_file(path_name_four)
-    information["charts_measurements"]["one"].savefig(
-        path_measurement_one,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_measurements"]["two"].savefig(
-        path_measurement_two,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_measurements"]["three"].savefig(
-        path_measurement_three,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_measurements"]["four"].savefig(
-        path_measurement_four,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
-    information["charts_measurements"]["five"].savefig(
-        path_measurement_five,
-        format="svg",
-        #dpi=600,
-        facecolor="w",
-        edgecolor="w",
-        transparent=False
-    )
 
+    # Degree.
+    path_degree_one_two = os.path.join(path, "metabolite_degrees_compartments-true.svg")
+    path_degree_three_four = os.path.join(path, "metabolite_degrees_compartments-false.svg")
+
+    # Rank.
+    path_rank_one = os.path.join(path, "metabolite_ranks_compartments-true_hubs-true.svg")
+    path_rank_two = os.path.join(path, "metabolite_ranks_compartments-true_hubs-false.svg")
+    path_rank_three = os.path.join(path, "metabolite_ranks_compartments-false_hubs-true.svg")
+    path_rank_four = os.path.join(path, "metabolite_ranks_compartments-false_hubs-false.svg")
+
+    # Name.
+    path_name_one = os.path.join(path, "metabolite_names_compartments-true_hubs-true.png")
+    path_name_two = os.path.join(path, "metabolite_names_compartments-true_hubs-false.png")
+    path_name_three = os.path.join(path, "metabolite_names_compartments-false_hubs-true.png")
+    path_name_four = os.path.join(path, "metabolite_names_compartments-false_hubs-false.png")
+
+    # Write information to file.
+    if information["charts_degrees"]["one_two"] != None:
+        information["charts_degrees"]["one_two"].savefig(
+            path_degree_one_two,
+            format="svg",
+            #dpi=600,
+            facecolor="w",
+            edgecolor="w",
+            transparent=False
+        )
+    if information["charts_degrees"]["three_four"] != None:
+        information["charts_degrees"]["three_four"].savefig(
+            path_degree_three_four,
+            format="svg",
+            #dpi=600,
+            facecolor="w",
+            edgecolor="w",
+            transparent=False
+        )
+
+    if information["charts_ranks"]["one"] != None:
+        information["charts_ranks"]["one"].savefig(
+            path_rank_one,
+            format="svg",
+            #dpi=600,
+            facecolor="w",
+            edgecolor="w",
+            transparent=False
+        )
+    if information["charts_ranks"]["two"] != None:
+        information["charts_ranks"]["two"].savefig(
+            path_rank_two,
+            format="svg",
+            #dpi=600,
+            facecolor="w",
+            edgecolor="w",
+            transparent=False
+        )
+    if information["charts_ranks"]["three"] != None:
+        information["charts_ranks"]["three"].savefig(
+            path_rank_three,
+            format="svg",
+            #dpi=600,
+            facecolor="w",
+            edgecolor="w",
+            transparent=False
+        )
+    if information["charts_ranks"]["four"] != None:
+        information["charts_ranks"]["four"].savefig(
+            path_rank_four,
+            format="svg",
+            #dpi=600,
+            facecolor="w",
+            edgecolor="w",
+            transparent=False
+        )
+
+    if information["charts_names"]["one"] != None:
+        information["charts_names"]["one"].to_file(path_name_one)
+
+    if information["charts_names"]["two"] != None:
+        information["charts_names"]["two"].to_file(path_name_two)
+
+    if information["charts_names"]["three"] != None:
+        information["charts_names"]["three"].to_file(path_name_three)
+
+    if information["charts_names"]["four"] != None:
+        information["charts_names"]["four"].to_file(path_name_four)
+
+    if len(information["charts_measurements"]) > 0:
+
+        figure_number = 0
+        figure_total = len(information["charts_measurements"])
+        counter = 1
+
+        for x in range(figure_total):
+            if information["charts_measurements"][x] != None:
+                path_measurement_x = os.path.join(path, "measurements_" + str(counter) + ".svg")
+                information["charts_measurements"][x].savefig(
+                    path_measurement_x,
+                    format="svg",
+                    #dpi=600,
+                    facecolor="w",
+                    edgecolor="w",
+                    transparent=False
+                )
+
+            figure_number += 1
+            counter += 1
 
 ###############################################################################
 # Procedure
@@ -1280,39 +1247,39 @@ def execute_procedure(directory=None):
     # Define colors.
     colors = define_color_properties()
     # Distributions of nodes' degrees.
+    print('Plotting node degree plot(s)...')
     charts_degrees = plot_degrees(
-        nodes_one=source["nodes_one"],
-        nodes_two=source["nodes_two"],
-        nodes_three=source["nodes_three"],
-        nodes_four=source["nodes_four"],
+        nodes_one=source["compartmentsTrue_hubsTrue"],
+        nodes_two=source["compartmentsTrue_hubsFalse"],
+        nodes_three=source["compartmentsFalse_hubsTrue"],
+        nodes_four=source["compartmentsFalse_hubsFalse"],
         fonts=fonts,
         colors=colors
     )
     # Ranks of nodes.
+    print('Plotting rank degree plot(s)...')
     charts_ranks = plot_ranks(
         count=10,
-        nodes_one=source["nodes_one"],
-        nodes_two=source["nodes_two"],
-        nodes_three=source["nodes_three"],
-        nodes_four=source["nodes_four"],
+        nodes_one=source["compartmentsTrue_hubsTrue"],
+        nodes_two=source["compartmentsTrue_hubsFalse"],
+        nodes_three=source["compartmentsFalse_hubsTrue"],
+        nodes_four=source["compartmentsFalse_hubsFalse"],
         fonts=fonts,
         colors=colors
     )
     # Names of nodes.
+    print('Plotting node names plot(s)...')
     charts_names = plot_names(
         count=5000,
-        nodes_one=source["nodes_one"],
-        nodes_two=source["nodes_two"],
-        nodes_three=source["nodes_three"],
-        nodes_four=source["nodes_four"],
+        nodes_one=source["compartmentsTrue_hubsTrue"],
+        nodes_two=source["compartmentsTrue_hubsFalse"],
+        nodes_three=source["compartmentsFalse_hubsTrue"],
+        nodes_four=source["compartmentsFalse_hubsFalse"],
     )
     # Metabolomic measurements.
+    print('Plotting metabolic measurement plot(s)...')
     charts_measurements = plot_measurements(
-        records_one=source["measurements_one"],
-        records_two=source["measurements_two"],
-        records_three=source["measurements_three"],
-        records_four=source["measurements_four"],
-        records_five=source["measurements_five"],
+        records=source["measurements"],
         threshold_p=0.01, # 0.05, 0.01
         threshold_fold=1.414, # 1.2, 2.0
         label=True,
@@ -1322,10 +1289,11 @@ def execute_procedure(directory=None):
     )
     # Compile information.
     information = {
-        "charts_degrees": charts_degrees,
-        "charts_ranks": charts_ranks,
-        "charts_names": charts_names,
-        "charts_measurements": charts_measurements
+        "charts_degrees": charts_degrees, #Dict of network reps with plot or None
+        "charts_ranks": charts_ranks, #Dict of network reps with plot or None
+        "charts_names": charts_names, #Dict of network reps with plot or None
+        "charts_measurements": charts_measurements #List or None
     }
     #Write product information to file.
+    print('Writing plots...')
     write_product(directory=directory, information=information)
