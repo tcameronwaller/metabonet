@@ -223,55 +223,24 @@ ls $DOCK/source/customization/
 echo "+-------------------------------------------------------------------------------" 2>/dev/null
 echo "| Step 5: Build Metabolic Model "
 echo "| We will now build the metabolic model."
-echo "| Default is yes (Y) for both options, but please refer to the MetaboNet manuscript "
-echo "| for further information. "
-read -p "| Do you want to build the model with compartments? (Y/n)" -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  COMPARTMENTS='yes'
-else
-  COMPARTMENTS='no'
-fi
-read -p "| Do you want to build the model with hubs? (Y/n)" -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  HUBS='yes'
-else
-  HUBS='no'
-fi
-
 echo "| "
 echo "| Building model..."
 
-#compartments true, hubs true
-if [ $COMPARTMENTS == 'yes' ] && [ $HUBS == 'yes' ]
-then
-  metabonet network -d $DOCK -yc -np -v
-  path_network=$DOCK/compartments-true_hubs-true
+echo "| compartments true, hubs true "
+metabonet network -d $DOCK -yc -np -v
+echo "| "
 
-#compartments true, hubs false
-elif [ $COMPARTMENTS == 'yes' ] && [ $HUBS == 'no' ]
-then
-  metabonet network -d $DOCK -ycs -np -v
-  path_network=$DOCK/compartments-true_hubs-false
+echo "| Compartments true, Hubs false "
+metabonet network -d $DOCK -ycs -np -v
+echo "| "
 
-#compartments false, hubs true
-elif [ $COMPARTMENTS == 'no' ] && [ $HUBS == 'yes' ]
-then
-  metabonet network -d $DOCK -y -np -v
-  path_network=$DOCK/compartments-false_hubs-true
+echo "| Compartments false, Hubs true "
+metabonet network -d $DOCK -y -np -v
+echo "| "
 
-#compartments false, hubs false
-elif [ $COMPARTMENTS == 'no' ] && [ $HUBS == 'no' ]
-then
-  metabonet network -d $DOCK -ys -np -v
-  path_network=$DOCK/compartments-false_hubs-false
-else
-  echo "| Something went wrong with the input"
-  exit 1
-fi
+echo "| Compartments false, Hubs false "
+metabonet network -d $DOCK -ys -np -v
+echo "| "
 echo "+-------------------------------------------------------------------------------" 2>/dev/null
 echo "| Step 6: Integrate measurements into model"
 echo "| Integrating measurements to network's metabolites..."
