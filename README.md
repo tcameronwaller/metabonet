@@ -29,8 +29,8 @@ with MetaboNet. If not, see <http://www.gnu.org/licenses/>.
 If you use [MetaboNet][1], please cite its publication.
 
 > T. Cameron Waller, Jordan A. Berg, Brian E. Chapman, Jared P. Rutter.
-> "Compartments and Hubs Differentiate the Relevance of Metabolic Networks to
-Metabolomic Experiments".
+> "Compartment and Hub Definitions Tune Metabolic Networks for Metabolomic
+Interpretations".
 > Journal. Year. Issue.
 > link
 
