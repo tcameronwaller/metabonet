@@ -194,13 +194,22 @@ $ ls ~/dock/source/
 
 ### Metabolomic Measurements
 
-[MetaboNet][1] integrates metabolomic measurements with metabolic networks. The
-authors curated metabolomic measurements from five specific studies and used
-these as examples. The original data sets for these metabolomic measurements
-came from [Metabolomics Workbench][8], a [repository][9] for data from
-metabolomic studies. These instructions explain the collection and curation of
-these data sets for use in [MetaboNet][1], and they also explain how to
-access ready archives.
+[MetaboNet][1] integrates metabolomic measurements with metabolic networks. In
+its current state, [MetaboNet][1] is specific to metabolomic measurements from
+five previously-published studies that the authors chose as examples. The
+original data sets for these metabolomic measurements came from the
+[Metabolomics Workbench][8] [repository][9]. These instructions explain how to
+collect and curate these five data sets for use in [MetaboNet][1].
+
+Some users might want to integrate their own metabolomic measurements for
+analysis in metabolic networks. In its current state, [MetaboNet][1] requires
+specific data file formats and expects to curate and integrate five studies at
+a time. Moreover, [MetaboNet][1] makes some assumptions about experimental
+groups and samples pairs that are specific to the five demonstration studies.
+It would be possible to adapt [MetaboNet][1] to integrate new metabolomic
+measurements with metabolic networks; however, this adaptation would require
+changes to the Python code. A future version might make this functionality more
+versatile from [MetaboNet][1]'s terminal interface.
 
 #### Option 1: Access previous measurement files in _"dock"_ directory
 
