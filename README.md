@@ -205,7 +205,7 @@ Some users might want to integrate their own metabolomic measurements for
 analysis in metabolic networks. In its current state, [MetaboNet][1] requires
 specific data file formats and expects to curate and integrate five studies at
 a time. Moreover, [MetaboNet][1] makes some assumptions about experimental
-groups and samples pairs that are specific to the five demonstration studies.
+groups and sample pairs that are specific to the five demonstration studies.
 It would be possible to adapt [MetaboNet][1] to integrate new metabolomic
 measurements with metabolic networks; however, this adaptation would require
 changes to the Python code. A future version might make this functionality more
