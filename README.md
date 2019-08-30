@@ -40,7 +40,7 @@ Interpretations".
 Many users might find it more convenient to access archival versions of major
 exports from [MetaboNet][1].
 
-Access these files from record [3382296][4] on [Zenodo][5].
+Access these files from record [3382296][21] on [Zenodo][5].
 
 
 ## Quick Start
