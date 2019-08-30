@@ -34,7 +34,18 @@ Interpretations".
 > Journal. Year. Issue.
 > link
 
-
+## Quick Start
+1. Open Terminal window
+2. Retrieve MetaboNet
+```
+$ curl -LO https://github.com/tcameronwaller/metabonet/archive/master.zip
+$ unzip master.zip
+$ cd metabonet-master
+```
+3. Run the interactive MetaboNet player
+```
+$ bash interactive_metabonet.sh
+```
 
 ## Archives
 
